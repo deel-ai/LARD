@@ -1,0 +1,12 @@
+output_directory: data
+dataset_name: test_dataset
+included_datasets:
+  VBL_Real:
+    type: real
+    path: scenarios/test/VBL_Test_Real
+  VBL_Synth:
+    type: earth_studio
+    path: scenarios/test/VBL_Test_Synth
+  VBL_Full_approach:
+    type: earth_studio
+    path: scenarios/test/VBL_Test_Synth_Full_Approach

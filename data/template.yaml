@@ -1,0 +1,46 @@
+airports:
+- code: TARB
+  runways:
+  - '20'
+camera:
+  fov: 33.50717983885091
+image:
+  height: 2048
+  width: 2448
+time:
+  day:
+    max: 1
+    min: 1
+  hour:
+    max: 11
+    min: 11
+  minute:
+    max: 0
+    min: 0
+  month:
+    max: 1
+    min: 1
+  second:
+    max: 0
+    min: 0
+  year:
+    max: 2020
+    min: 2020
+trajectory:
+  alpha_h_deg: 0.0
+  alpha_v_deg: -3
+  distrib_param: 1.41
+  distribution: exp
+  max_distance_m: 8000.0
+  min_distance_m: 150.0
+  param_distrib: 1.2
+  pitch_deg: -4.0
+  roll_deg: 0.0
+  sample_number: 10
+  std_alpha_h_deg: 2.0
+  std_alpha_v_deg: 0.2
+  std_pitch_deg: 2.0
+  std_roll_deg: 5.0
+  std_yaw_deg: 5.0
+watermark:
+  height: 300
