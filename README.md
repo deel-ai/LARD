@@ -1,5 +1,7 @@
-
-![alt-text-1](docs/assets/Lard_grey.png "LARD") 
+<div align="center">
+    <img src="docs/assets/Lard_grey_transp.png" width="50%" alt="LARD dataset" align="center" />
+</div>
+<br>
 
 Landing Approach Runway Detection (**LARD**) is a [dataset](#lard-dataset) of aerial front view images of runways designed for aircraft landing phase. It contains around 15K synthetic images of various runways, enriched with annotated pictures from real landing footages for comparison.
 
