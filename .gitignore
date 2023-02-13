@@ -68,6 +68,6 @@ target/
 *.ipynb_checkpoints
 
 #data
-*.jpg
-*.jpeg
-*.png
+# *.jpg
+# *.jpeg
+# *.png
