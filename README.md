@@ -15,8 +15,18 @@ We also provide a [synthetic image generator](#synthetic-generator) based on Goo
 - Renvoi vers le papier
 Accentuer sur lacces aux notebooks/quickstart et le DL du dataset
 
-## LARD Dataset
-The 
+## 📚 Table of contents
+
+- [✈️ LARD dataset](#-lard-dataset)
+- [⚙️ Synthetic generator](#-synthetic-generator)
+- [🛠️ Dataset exploitation](#-dataset-exploitation)
+- [🙏 Acknowledgment](#-acknowledgment)
+- [🗞️ Citation](#-citation)
+- [📝 License](#-license)
+
+## ✈️ LARD Dataset
+
+- 🔽 [LARD - **Download**](https://share.deel.ai/s/H4iLKRmLkdBWqSt?path=%2Flard%2F1.0.0)
 - Approche (d'avion) generique pour la selection des images
 - Renvoi vers le Dataset
 - Structure des dossiers (ascii) + description du contenu (split)
@@ -33,45 +43,47 @@ The
   
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/17MUtbOfdNQ/0.jpg)](http://www.youtube.com/watch?v=17MUtbOfdNQ?t=500s "Landing at PALERMO, by GreatFlyer")
 
-## Synthetic Generator
-- Quickstart
+## ⚙️ Synthetic Generator
 - Démarche generique du générateur 
 - Image allégée du pipeline
-  - Python prerequisites :
-    - You can install the specific version of the packages needed for this project through conda:
+### Setup
+- You can install python dependancies through `Conda`: 
 
-  
-            conda env create -f env.yml -p ./env
-If the versions are not available for your system, you can find the list of simplified dependencies in env_simplified.yml.
-Then activate your newly created environment :
+        conda env create -f env.yml -p ./env
+- Alternately, you can use the `requirements.txt` to install packages through `pip`
+- If neither of these intallation are available for your system, you can find the list of simplified dependencies in `env_simplified.yml`
 
-            conda activate ./env
-  - Managing the runway database (notebook/script) 
-    - The databases used for LARD are provided in data/runways_database_train.json and data/runways_database_test.json
-    - An example of how to manage a runway database, add or update runways can be found in db_generation.ipynb
-    - Databases are simple json files with the following structure (field in upper case are to be replace with their value. 
-    We used A,B,C and D as corners names):
+### Enrich the runway database
+- 🔥 [Notebook - **Database generation**](00_database_generation.ipynb)
+
+
+- The database used for LARD is provided in `data/runways_database.json`
+- An example of how to manage the runway database, add or update runways can be found in the notebook [00_database_generation.ipynb](00_database_generation.ipynb)
+- Databases are simple json files which contain the position of each corner in both `lat/lon/alt` coordinates and the corresponding ___ coordinates (A,B,C and D are corners names):
   
-``` "AIRPORT": {
-        "RUNWAY": {
-            "CORNER": {
-                "position": {
-                    "x": -2183272.4689240726,
-                    "y": 4357496.814901311,
-                    "z": 4103132.159236785
-                },
-                "coordinate": {
-                    "latitude": 40.09288445386455,
-                    "longitude": 116.61262013286958,
-                    "altitude": 30.0
-                }
-            ...
+``` 
+    "AIRPORT": {
+      "RUNWAY": {
+        "A": {
+            "position": {
+                "x": -2183272.4689240726,
+                "y": 4357496.814901311,
+                "z": 4103132.159236785
+            },
+            "coordinate": {
+                "latitude": 40.09288445386455,
+                "longitude": 116.61262013286958,
+                "altitude": 30.0
+            }
+        ...
 ```
-  - Generating scenarii for new approaches :
-    - A comprehensive example is available in scenario_gen.ipynb
-    - Alternatively, you can generate news scenarii in command line :
-      - Configure your scenario as a yml file. An example is provided here : _params/example_generation.yml_
-      - Run the script with your yml as an input :
+
+### Generate a scenario
+- 🔥 [Notebook - **Scenario generation**](01_scenario_generation.ipynb)
+- A comprehensive example is available in scenario_gen.ipynb
+- Alternatively, you can generate news scenarios in command line :
+  - Configure your scenario as a yml file. An example is provided here : _params/example_generation.yml_
+  - Run the script with your yml as an input :
 
 
         python src\scenario\write_scenario.py params/example_generation.yml
@@ -79,7 +91,7 @@ Then activate your newly created environment :
   - (GES) infos succintes sur les parametres de generation.
   - Export the output of one or multiple Earth studio generation as a single dataset :
     - As with the previous steps, you can find a comprehensive example in the dedicated notebook : labeling.ipynb
-    - Alternatively, you can generate news scenarii in command line :
+    - Alternatively, you can generate news scenarios in command line :
       - Configure your scenario as a yml file. An example is provided here : _params/export_train_dataset.yml_
       - Run the script with your yml as an input :  
       
@@ -87,7 +99,9 @@ Then activate your newly created environment :
     python src\labeling\generate_dataset.py params/export_train_dataset.yml        
 
 
-## Dataset Exploitation
+## 🛠️ Dataset Exploitation
+- 🔥 [Notebook - **Export tool**](01_scenario_generation.ipynb)
+
 Each part of the Lard dataset is structured as followed :
 
     -->train_dataset/
@@ -167,3 +181,11 @@ A more comprehensive description of the available parameters and exports options
     - If True, crop during export all images with watermarks and updates bboxes position to the cropped image. 
     - If False, the image will be copied without modifications.
 - '-e', '--ext' : Extension format for labels files (without the "."). Default is "txt".
+
+
+## 🙏 Acknowledgment
+
+## 🗞️ Citation
+
+## 📝 License
+The package is released under [MIT license](https://choosealicense.com/licenses/mit).
