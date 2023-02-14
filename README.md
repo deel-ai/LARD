@@ -17,12 +17,12 @@ Accentuer sur lacces aux notebooks/quickstart et le DL du dataset
 
 ## 📚 Table of contents
 
-- [✈️ LARD dataset](#-lard-dataset)
-- [⚙️ Synthetic generator](#-synthetic-generator)
-- [🛠️ Dataset exploitation](#-dataset-exploitation)
-- [🙏 Acknowledgment](#-acknowledgment)
-- [🗞️ Citation](#-citation)
-- [📝 License](#-license)
+- [✈️ LARD dataset](#%EF%B8%8F-lard-dataset)
+- [⚙️ Synthetic generator](#%EF%B8%8F-synthetic-generator)
+- [🛠️ Dataset exploitation](#%EF%B8%8F-dataset-exploitation)
+- [🙏 Acknowledgment](#%EF%B8%8F-acknowledgment)
+- [🗞️ Citation](#%EF%B8%8F-citation)
+- [📝 License](#%EF%B8%8F-license)
 
 ## ✈️ LARD Dataset
 
