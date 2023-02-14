@@ -12,21 +12,27 @@ We also provide a [synthetic image generator](#synthetic-generator) based on Goo
 | ![dataset-mosaic](docs/assets/mosaic_smallest.png "Dataset Mosaic") | ![synthetic-generator](docs/assets/landing_sequence.gif "Synthetic Generator") |
 *Synthetic and real runways* | *Synthetic landing sequence*
 
-- Renvoi vers le papier
-Accentuer sur lacces aux notebooks/quickstart et le DL du dataset
 
-## 📚 Table of contents
+## 🚀 Quickstart
+- 💾 [Download LARD dataset](https://share.deel.ai/s/H4iLKRmLkdBWqSt?path=%2Flard%2F1.0.0)
+- 🔥 [Generate scenarios (notebook)](01_scenario_generation.ipynb)
+- 📜 Read paper (to be published)
+
+# 📚 Table of contents
 
 - [✈️ LARD dataset](#%EF%B8%8F-lard-dataset)
 - [⚙️ Synthetic generator](#%EF%B8%8F-synthetic-generator)
+  1. [Enrich the runway database](#1-enrich-the-runway-database)
+  2. [Generate scenarios](#2-generate-a-scenario)
+  3. [Label automatically](#3-automatic-labeling)
 - [🛠️ Dataset exploitation](#%EF%B8%8F-dataset-exploitation)
 - [🙏 Acknowledgment](#%EF%B8%8F-acknowledgment)
 - [🗞️ Citation](#%EF%B8%8F-citation)
 - [📝 License](#%EF%B8%8F-license)
 
-## ✈️ LARD Dataset
+# ✈️ LARD Dataset
 
-- 🔽 [LARD - **Download**](https://share.deel.ai/s/H4iLKRmLkdBWqSt?path=%2Flard%2F1.0.0)
+- 💾 [LARD - **Download**](https://share.deel.ai/s/H4iLKRmLkdBWqSt?path=%2Flard%2F1.0.0)
 - Approche (d'avion) generique pour la selection des images
 - Renvoi vers le Dataset
 - Structure des dossiers (ascii) + description du contenu (split)
@@ -43,23 +49,28 @@ Accentuer sur lacces aux notebooks/quickstart et le DL du dataset
   
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/17MUtbOfdNQ/0.jpg)](http://www.youtube.com/watch?v=17MUtbOfdNQ?t=500s "Landing at PALERMO, by GreatFlyer")
 
-## ⚙️ Synthetic Generator
+# ⚙️ Synthetic Generator
 - Démarche generique du générateur 
 - Image allégée du pipeline
-### Setup
+### *TL; DR*
+- 🔥 [Update runways database (notebook)](00_database_generation.ipynb)
+- 🔥 [Generate scenarios (notebook)](01_scenario_generation.ipynb)
+- 🔥 [Label automatically (notebook)](02_labeling.ipynb)
+
+## Setup
 - You can install python dependancies through `Conda`: 
 
         conda env create -f env.yml -p ./env
 - Alternately, you can use the `requirements.txt` to install packages through `pip`
 - If neither of these intallation are available for your system, you can find the list of simplified dependencies in `env_simplified.yml`
 
-### Enrich the runway database
+## 1. Enrich the runway database
 - 🔥 [Notebook - **Database generation**](00_database_generation.ipynb)
 
 
 - The database used for LARD is provided in `data/runways_database.json`
 - An example of how to manage the runway database, add or update runways can be found in the notebook [00_database_generation.ipynb](00_database_generation.ipynb)
-- Databases are simple json files which contain the position of each corner in both `lat/lon/alt` coordinates and the corresponding ___ coordinates (A,B,C and D are corners names):
+- Databases are simple json files which contain the position of each corner in both `lat/lon/alt` coordinates and the corresponding ___ coordinates (A,B,C and D the are corners names):
   
 ``` 
     "AIRPORT": {
@@ -78,40 +89,41 @@ Accentuer sur lacces aux notebooks/quickstart et le DL du dataset
         ...
 ```
 
-### Generate a scenario
+## 2. Generate a scenario
 - 🔥 [Notebook - **Scenario generation**](01_scenario_generation.ipynb)
-- A comprehensive example is available in scenario_gen.ipynb
-- Alternatively, you can generate news scenarios in command line :
-  - Configure your scenario as a yml file. An example is provided here : _params/example_generation.yml_
-  - Run the script with your yml as an input :
+  - This notebook provides a comprehensive example for generating a scenario for a specific runway.
+- 🖳 **CLI** - Alternately, you can generate news scenarios in command line :
+  1. Configure your scenario as a `.yml` file. An example is provided in `params/example_generation.yml`
+  2. Run the script with the `.yml` as an input :
+```
+python src\scenario\write_scenario.py params/example_generation.yml
+```
+- TODO: (GES) infos succintes sur les parametres de generation.
 
+## 3. Automatic labeling
+- 🔥 [Notebook - **Labeling**](02_labeling.ipynb)
+  - This notebook provides a comprehensive example to automatically label one or multiple Earth Studio generation results and export the corresponding dataset.
+- 🖳 **CLI** - Alternately, you can generate news scenarios in command line :
+  1. Configure your scenario as a `.yml` file. An example is provided in `params/export_train_dataset.yml`
+  2. Run the script with the `.yml` as an input :
+```
+python src\labeling\generate_dataset.py params/export_train_dataset.yml
+```
 
-        python src\scenario\write_scenario.py params/example_generation.yml
-  
-  - (GES) infos succintes sur les parametres de generation.
-  - Export the output of one or multiple Earth studio generation as a single dataset :
-    - As with the previous steps, you can find a comprehensive example in the dedicated notebook : labeling.ipynb
-    - Alternatively, you can generate news scenarios in command line :
-      - Configure your scenario as a yml file. An example is provided here : _params/export_train_dataset.yml_
-      - Run the script with your yml as an input :  
-      
-      
-    python src\labeling\generate_dataset.py params/export_train_dataset.yml        
-
-
-## 🛠️ Dataset Exploitation
+# 🛠️ Dataset Exploitation
 - 🔥 [Notebook - **Export tool**](01_scenario_generation.ipynb)
 
-Each part of the Lard dataset is structured as followed :
+Each part of the LARD dataset is structured as followed :
+```
+train_dataset/
+| metadata.csv: file with image path, labels (corners positions) and all the metadata of each image in images/
+| infos.md: description of the dataset and the content of each column of metadata.csv
+| images/: image directory
+| | name_of_image_1.png  # each uncropped image of the dataset
+| | ....
+```
 
-    -->train_dataset/
-    ----->train_dataset/metadata.csv  : file with image path, labels (corners positions) and all the metadata of each image in images/
-    ----->train_dataset/infos.md  : description of the dataset and the content of each column of metadata.csv
-    ----->train_dataset/images/ : image directory
-    ----->train_dataset/images/name_of_image_1....png  # each uncropped image of the dataset
-    ....
-
-An identical structure can be found for the test set.
+The structure is identic for the test set.
 
 To facilitate its export and usage for detection tasks, we provide an export python script (also available in notebook), 
 able to convert LARD to most of the commons format for detection format.
