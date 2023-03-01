@@ -16,6 +16,7 @@ We also provide a [synthetic image generator](#synthetic-generator) based on Goo
 ## 🚀 Quickstart
 - 💾 [Download LARD dataset](https://share.deel.ai/s/H4iLKRmLkdBWqSt?path=%2Flard%2F1.0.0)
 - 🔥 [Generate scenarios (notebook)](01_scenario_generation.ipynb)
+- 🛠️ [Export tool (notebook)](export_tool.ipynb)
 - 📜 Read paper (to be published)
 
 # 📚 Table of contents
@@ -50,27 +51,31 @@ We also provide a [synthetic image generator](#synthetic-generator) based on Goo
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/17MUtbOfdNQ/0.jpg)](http://www.youtube.com/watch?v=17MUtbOfdNQ?t=500s "Landing at PALERMO, by GreatFlyer")
 
 # ⚙️ Synthetic Generator
-- Démarche generique du générateur 
-- Image allégée du pipeline
-### *TL; DR*
-- 🔥 [Update runways database (notebook)](00_database_generation.ipynb)
-- 🔥 [Generate scenarios (notebook)](01_scenario_generation.ipynb)
-- 🔥 [Label automatically (notebook)](02_labeling.ipynb)
+The simplified internal working of the generator is as follows:
+<div align="center">
+    <img src="docs/assets/generator_pipeline.png" width="70%" alt="Generator Pipeline" align="center" />
+</div>
+<br>
+
+### *In short:*
+- 🔥 [Update runways database (notebook)](00_database_generation.ipynb): We use a runway database as input, which you can enrich with new airports and runways.
+- 🔥 [Generate scenarios (notebook)](01_scenario_generation.ipynb): We offer the capability to generate highly configurable landing scenarios
+- 🔥 [Label automatically (notebook)](02_labeling.ipynb): We provide the tool to automatically annotate the resulting images
 
 ## Setup
 - You can install python dependancies through `Conda`: 
-
-        conda env create -f env.yml -p ./env
+```
+conda env create -f env.yml -p ./env
+conda activate ./env
+```
 - Alternately, you can use the `requirements.txt` to install packages through `pip`
 - If neither of these intallation are available for your system, you can find the list of simplified dependencies in `env_simplified.yml`
 
 ## 1. Enrich the runway database
 - 🔥 [Notebook - **Database generation**](00_database_generation.ipynb)
-
-
+  - This notebook provides a comprehensive example for adding or update runways and airports in the database.
 - The database used for LARD is provided in `data/runways_database.json`
-- An example of how to manage the runway database, add or update runways can be found in the notebook [00_database_generation.ipynb](00_database_generation.ipynb)
-- Databases are simple json files which contain the position of each corner in both `lat/lon/alt` coordinates and the corresponding ___ coordinates (A,B,C and D the are corners names):
+- The database is a simple json file which contains the position of each corner in both `lat/lon/alt` coordinates and the corresponding ECEF (Earth-centered Earth-fixed) coordinates (A,B,C and D are the corners names):
   
 ``` 
     "AIRPORT": {
@@ -89,6 +94,8 @@ We also provide a [synthetic image generator](#synthetic-generator) based on Goo
         ...
 ```
 
+_Note that only the WGS84 coordinates (`lat/lon/alt`) are needed, as the ECEF coordinates are automatically computed by the script._
+
 ## 2. Generate a scenario
 - 🔥 [Notebook - **Scenario generation**](01_scenario_generation.ipynb)
   - This notebook provides a comprehensive example for generating a scenario for a specific runway.
@@ -96,10 +103,19 @@ We also provide a [synthetic image generator](#synthetic-generator) based on Goo
   1. Configure your scenario as a `.yml` file. An example is provided in `params/example_generation.yml`
   2. Run the script with the `.yml` as an input :
 ```
-python src\scenario\write_scenario.py params/example_generation.yml
+python src/scenario/write_scenario.py params/example_generation.yml
 ```
-- TODO: (GES) infos succintes sur les parametres de generation.
+We used as a reference the following parameters that describe a generic landing trajectory:
+|Usual name|parameter name|value ranges|
+|-|-|-|
+| Distance           | `min_distance_m`, `max_distance_m` (in meters) | [0.08, 3] NM  |
+| Vertical deviation / Glide slope angle | `alpha_v_deg`| [2.2°, 3.8]°  | 
+| Lateral deviation  | `alpha_h_deg`| [- 4, 4] °    |
+| Yaw                | `yaw_deg` | [-10,10] °    |
+| Pitch              | `pitch_deg` | [-8,0] °      |
+| Roll               | `roll_deg` | [-10,10] °    |
 
+However all these parameters except the distance are not defined as ranges, but rather with gaussian noise around a fixed center and a standard deviation (`std_alpha_v_deg`, `std_alpha_h_deg`, `std_yaw_deg`, `std_pitch_deg`, `std_roll_deg`).
 ## 3. Automatic labeling
 - 🔥 [Notebook - **Labeling**](02_labeling.ipynb)
   - This notebook provides a comprehensive example to automatically label one or multiple Earth Studio generation results and export the corresponding dataset.
@@ -107,96 +123,43 @@ python src\scenario\write_scenario.py params/example_generation.yml
   1. Configure your scenario as a `.yml` file. An example is provided in `params/export_train_dataset.yml`
   2. Run the script with the `.yml` as an input :
 ```
-python src\labeling\generate_dataset.py params/export_train_dataset.yml
+python src/labeling/generate_dataset.py params/export_train_dataset.yml
 ```
 
 
 # 🛠️ Dataset Exploitation
-- 🔥 [Notebook - **Export tool**](01_scenario_generation.ipynb)
-
-Each part of the LARD dataset is structured as followed :
+- 🔥 [Notebook - **Export tool**](export_tool.ipynb)
+  - This provides a comprehensive example to export the dataset in a specific format such as COCO.
+- This tool allows to generate `bounding boxes` around the corners of the runway, in several possible format, to choose between `multiple` label files or a `single` label file, and to `crop` the watermark.
+- The dataset before export should respect a specific structure which is detailed in the notebook, and looks like this:
 ```
-train_dataset/
-| metadata.csv: file with image path, labels (corners positions) and all the metadata of each image in images/
-| infos.md: description of the dataset and the content of each column of metadata.csv
-| images/: image directory
-| | name_of_image_1.png  # each uncropped image of the dataset
-| | ....
+    DATASET_PATH/
+    | metadata.csv
+    | images/
+    | | nameimage1.jpeg
+    | | nameimage2.jpeg
+    | | ...
 ```
 
-The structure is identic for the test set.
+- 🖳 **CLI** - Alternately, you can generate news scenarios in command line :
+```
+python src/dataset/lard_export.py --train data/multiple_train --test data/test_dataset -o data/converted_coco -b "xywh" -n -lf "multiple" -c -s " "
+```
+/!\ Not tested yet
+## 👀 See Also
 
-To facilitate its export and usage for detection tasks, we provide an export python script (also available in notebook), 
-able to convert LARD to most of the commons format for detection format.
-- Please refer to ./notebooks/lard_export.ipynb  for the notebook version and associated documentation.
-
-### How to export LARD to Coco format :
-
-MAXIME : PAS ENCORE TESTE SUR LA V1.3, EN COURS
-
-    python src/dataset/lard_export.py --train data/multiple_train --test data/test_dataset -o data/converted_coco -b "xywh" -n -lf "multiple" -c -s " "
-
-#### How should your dataset be structured for it to work ?
-
-The expected format is one created with the Lard labeling script or notebook :
-
-- Case 1 : single dataset :  with DATASET_PATH either of the path provided to LardDataset(train_path=, test_path=)
-
-    DATASET_PATH :
-        ---> DATASET_PATH/metadata.csv
-        ---> DATASET_PATH/images/
-        ---> DATASET_PATH/images/nameimage1.jpeg
-        ---> DATASET_PATH/images/nameimage2.jpeg
-    ...
-
-And same structure for TEST_PATH. Please note it is the default structure the labelling script exports the labels.
-
-- Case 2 : multiple datasets :  DATASET_PATH can be either of the path provided to LardDataset(train_path=, test_path=)
-
-    DATASET_PATH :
-        ---> DATASET_PATH/dataset_1/metadata.csv
-        ---> DATASET_PATH/dataset_1/images/
-        ---> DATASET_PATH/dataset_1/images/name_dataset1image1.jpeg
-        ---> DATASET_PATH/dataset_1/images/name_dataset1image2.jpeg
-        
-        ---> DATASET_PATH/dataset_2/others_metadata.csv
-        ---> DATASET_PATH/dataset_2/images/
-        ---> DATASET_PATH/dataset_2/images/name_dataset2_image1.jpeg
-        ---> DATASET_PATH/dataset_2/images/name_dataset2_image2.jpeg
-        ...
-
-- Other informations : 
-    - train_path and test_path can of the same type, or mixted : train_path can be of type 1 and test_path of type 2, or the opposite. 
-    - There can be more than two dataset in DATASET_PATH in case 2. 
-    - CSV and images names do not matter, only the architecture : that there is a single csv file in each directory specified above. Each csv is expected to be generated with the LARD labeling script or notebook.
-
-#### What are the supported options for export ?
-
-A more comprehensive description of the available parameters and exports options :
-
-- '--train' : optional, train directory. At least one of train or test should be provided.
-- '--test' : optional, test directory
-- '-o', '--output_dir' : directory where the converted dataset will be saved. Expects a pathlib Path or a string.
--   '-b', '--bbox' : string format for label bbox. Options are :
-    - "tlbr" (x,y of top left then x,y of bottom rights corners of the bbox)
-    - "tlwh" (x, y of top left, bbox width and height)
-    - "xywh" (x, y of the center of the bbox, bbox width and height)
-    - "corners" (x,y of each corner)
-- '-n', '--normalize': boolean, option to normalize the bbox position by the image size. 
-    - If true, bbox labels are expressed in fraction of the image width and height
-    - If False, positions are left in pixels. Default choice.
-- '-lf', '--label_format' : string, options are :
-    - "single" : all the labels are in a single csv, with a column with image path
-    - "multiple" : one label file per image, saved in output_dir/labels.
-- '-s', '--sep' : label file(s) separator, default is ";".
-- '--header' : boolean. If True, an header column with column names is added to each label file.
-- '-c', '--crop' : boolean 
-    - If True, crop during export all images with watermarks and updates bboxes position to the cropped image. 
-    - If False, the image will be copied without modifications.
-- '-e', '--ext' : Extension format for labels files (without the "."). Default is "txt".
+More from the DEEL project:
+- [Xplique](https://github.com/deel-ai/xplique) a Python library exclusively dedicated to explaining neural networks.
+- [deel-lip](https://github.com/deel-ai/deel-lip) a Python library for training k-Lipschitz neural networks on TF.
+- [Influenciae](https://github.com/deel-ai/influenciae) Python toolkit dedicated to computing influence values for the discovery of potentially problematic samples in a dataset.
+- [deel-torchlip](https://github.com/deel-ai/deel-torchlip) a Python library for training k-Lipschitz neural networks on PyTorch.
+- [DEEL White paper](https://arxiv.org/abs/2103.10529) a summary of the DEEL team on the challenges of certifiable AI and the role of data quality, representativity and explainability for this purpose.
 
 
 ## 🙏 Acknowledgment
+
+This project received funding from the French ”Investing for the Future – PIA3” program within the Artificial and Natural Intelligence Toulouse Institute (ANITI).
+
 
 ## 🗞️ Citation
 
