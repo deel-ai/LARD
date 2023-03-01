@@ -20,9 +20,8 @@ Landing Approach Runway Detection (**LARD**) is a [dataset](#lard-dataset) of ae
 
 We also provide a [synthetic image generator](#synthetic-generator) based on Google Earth Studio if you want to enrich your dataset, or *fatten your LARD*. Starting from a database of runway positions, our generator produces high quality synthetic pictures of airport runways with their metadata. Through geometric transformations, these pictures can then be automatically annotated with the position of the runway or any targeted element in the aerial picture.
 
-| | |
-:---:|:---:
 | ![dataset-mosaic](docs/assets/mosaic_smallest.png "Dataset Mosaic") | ![synthetic-generator](docs/assets/landing_sequence.gif "Synthetic Generator") |
+:---:|:---:
 *Synthetic and real runways* | *Synthetic landing sequence*
 
 
@@ -82,6 +81,8 @@ LARD_train_VABB/
 - The `LARD_test_synth_` folder is  dedicated to testing models on synthetic images
 - The metadata are provided in a single file in each folder or subfolder, and the metadata of the whole set of training images is also provided as a single file at the root of the folder (`LARD_train.csv`)
 
+💡 _Note that this dataset may be updated in the future, with more images for new runways and a greater variety of sources, for both the train set and the test set (and possibly other sets)_
+
 ### 🏷️ Metadata
 The images of the dataset are provided in a `images/` folder together
 with a `.csv` file which contains all the metadata. Some metadata are
@@ -135,16 +136,23 @@ Please refer to the `infos.md` file for a detailed description of each metadata.
 
 ### 🎥 Real footage
 The following channels were used to build the set of real images of LARD. These content creators provided the rights to use their footage videos for research and for the sole purpose of building this open-source dataset, and can be used to obtain more images, which must then be manually annotated:
+
+<div align="right">
+  <picture>
+    <a href="http://www.youtube.com/watch?v=17MUtbOfdNQ?t=500s"><img alt="Landing at PALERMO, by GreatFlyer" src="http://img.youtube.com/vi/17MUtbOfdNQ/0.jpg" width="20%" align="right"></a>
+  </picture>
+</div>
+
 - [The Great Flyer](https://www.youtube.com/user/TheGreatFlyer/featured)
 - [D.N.Hug](https://www.youtube.com/c/dnhug/search?query=landing)
 - [High Pressure Aviation Films](https://www.youtube.com/c/HighPressureAviationFilms/search?query=landing)
 - [SOG Pilot](https://www.youtube.com/@sogpilot3137/search?query=landing)
 - [737 Aviation](https://www.youtube.com/@737Aviation/search?query=landing)
 
-[![IMAGE ALT TEXT](http://img.youtube.com/vi/17MUtbOfdNQ/0.jpg)](http://www.youtube.com/watch?v=17MUtbOfdNQ?t=500s "Landing at PALERMO, by GreatFlyer")
+<!--
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/17MUtbOfdNQ/0.jpg)](http://www.youtube.com/watch?v=17MUtbOfdNQ?t=500s "Landing at PALERMO, by GreatFlyer")-->
 
 
-💡 _Note that this dataset may be updated in the future, with more images for new runways and a greater variety of sources, for both the train set and the test set (and possibly other sets)_
 
 # ⚙️ Synthetic Generator
 The simplified internal working of the generator is as follows:
