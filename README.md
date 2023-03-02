@@ -16,9 +16,9 @@
 <br>
 
 
-Landing Approach Runway Detection (**LARD**) is a [dataset](#lard-dataset) of aerial front view images of runways designed for aircraft landing phase. It contains around 15K synthetic images of various runways, enriched with annotated pictures from real landing footages for comparison.
+Landing Approach Runway Detection (**LARD**) is a [dataset](#%EF%B8%8F-lard-dataset) of aerial front view images of runways designed for aircraft landing phase. It contains over 17K synthetic images of various runways, enriched with annotated pictures from real landing footages for comparison.
 
-We also provide a [synthetic image generator](#synthetic-generator) based on Google Earth Studio if you want to enrich your dataset, or *fatten your LARD*. Starting from a database of runway positions, our generator produces high quality synthetic pictures of airport runways with their metadata. Through geometric transformations, these pictures can then be automatically annotated with the position of the runway or any targeted element in the aerial picture.
+We also provide a [synthetic image generator](#%EF%B8%8F-synthetic-generator) based on Google Earth Studio if you want to enrich your dataset, or *fatten your LARD*. Starting from a database of runway positions, our generator produces high quality synthetic pictures of airport runways with their metadata. Through geometric transformations, these pictures can then be automatically annotated with the position of the runway or any targeted element in the aerial picture.
 
 | ![dataset-mosaic](docs/assets/mosaic_smallest.png "Dataset Mosaic") | ![synthetic-generator](docs/assets/landing_sequence.gif "Synthetic Generator") |
 :---:|:---:
@@ -78,7 +78,7 @@ LARD_train_VABB/
 ```
 - All `LARD_train_*` folders contain images dedicated to training, from one or more airports
 - The `LARD_test_real` folder is dedicated to testing models on real images, and is further divided into 3 subfolders with _nominal_cases_, _edge_case_ with a poor runway visibility, and _domain_adaptation_ 
-- The `LARD_test_synth_` folder is  dedicated to testing models on synthetic images
+- The `LARD_test_synth` folder is  dedicated to testing models on synthetic images
 - The metadata are provided in a single file in each folder or subfolder, and the metadata of the whole set of training images is also provided as a single file at the root of the folder (`LARD_train.csv`)
 
 💡 _Note that this dataset may be updated in the future, with more images for new runways and a greater variety of sources, for both the train set and the test set (and possibly other sets)_
@@ -101,10 +101,8 @@ following columns are common:
     completed with other sources such as flight simulators.
 
 -   The next columns indicate the `airport` and `runway` targeted during
-    landing, when they are known. _Note that the runway is not a number
-    but an identifier which may contain a letter (L/C/R for
+    landing, when they are known. _Note that the runway is not a number but an identifier which may contain a letter (L/C/R for
     Left/Center/Right)._
-
 -   Finally, the last columns provide the pixel coordinates of each
     `corner` of the runway on the picture.
 
@@ -129,21 +127,18 @@ Please refer to the `infos.md` file for a detailed description of each metadata.
     - Echelle de distance 3eme dim (couleur)
   - Positions des centres
   - 
-  - (video cone)
-- Lister les channels contributeurs
-  - Videos youtube incrustée sur la minute d'atterrissage
-  - Les channels sont disponibles (pour usage recherche & non-commercial uniquement) -->
+  - (video cone) -->
 
 ### 🎥 Real footage
-The following channels were used to build the set of real images of LARD. These content creators provided the rights to use their footage videos for research and for the sole purpose of building this open-source dataset, and can be used to obtain more images, which must then be manually annotated:
+The following channels were used to build the set of real images of LARD. These content creators provided the rights to use their footage videos for research and for the sole purpose of building this open-source dataset, and their videos can be used to obtain more images of runways, which must then be manually annotated:
 
 <div align="right">
   <picture>
-    <a href="http://www.youtube.com/watch?v=17MUtbOfdNQ?t=500s"><img alt="Landing at PALERMO, by GreatFlyer" src="http://img.youtube.com/vi/17MUtbOfdNQ/0.jpg" width="20%" align="right"></a>
+    <a href="http://www.youtube.com/watch?v=17MUtbOfdNQ?t=500s"><img alt="Landing at PALERMO, by GreatFlyer" src="http://img.youtube.com/vi/17MUtbOfdNQ/0.jpg" width="25%" align="right"></a>
   </picture>
 </div>
 
-- [The Great Flyer](https://www.youtube.com/user/TheGreatFlyer/featured)
+- [The Great Flyer](https://www.youtube.com/user/TheGreatFlyer/search?query=landing)
 - [D.N.Hug](https://www.youtube.com/c/dnhug/search?query=landing)
 - [High Pressure Aviation Films](https://www.youtube.com/c/HighPressureAviationFilms/search?query=landing)
 - [SOG Pilot](https://www.youtube.com/@sogpilot3137/search?query=landing)
