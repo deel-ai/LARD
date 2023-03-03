@@ -128,13 +128,13 @@ Please refer to the `infos.md` file for a detailed description of each metadata.
   - (video cone) -->
 
 ### 🎥 Real footage
-The following channels were used to build the set of real images of LARD. These content creators provided the rights to use their footage videos for research and for the sole purpose of building this open-source dataset, and their videos can be used to obtain more images of runways, which must then be manually annotated:
-
 <div align="right">
   <picture>
-    <a href="http://www.youtube.com/watch?v=17MUtbOfdNQ?t=500s"><img alt="Landing at PALERMO, by GreatFlyer" src="http://img.youtube.com/vi/17MUtbOfdNQ/0.jpg" width="25%" align="right"></a>
+    <a href="http://www.youtube.com/watch?v=17MUtbOfdNQ?t=500s"><img alt="Landing at PALERMO, by GreatFlyer" src="http://img.youtube.com/vi/17MUtbOfdNQ/0.jpg" width="30%" align="right"></a>
   </picture>
 </div>
+
+The following channels were used to build the set of real images of LARD. These content creators provided the rights to use their footage videos for research and for the sole purpose of building this open-source dataset, and their videos can be used to obtain more images of runways, which must then be manually annotated:
 
 - [The Great Flyer](https://www.youtube.com/user/TheGreatFlyer/search?query=landing)
 - [D.N.Hug](https://www.youtube.com/c/dnhug/search?query=landing)
