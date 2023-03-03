@@ -1,5 +1,5 @@
 output_directory: data
-dataset_name: test_dataset
+dataset_name: LARD_test
 included_datasets:
   LARD_test_real:
     type: real

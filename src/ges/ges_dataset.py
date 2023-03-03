@@ -16,7 +16,7 @@ from src.scenario.default_scenario_values import DefaultTrajectory
 def add_or_update_runways(database_file: str, airport_ocai: str, runways: str, coordinates):
     """
     
-    Return the points around the runway (4 corners, ltp and fpap)
+    Update the database with new runways or update the coordinates of existing ones.
     
     :param database_file: file containing coordinates of the runways
     :type database_file: str

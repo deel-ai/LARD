@@ -106,9 +106,7 @@ following columns are common:
 -   Finally, the last columns provide the pixel coordinates of each
     `corner` of the runway on the picture.
 
-Due to limitations, the remaining columns are specific to only one
-source of data, but could also be used jointly by a new source of data
-such as a flight simulator supporting live weather.
+Due to limitations, the remaining columns are specific to only one source of data, but could also be used jointly by a new source of data such as a flight simulator supporting live weather.
 
 For real images, three additional metadata are provided:
 
@@ -173,7 +171,7 @@ conda activate ./env
 ## 1. Enrich the runway database
 - 🔥 [Notebook - **Database generation**](00_database_generation.ipynb)
   - This notebook provides a comprehensive example for adding or update runways and airports in the database.
-- The database used for LARD is provided in `data/runways_database.json`
+- The database used for LARD is provided in [`data/runways_database.json`](data/runways_database.json)
 - The database is a simple json file which contains the position of each corner in both `lat/lon/alt` coordinates and the corresponding ECEF (Earth-centered Earth-fixed) coordinates (A,B,C and D are the corners names):
   
 ``` 
@@ -199,7 +197,7 @@ _Note that only the WGS84 coordinates (`lat/lon/alt`) are needed, as the ECEF co
 - 🔥 [Notebook - **Scenario generation**](01_scenario_generation.ipynb)
   - This notebook provides a comprehensive example for generating a scenario for a specific runway.
 - 🖳 **CLI** - Alternately, you can generate news scenarios in command line :
-  1. Configure your scenario as a `.yml` file. An example is provided in `params/example_generation.yml`
+  1. Configure your scenario as a `.yml` file. An example is provided in [`params/example_generation.yml`](params/example_generation.yml)
   2. Run the script with the `.yml` as an input:
 ```
 python src/scenario/write_scenario.py params/example_generation.yml
@@ -219,7 +217,7 @@ However all these parameters except the distance are not defined as ranges, but 
 - 🔥 [Notebook - **Labeling**](02_labeling.ipynb)
   - This notebook provides a comprehensive example to automatically label one or multiple Earth Studio generation results and export the corresponding dataset.
 - 🖳 **CLI** - Alternately, you can generate news scenarios in command line :
-  1. Configure your scenario as a `.yml` file. An example is provided in `params/export_train_dataset.yml`
+  1. Configure your scenario as a `.yml` file. An example is provided in [`params/export_train_dataset.yml`](params/export_train_dataset.yml)
   2. Run the script with the `.yml` as an input:
 ```
 python src/labeling/generate_dataset.py params/export_train_dataset.yml
@@ -247,6 +245,7 @@ python src/dataset/lard_export.py --train data/multiple_train --test data/test_d
 /!\ Not tested yet
 
 Please refer to the provided [notebook (export tool)](export_tool.ipynb) for comprehensive details about the possible export options and the folder structures.
+
 ## 👀 See Also
 
 More from the DEEL project:
@@ -264,5 +263,6 @@ This project received funding from the French ”Investing for the Future – PI
 
 ## 🗞️ Citation
 _To be published_
+
 ## 📝 License
 The package is released under [MIT license](LICENSE).
