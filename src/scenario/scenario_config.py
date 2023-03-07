@@ -26,9 +26,9 @@ class ScenarioConfig:
 
     def autofill_empty_outputs(self):
         if self.outputs.earth_studio_scenario is None:
-            self.outputs.earth_studio_scenario = self.scenario_dir / (self.scenario_dir.name+".esp")
+            self.outputs.earth_studio_scenario = self.scenario_dir / (self.scenario_name + ".esp")
         if self.outputs.scenario_metadata is None:
-            self.outputs.scenario_metadata = self.scenario_dir / (self.scenario_dir.name+".yaml")
+            self.outputs.scenario_metadata = self.scenario_dir / (self.scenario_name + ".yaml")
 
     def update_fields(self):
         for key, val in self.__dict__.items():

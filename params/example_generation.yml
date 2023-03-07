@@ -1,7 +1,7 @@
 outputs:
-  dataset_directory: scenarios/SAEZ_test_
-  earth_studio_scenario: scenarios/SAEZ_test_/SAEZ_test_17.esp
-  scenario_metadata: scenarios/SAEZ_test_/SAEZ_test_17.yaml
+  dataset_directory: scenarios
+  earth_studio_scenario: scenarios/SAEZ_test_17.esp
+  scenario_metadata: scenarios/SAEZ_test_17.yaml
 content:
   airport: SAEZ
   runways_database: data/runways_database.json

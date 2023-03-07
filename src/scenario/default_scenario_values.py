@@ -33,7 +33,7 @@ class DefaultTrajectory:
     dist_ap_m: float = 300.0
     distrib_param: float = 1.41
     distribution: str = "exp"
-    max_distance_m: float = 8000
+    max_distance_m: float = 5556
     min_distance_m: float = 150
     pitch_deg: float = -4
     roll_deg: float = 0
