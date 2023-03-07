@@ -223,7 +223,7 @@ The `.esp` file produced at *step #2* can be directly loaded into Google Earth S
 - In *'advanced'* settings, The `.json` file for 3D data must be generated with a 'global' coordinate space
 
 <div align="right">
-    <img src="docs/assets/folder_example.png" width="100px" alt="folder example from docs/assets/" align="right" />
+    <img src="data/folder_example.png" width="100px" alt="folder example from docs/assets/" align="right" />
 </div>
 <br>
 
