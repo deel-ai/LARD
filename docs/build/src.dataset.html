@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.dataset package &mdash; Lard 1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Lard
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">src.dataset package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.dataset.lard_dataset">src.dataset.lard_dataset module</a></li>
+<li><a class="reference internal" href="#module-src.dataset.lard_export">src.dataset.lard_export module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Lard</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">src.dataset package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.dataset.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-src.dataset">
+<span id="src-dataset-package"></span><h1>src.dataset package<a class="headerlink" href="#module-src.dataset" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-src.dataset.lard_dataset">
+<span id="src-dataset-lard-dataset-module"></span><h2>src.dataset.lard_dataset module<a class="headerlink" href="#module-src.dataset.lard_dataset" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.dataset.lard_dataset.LardDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.dataset.lard_dataset.</span></span><span class="sig-name descname"><span class="pre">LardDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/dataset/lard_dataset.html#LardDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.dataset.lard_dataset.LardDataset" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to load, merge (in the case of a splitted dataset), remove watermark and easily export a LardDataset to other
+detection formats  (coco, tlbr,..).</p>
+<p>Usage :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">LardDataset</span><span class="p">(</span><span class="n">train_path</span><span class="o">=</span><span class="n">PATH_TO_TRAIN_DATASET</span><span class="p">,</span> <span class="n">test_path</span><span class="o">=</span><span class="n">PATH_TO_TEST_DATASET</span><span class="p">)</span>
+<span class="c1"># Coco format</span>
+<span class="n">dataset</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">output_directory</span><span class="p">,</span>
+               <span class="n">bbx_format</span><span class="o">=</span><span class="s2">&quot;xywh&quot;</span><span class="p">,</span>     <span class="c1"># other formats are tlbr (top left bottom right), tlwh (top left width</span>
+                                      <span class="c1"># height, corners (keep corner instead of bbox)</span>
+               <span class="n">normalized</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>       <span class="c1"># are bbox positions normalized with respect to image size or kept as pixel</span>
+               <span class="n">label_file</span><span class="o">=</span><span class="s2">&quot;multiple&quot;</span><span class="p">,</span> <span class="c1"># one file per image, &quot;single&quot; for a single label file</span>
+               <span class="n">crop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>             <span class="c1"># crop each synthetized image to remove watermarks</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.dataset.lard_dataset.LardDataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/dataset/lard_dataset.html#LardDataset.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.dataset.lard_dataset.LardDataset.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Load a Lard dataset as obtained after the labeling phase. At least one of train_path or test_path must be
+provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train_path</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em>) – path to a labeled (after labeling phase) Lard dataset.</p></li>
+<li><p><strong>test_path</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em>) – path to a labeled (after labeling phase) Lard dataset.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.dataset.lard_dataset.LardDataset.crop_labels">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">crop_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="src.labeling.html#src.labeling.labels.Labels" title="src.labeling.labels.Labels"><span class="pre">Labels</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/dataset/lard_dataset.html#LardDataset.crop_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.dataset.lard_dataset.LardDataset.crop_labels" title="Permalink to this definition"></a></dt>
+<dd><p>Update labels to positions in cropped images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>labels</strong> (<a class="reference internal" href="src.labeling.html#src.labeling.labels.Labels" title="src.labeling.labels.Labels"><em>Labels</em></a>) – dataset labels</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.dataset.lard_dataset.LardDataset.export">
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bbx_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalized</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'single'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">';'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'txt'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/dataset/lard_dataset.html#LardDataset.export"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.dataset.lard_dataset.LardDataset.export" title="Permalink to this definition"></a></dt>
+<dd><p>Export the Lard dataset to another format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_dir</strong> (<em>Path</em><em> or </em><em>string</em>) – directory where the converted dataset will be saved</p></li>
+<li><p><strong>bbx_format</strong> – Format for label bbox. Options are :</p></li>
+</ul>
+</dd>
+</dl>
+<ul class="simple">
+<li><p>“tlbr” (x,y of top left then x,y of bottom rights corners of the bbox)</p></li>
+<li><p>“tlwh” (x, y of top left, bbox width and height)</p></li>
+<li><p>“xywh” (x, y of the center of the bbox, bbox width and height)</p></li>
+<li><p>“corners” (x,y of each corner)</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>normalized</strong> – option to normalize the bbox position by the image size. If true, bbox labels are expressed</p>
+</dd>
+</dl>
+<p>in fraction of the image width and height, if False, left in pixels. Default = False.
+:type normalized: bool
+:param label_file: “single” (all the labels are in a single csv, with a column with image path) or
+“multiple” (one label file per image, saved in output_dir/labels).
+:type label_file: str
+:param sep: label file(s) separator, default is “;”.
+:type sep: ” ”
+:param header: If True, an header with column names is added to each label file.
+:type header: bool
+:param crop: If True, crop during export all images with watermarks and updates bboxes position for the cropped
+image. If False, the image will be copied without modifications.
+:type crop: bool
+:param ext: Extension format for labels files. Default is “txt”.
+:type ext: str
+:return: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.dataset.lard_dataset.LardDataset.get_ordered_cols">
+<span class="sig-name descname"><span class="pre">get_ordered_cols</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/dataset/lard_dataset.html#LardDataset.get_ordered_cols"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.dataset.lard_dataset.LardDataset.get_ordered_cols" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the names of the columns containing target position in a specific order.
+Order is x coordinate, then y coordinate, for each of the position columns in <code class="docutils literal notranslate"><span class="pre">self.x_cols</span></code> order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ordered list of columns names for target position.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.dataset.lard_dataset.LardDataset.normalize_labels">
+<span class="sig-name descname"><span class="pre">normalize_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="src.labeling.html#src.labeling.labels.Labels" title="src.labeling.labels.Labels"><span class="pre">Labels</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/dataset/lard_dataset.html#LardDataset.normalize_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.dataset.lard_dataset.LardDataset.normalize_labels" title="Permalink to this definition"></a></dt>
+<dd><p>Normalize label with the image size. Input labels should be in pixels, and will be divided by image width/height</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>labels</strong> (<a class="reference internal" href="src.labeling.html#src.labeling.labels.Labels" title="src.labeling.labels.Labels"><em>Labels</em></a>) – Lard dataset Labels, with target positions in pixels.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.dataset.lard_dataset.LardDataset.tlwh_to_xywh">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tlwh_to_xywh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="src.labeling.html#src.labeling.labels.Labels" title="src.labeling.labels.Labels"><span class="pre">Labels</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/dataset/lard_dataset.html#LardDataset.tlwh_to_xywh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.dataset.lard_dataset.LardDataset.tlwh_to_xywh" title="Permalink to this definition"></a></dt>
+<dd><p>Convert tlwh bboxes to xywh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>labels</strong> (<a class="reference internal" href="src.labeling.html#src.labeling.labels.Labels" title="src.labeling.labels.Labels"><em>Labels</em></a>) – Lard dataset Labels in tlwh format.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.dataset.lard_dataset.LardDataset.to_tlbr">
+<span class="sig-name descname"><span class="pre">to_tlbr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="src.labeling.html#src.labeling.labels.Labels" title="src.labeling.labels.Labels"><span class="pre">Labels</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/dataset/lard_dataset.html#LardDataset.to_tlbr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.dataset.lard_dataset.LardDataset.to_tlbr" title="Permalink to this definition"></a></dt>
+<dd><p>Convert labels with corners position to bboxes in tlbr (top left and bottom right points ) format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>labels</strong> (<a class="reference internal" href="src.labeling.html#src.labeling.labels.Labels" title="src.labeling.labels.Labels"><em>Labels</em></a>) – Lard dataset labels with corner positions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.dataset.lard_dataset.LardDataset.to_tlwh">
+<span class="sig-name descname"><span class="pre">to_tlwh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="src.labeling.html#src.labeling.labels.Labels" title="src.labeling.labels.Labels"><span class="pre">Labels</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/dataset/lard_dataset.html#LardDataset.to_tlwh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.dataset.lard_dataset.LardDataset.to_tlwh" title="Permalink to this definition"></a></dt>
+<dd><p>Convert corners position to tlwh bbox labels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>labels</strong> (<a class="reference internal" href="src.labeling.html#src.labeling.labels.Labels" title="src.labeling.labels.Labels"><em>Labels</em></a>) – Lard dataset labels with corner positions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.dataset.lard_export">
+<span id="src-dataset-lard-export-module"></span><h2>src.dataset.lard_export module<a class="headerlink" href="#module-src.dataset.lard_export" title="Permalink to this heading"></a></h2>
+<p>Command-line script to export a lard dataset to most of the popular formats.</p>
+<p>To get the list of available options :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python lard_export.py -h</span>
+</pre></div>
+</div>
+<p>Usage example for coco format:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python src/dataset/lard_export.py --train data/multiple_train --test data/test_dataset -o data/converted_coco -b &quot;xywh&quot;</span>
+<span class="go">-n -lf &quot;multiple&quot; -c -s &quot; &quot;</span>
+</pre></div>
+</div>
+<p>Parameters values and expected format are the same as the python methods, described in <code class="docutils literal notranslate"><span class="pre">notebooks/lard_export.py</span></code></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Mussot Vincent.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

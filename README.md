@@ -246,6 +246,11 @@ python src/dataset/lard_export.py --train data/multiple_train --test data/test_d
 
 Please refer to the provided [notebook (export tool)](export_tool.ipynb) for comprehensive details about the possible export options and the folder structures.
 
+## Documentation
+
+Technical Documentation
+The technical documentation of the different python modules and python methods implemented can be found in "./doc/build". You can open "./doc/build/index.html" in a web browser to navigate through it.
+
 ## 👀 See Also
 
 More from the DEEL project:

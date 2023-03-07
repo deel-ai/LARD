@@ -1,0 +1,614 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.ges.ges_dataset &#8212; Lard 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.ges.ges_dataset</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pyproj</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">src.ges.geo_utils</span> <span class="kn">import</span> <span class="n">find_center</span><span class="p">,</span> <span class="n">ecef2llh</span><span class="p">,</span> <span class="n">llh2ecef</span><span class="p">,</span> <span class="n">find_azimuth_between_2_coordinates</span><span class="p">,</span> <span class="n">forward_pos</span>
+<span class="kn">from</span> <span class="nn">src.scenario.default_scenario_values</span> <span class="kn">import</span> <span class="n">DefaultTrajectory</span>
+
+
+<div class="viewcode-block" id="add_or_update_runways"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_dataset.add_or_update_runways">[docs]</a><span class="k">def</span> <span class="nf">add_or_update_runways</span><span class="p">(</span><span class="n">database_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">airport_ocai</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">runways</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    Update the database with new runways or update the coordinates of existing ones.</span>
+<span class="sd">    </span>
+<span class="sd">    :param database_file: file containing coordinates of the runways</span>
+<span class="sd">    :type database_file: str</span>
+<span class="sd">    :param airport_ocai: code of the airport</span>
+<span class="sd">    :type airport_ocai: str</span>
+<span class="sd">    :param runways: Runway code and optionally the id of the opposite runway</span>
+<span class="sd">    :type runways: array of str, max length of 2</span>
+<span class="sd">    :param coordinates: table of 4 points, each defined by latitude, longitude and altitude</span>
+<span class="sd">    :type coordinates: numpy array of floats, with shape (4, 3)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">database_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">runways_db</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">airport_ocai</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">runways_db</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">runways_db</span><span class="p">[</span><span class="n">airport_ocai</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">latitude</span> <span class="o">=</span> <span class="n">coordinates</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">longitude</span> <span class="o">=</span> <span class="n">coordinates</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">altitude</span> <span class="o">=</span> <span class="n">coordinates</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="n">rway</span> <span class="o">=</span> <span class="n">runways</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Treat the first runway id</span>
+    <span class="n">runways_db</span><span class="p">[</span><span class="n">airport_ocai</span><span class="p">][</span><span class="n">rway</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+              <span class="s1">&#39;coordinate&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;latitude&#39;</span><span class="p">:</span> <span class="n">latitude</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;longitude&#39;</span><span class="p">:</span> <span class="n">longitude</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;altitude&#39;</span><span class="p">:</span> <span class="n">altitude</span><span class="p">[</span><span class="mi">2</span><span class="p">]}},</span>
+        <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+              <span class="s1">&#39;coordinate&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;latitude&#39;</span><span class="p">:</span> <span class="n">latitude</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;longitude&#39;</span><span class="p">:</span> <span class="n">longitude</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;altitude&#39;</span><span class="p">:</span> <span class="n">altitude</span><span class="p">[</span><span class="mi">3</span><span class="p">]}},</span>
+        <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+              <span class="s1">&#39;coordinate&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;latitude&#39;</span><span class="p">:</span> <span class="n">latitude</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;longitude&#39;</span><span class="p">:</span> <span class="n">longitude</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;altitude&#39;</span><span class="p">:</span> <span class="n">altitude</span><span class="p">[</span><span class="mi">0</span><span class="p">]}},</span>
+        <span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+              <span class="s1">&#39;coordinate&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;latitude&#39;</span><span class="p">:</span> <span class="n">latitude</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;longitude&#39;</span><span class="p">:</span> <span class="n">longitude</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;altitude&#39;</span><span class="p">:</span> <span class="n">altitude</span><span class="p">[</span><span class="mi">1</span><span class="p">]}},</span>
+    <span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">runways_db</span><span class="p">[</span><span class="n">airport_ocai</span><span class="p">][</span><span class="n">rway</span><span class="p">]:</span>
+        <span class="n">runways_db</span><span class="p">[</span><span class="n">airport_ocai</span><span class="p">][</span><span class="n">rway</span><span class="p">][</span><span class="n">point</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> \
+        <span class="n">runways_db</span><span class="p">[</span><span class="n">airport_ocai</span><span class="p">][</span><span class="n">rway</span><span class="p">][</span><span class="n">point</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> \
+        <span class="n">runways_db</span><span class="p">[</span><span class="n">airport_ocai</span><span class="p">][</span><span class="n">rway</span><span class="p">][</span><span class="n">point</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">][</span><span class="s1">&#39;z&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">llh2ecef</span><span class="p">(</span>
+            <span class="n">runways_db</span><span class="p">[</span><span class="n">airport_ocai</span><span class="p">][</span><span class="n">rway</span><span class="p">][</span><span class="n">point</span><span class="p">][</span><span class="s1">&#39;coordinate&#39;</span><span class="p">][</span><span class="s1">&#39;latitude&#39;</span><span class="p">],</span>
+            <span class="n">runways_db</span><span class="p">[</span><span class="n">airport_ocai</span><span class="p">][</span><span class="n">rway</span><span class="p">][</span><span class="n">point</span><span class="p">][</span><span class="s1">&#39;coordinate&#39;</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">],</span>
+            <span class="n">runways_db</span><span class="p">[</span><span class="n">airport_ocai</span><span class="p">][</span><span class="n">rway</span><span class="p">][</span><span class="n">point</span><span class="p">][</span><span class="s1">&#39;coordinate&#39;</span><span class="p">][</span><span class="s1">&#39;altitude&#39;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">runways</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># Treat the opposite runway if needed</span>
+        <span class="n">rway</span> <span class="o">=</span> <span class="n">runways</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">runways_db</span><span class="p">[</span><span class="n">airport_ocai</span><span class="p">][</span><span class="n">rway</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+                  <span class="s1">&#39;coordinate&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;latitude&#39;</span><span class="p">:</span> <span class="n">latitude</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;longitude&#39;</span><span class="p">:</span> <span class="n">longitude</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;altitude&#39;</span><span class="p">:</span> <span class="n">altitude</span><span class="p">[</span><span class="mi">0</span><span class="p">]}},</span>
+            <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+                  <span class="s1">&#39;coordinate&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;latitude&#39;</span><span class="p">:</span> <span class="n">latitude</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;longitude&#39;</span><span class="p">:</span> <span class="n">longitude</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;altitude&#39;</span><span class="p">:</span> <span class="n">altitude</span><span class="p">[</span><span class="mi">1</span><span class="p">]}},</span>
+            <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+                  <span class="s1">&#39;coordinate&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;latitude&#39;</span><span class="p">:</span> <span class="n">latitude</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;longitude&#39;</span><span class="p">:</span> <span class="n">longitude</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;altitude&#39;</span><span class="p">:</span> <span class="n">altitude</span><span class="p">[</span><span class="mi">2</span><span class="p">]}},</span>
+            <span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+                  <span class="s1">&#39;coordinate&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;latitude&#39;</span><span class="p">:</span> <span class="n">latitude</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;longitude&#39;</span><span class="p">:</span> <span class="n">longitude</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;altitude&#39;</span><span class="p">:</span> <span class="n">altitude</span><span class="p">[</span><span class="mi">3</span><span class="p">]}},</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">runways_db</span><span class="p">[</span><span class="n">airport_ocai</span><span class="p">][</span><span class="n">rway</span><span class="p">]:</span>
+            <span class="n">runways_db</span><span class="p">[</span><span class="n">airport_ocai</span><span class="p">][</span><span class="n">rway</span><span class="p">][</span><span class="n">point</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">][</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> \
+            <span class="n">runways_db</span><span class="p">[</span><span class="n">airport_ocai</span><span class="p">][</span><span class="n">rway</span><span class="p">][</span><span class="n">point</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> \
+            <span class="n">runways_db</span><span class="p">[</span><span class="n">airport_ocai</span><span class="p">][</span><span class="n">rway</span><span class="p">][</span><span class="n">point</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">][</span><span class="s1">&#39;z&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">llh2ecef</span><span class="p">(</span>
+                <span class="n">runways_db</span><span class="p">[</span><span class="n">airport_ocai</span><span class="p">][</span><span class="n">rway</span><span class="p">][</span><span class="n">point</span><span class="p">][</span><span class="s1">&#39;coordinate&#39;</span><span class="p">][</span><span class="s1">&#39;latitude&#39;</span><span class="p">],</span>
+                <span class="n">runways_db</span><span class="p">[</span><span class="n">airport_ocai</span><span class="p">][</span><span class="n">rway</span><span class="p">][</span><span class="n">point</span><span class="p">][</span><span class="s1">&#39;coordinate&#39;</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">],</span>
+                <span class="n">runways_db</span><span class="p">[</span><span class="n">airport_ocai</span><span class="p">][</span><span class="n">rway</span><span class="p">][</span><span class="n">point</span><span class="p">][</span><span class="s1">&#39;coordinate&#39;</span><span class="p">][</span><span class="s1">&#39;altitude&#39;</span><span class="p">])</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">database_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">runways_db</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_runway_points"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_dataset.get_runway_points">[docs]</a><span class="k">def</span> <span class="nf">get_runway_points</span><span class="p">(</span><span class="n">database_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">airport_oaci</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">runway_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    Return the points around the runway (4 corners, ltp and fpap)</span>
+<span class="sd">    </span>
+<span class="sd">    :param database_file: file containing coordinates of the runways</span>
+<span class="sd">    :type database_file: str</span>
+<span class="sd">    :param airport_oaci: code of the airport</span>
+<span class="sd">    :type airport_oaci: str</span>
+<span class="sd">    :param runway_id: code of the runway</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">database_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">runways_database</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">runway_points</span> <span class="o">=</span> <span class="n">runways_database</span><span class="p">[</span><span class="n">airport_oaci</span><span class="p">][</span><span class="n">runway_id</span><span class="p">]</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">ltp</span> <span class="o">=</span> <span class="n">find_center</span><span class="p">(</span>
+        <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;D&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())])</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">fpap</span> <span class="o">=</span> <span class="n">find_center</span><span class="p">(</span>
+        <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())])</span>
+    <span class="k">return</span> <span class="n">runway_points</span><span class="p">,</span> <span class="n">ltp</span><span class="p">,</span> <span class="n">fpap</span></div>
+
+
+<div class="viewcode-block" id="compute_aiming_point"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_dataset.compute_aiming_point">[docs]</a><span class="k">def</span> <span class="nf">compute_aiming_point</span><span class="p">(</span><span class="n">database_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">airport_ocai</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">runway_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dist_m</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        </span>
+<span class="sd">    get the aiming point on the runway at a distance &#39;dist&#39; from the LTP</span>
+<span class="sd">    </span>
+<span class="sd">    :param database_file: file containing coordinates of the runways</span>
+<span class="sd">    :type database_file: str</span>
+<span class="sd">    :param airport_ocai: code of the airport</span>
+<span class="sd">    :type airport_ocai: str</span>
+<span class="sd">    :param runway_id: code of the runway</span>
+<span class="sd">    :type runway_id: str</span>
+<span class="sd">    :param dist_m: distance of the aiming point from the LTP</span>
+<span class="sd">    :type dist_m: float        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">ltp</span><span class="p">,</span> <span class="n">fpap</span> <span class="o">=</span> <span class="n">get_runway_points</span><span class="p">(</span><span class="n">database_file</span><span class="p">,</span> <span class="n">airport_ocai</span><span class="p">,</span> <span class="n">runway_id</span><span class="p">)</span>
+
+    <span class="c1"># centerline_vector = (np.array(ltp) - np.array(fpap)) / np.linalg.norm(np.array(ltp) - np.array(fpap))</span>
+    <span class="n">ltp_lat</span><span class="p">,</span> <span class="n">ltp_long</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ecef2llh</span><span class="p">(</span><span class="n">ltp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ltp</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ltp</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">fpap_lat</span><span class="p">,</span> <span class="n">fpap_long</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ecef2llh</span><span class="p">(</span><span class="n">fpap</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">fpap</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">fpap</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">rwy_psi</span> <span class="o">=</span> <span class="n">find_azimuth_between_2_coordinates</span><span class="p">(</span><span class="n">ltp_long</span><span class="p">,</span> <span class="n">ltp_lat</span><span class="p">,</span> <span class="n">fpap_long</span><span class="p">,</span>
+                                                 <span class="n">fpap_lat</span><span class="p">)</span>  <span class="c1"># (forward azimuth, back azimuth, distance between points)</span>
+    <span class="c1"># compute aiming point</span>
+    <span class="n">ap_long</span><span class="p">,</span> <span class="n">ap_lat</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">forward_pos</span><span class="p">(</span><span class="n">ltp_long</span><span class="p">,</span> <span class="n">ltp_lat</span><span class="p">,</span> <span class="n">rwy_psi</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dist_m</span><span class="p">)</span>  <span class="c1"># (longitude, latitude, azimuth)</span>
+
+    <span class="k">return</span> <span class="n">ap_long</span><span class="p">,</span> <span class="n">ap_lat</span><span class="p">,</span> <span class="n">rwy_psi</span><span class="p">,</span> <span class="n">ltp</span><span class="p">,</span> <span class="n">fpap</span></div>
+
+
+<div class="viewcode-block" id="generate_dist"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_dataset.generate_dist">[docs]</a><span class="k">def</span> <span class="nf">generate_dist</span><span class="p">(</span><span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">,</span> <span class="n">sample_number</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">string</span><span class="p">,</span> <span class="n">par_distrib1</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    generate the distances from the runway</span>
+<span class="sd">    </span>
+<span class="sd">    uniform: uniform between min and max distances</span>
+<span class="sd">    exp: uniform(0,1)**par_distrib1 then reshape to [min, max] par_distrib &lt;1 -&gt; more images far from the runway</span>
+<span class="sd">                                                               par_distrib &gt;1 -&gt; more images near the runway</span>
+<span class="sd">    normal: normal distribution troncated to have the maximum of the distribution at 1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">assert</span> <span class="n">distribution</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="s1">&#39;exp&#39;</span><span class="p">,</span> <span class="s1">&#39;normal&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">distribution</span> <span class="o">==</span> <span class="s1">&#39;uniform&#39;</span><span class="p">:</span>
+        <span class="n">dh_m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="p">(</span><span class="n">sample_number</span><span class="p">,))</span> <span class="o">*</span> <span class="p">(</span><span class="nb">max</span> <span class="o">-</span> <span class="nb">min</span><span class="p">)</span> <span class="o">+</span> <span class="nb">min</span>
+
+    <span class="k">if</span> <span class="n">distribution</span> <span class="o">==</span> <span class="s1">&#39;exp&#39;</span><span class="p">:</span>  <span class="c1"># here the user will fill the par_distrib1 parameter</span>
+        <span class="n">dh_m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="p">(</span><span class="n">sample_number</span><span class="p">,))</span> <span class="o">**</span> <span class="n">par_distrib1</span> <span class="o">*</span> <span class="p">(</span><span class="nb">max</span> <span class="o">-</span> <span class="nb">min</span><span class="p">)</span> <span class="o">+</span> <span class="nb">min</span>
+
+    <span class="k">if</span> <span class="n">distribution</span> <span class="o">==</span> <span class="s1">&#39;normal&#39;</span><span class="p">:</span>
+        <span class="n">dh_m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sample_number</span><span class="p">)</span>
+        <span class="c1"># get only the negative values</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sample_number</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">dh_m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dh_m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">dh_m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="c1"># reshape (-inf, 0) to (min, max) (in reality we just take the values below -10 and put it at 10)</span>
+        <span class="c1"># then we reshape (-10,0) to (min, max)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sample_number</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">dh_m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">10</span><span class="p">:</span>
+                <span class="n">dh_m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10</span>
+        <span class="n">dh_m</span> <span class="o">=</span> <span class="n">dh_m</span> <span class="o">/</span> <span class="mi">10</span>
+        <span class="n">dh_m</span> <span class="o">=</span> <span class="n">dh_m</span> <span class="o">*</span> <span class="p">(</span><span class="nb">max</span> <span class="o">-</span> <span class="nb">min</span><span class="p">)</span> <span class="o">+</span> <span class="nb">min</span>
+
+    <span class="k">return</span> <span class="n">dh_m</span></div>
+
+
+<div class="viewcode-block" id="define_offset"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_dataset.define_offset">[docs]</a><span class="k">def</span> <span class="nf">define_offset</span><span class="p">(</span>
+        <span class="n">aiming_point</span><span class="p">,</span>
+        <span class="n">rwy_psi</span><span class="p">,</span>
+        <span class="n">ltp</span><span class="p">,</span>
+        <span class="n">fpap</span><span class="p">,</span>
+        <span class="n">traj</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    distribution,</span>
+
+<span class="sd">    alpha_v_deg: float = -3,</span>
+<span class="sd">    std_alpha_v_deg: float = 0.2,</span>
+<span class="sd">    alpha_h_deg: float = 0.,</span>
+<span class="sd">    std_alpha_h_deg: float = 2.,</span>
+<span class="sd">    min_distance_m: float = 150.,</span>
+<span class="sd">    max_distance_m: float = 10000.,</span>
+<span class="sd">    roll_deg: float = 0.,</span>
+<span class="sd">    std_roll_deg: float = 5.,</span>
+<span class="sd">    pitch_deg: float = -4.,</span>
+<span class="sd">    std_pitch_deg: float = 2.,</span>
+<span class="sd">    std_yaw_deg: float = 5.,</span>
+<span class="sd">    sample_number: int = 1000,</span>
+<span class="sd">    par_distrib1=0,</span>
+<span class="sd">    return all the camera positions and angle with the deviations</span>
+<span class="sd">    we get more footage when close to the aiming point with the exp(sqrt(2))</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ap_long</span> <span class="o">=</span> <span class="n">aiming_point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ap_lat</span> <span class="o">=</span> <span class="n">aiming_point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ltp_alt</span> <span class="o">=</span> <span class="n">ecef2llh</span><span class="p">(</span><span class="n">ltp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ltp</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ltp</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="c1"># fpap_lat, fpap_long, fpap_alt = ecef2llh(fpap[0], fpap[1], fpap[2])</span>
+    <span class="n">dh_m</span> <span class="o">=</span> <span class="n">generate_dist</span><span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">min_distance_m</span><span class="p">,</span> <span class="n">traj</span><span class="o">.</span><span class="n">max_distance_m</span><span class="p">,</span> <span class="n">traj</span><span class="o">.</span><span class="n">sample_number</span><span class="p">,</span> <span class="n">traj</span><span class="o">.</span><span class="n">distribution</span><span class="p">,</span> <span class="n">traj</span><span class="o">.</span><span class="n">distrib_param</span><span class="p">)</span>
+    <span class="n">dh_m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">dh_m</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># print(std_roll_deg)</span>
+    <span class="n">dav_deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">alpha_v_deg</span><span class="p">,</span> <span class="n">traj</span><span class="o">.</span><span class="n">std_alpha_v_deg</span><span class="p">,</span> <span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">sample_number</span><span class="p">,))</span>
+    <span class="n">dz_m</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">dav_deg</span><span class="p">))</span> <span class="o">*</span> <span class="n">dh_m</span>
+    <span class="n">dah_deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">alpha_h_deg</span><span class="p">,</span> <span class="n">traj</span><span class="o">.</span><span class="n">std_alpha_h_deg</span><span class="p">,</span> <span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">sample_number</span><span class="p">,))</span>
+    <span class="n">phi_deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">roll_deg</span><span class="p">,</span> <span class="n">traj</span><span class="o">.</span><span class="n">std_roll_deg</span><span class="p">,</span> <span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">sample_number</span><span class="p">,))</span>
+    <span class="n">theta_deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">pitch_deg</span><span class="p">,</span> <span class="n">traj</span><span class="o">.</span><span class="n">std_pitch_deg</span><span class="p">,</span> <span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">sample_number</span><span class="p">,))</span>
+    <span class="n">psi_deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">traj</span><span class="o">.</span><span class="n">std_yaw_deg</span><span class="p">,</span> <span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">sample_number</span><span class="p">,))</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Geod</span><span class="p">(</span><span class="n">ellps</span><span class="o">=</span><span class="s1">&#39;WGS84&#39;</span><span class="p">)</span>
+    <span class="n">lon_deg</span><span class="p">,</span> <span class="n">lat_deg</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">fwd</span><span class="p">(</span>
+        <span class="n">ap_long</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">sample_number</span><span class="p">),</span>
+        <span class="n">ap_lat</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">sample_number</span><span class="p">),</span>
+        <span class="n">rwy_psi</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">dah_deg</span><span class="p">,</span>
+        <span class="n">dh_m</span><span class="p">,</span>
+        <span class="n">radians</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+    <span class="n">alt_m</span> <span class="o">=</span> <span class="n">ltp_alt</span> <span class="o">+</span> <span class="n">dz_m</span>
+
+    <span class="k">return</span> <span class="n">dh_m</span><span class="p">,</span> <span class="n">dav_deg</span><span class="p">,</span> <span class="n">dz_m</span><span class="p">,</span> <span class="n">dah_deg</span><span class="p">,</span> <span class="n">phi_deg</span><span class="p">,</span> <span class="n">theta_deg</span><span class="p">,</span> <span class="n">psi_deg</span><span class="p">,</span> <span class="n">lon_deg</span><span class="p">,</span> <span class="n">lat_deg</span><span class="p">,</span> <span class="n">alt_m</span></div>
+
+
+<div class="viewcode-block" id="GESDataset"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_dataset.GESDataset">[docs]</a><span class="k">class</span> <span class="nc">GESDataset</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loc_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loc_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">loc_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span> <span class="k">if</span> <span class="n">name</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">loc_path</span><span class="o">.</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">images_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="GESDataset.load_data"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_dataset.GESDataset.load_data">[docs]</a>    <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract the frame parameters which are in a json file generated by GoogleEarth Studio.</span>
+
+<span class="sd">        Frame information:</span>
+<span class="sd">            &quot;cameraFrames&quot;:[</span>
+<span class="sd">                { &quot;position&quot;: {&quot;x&quot;: ... , &quot;y&quot;: ... , &quot;z&quot;: ...}</span>
+<span class="sd">                  &quot;rotation&quot;: {&quot;x&quot;: ... , &quot;y&quot;: ... , &quot;z&quot;: ...}</span>
+<span class="sd">                  &quot;coordinate&quot;: {&quot;latitude&quot;: ... , &quot;longitude&quot;: ... , &quot;altitude&quot;: ... }</span>
+<span class="sd">                  &quot;fovVertical&quot;:</span>
+<span class="sd">                },</span>
+<span class="sd">                { &quot;position&quot;: ....</span>
+<span class="sd">                },</span>
+<span class="sd">                ...</span>
+<span class="sd">            ]</span>
+<span class="sd">        :return: None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loc_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loc_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">]</span>  <span class="c1"># Camera sensor size (pixel number)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">]</span>  <span class="c1"># Camera sensor size (pixel number)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;numFrames&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="GESDataset.generate_landing_poses"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_dataset.GESDataset.generate_landing_poses">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">generate_landing_poses</span><span class="p">(</span>
+            <span class="n">runaway_db</span><span class="p">,</span>
+            <span class="n">airport</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">runway</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">trajectory</span><span class="p">:</span> <span class="n">DefaultTrajectory</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        distribution: str = &#39;exp&#39;,</span>
+<span class="sd">        distrib_param: float = math.sqrt(2),</span>
+<span class="sd">        alpha_v_deg: float = -3,</span>
+<span class="sd">        std_alpha_v_deg: float = 0.2,</span>
+<span class="sd">        alpha_h_deg: float = 0.,</span>
+<span class="sd">        std_alpha_h_deg: float = 2.,</span>
+<span class="sd">        min_distance_m: float = 150.,</span>
+<span class="sd">        max_distance_m: float = 10000.,</span>
+<span class="sd">        roll_deg: float = 0.,</span>
+<span class="sd">        std_roll_deg: float = 5.,</span>
+<span class="sd">        pitch_deg: float = -4.,</span>
+<span class="sd">        std_pitch_deg: float = 2.,</span>
+<span class="sd">        std_yaw_deg: float = 5.,</span>
+<span class="sd">        sample_number: int = 1000,</span>
+<span class="sd">        dist_ap_m: float = 300.):</span>
+
+<span class="sd">        Take a trajectory config and return a flight plan (ie. all the camera positions and </span>
+<span class="sd">        rotations according to the config file)</span>
+
+<span class="sd">        :param airport: code of the airport</span>
+<span class="sd">        :type airport: str</span>
+<span class="sd">        </span>
+<span class="sd">        :param runway: code of the runway</span>
+<span class="sd">        :type runway: str</span>
+<span class="sd">        </span>
+<span class="sd">        :param alpha_v_deg: vertical angle. Defaults to -3.</span>
+<span class="sd">        :type alpha_v_deg: float, optional</span>
+<span class="sd">        </span>
+<span class="sd">        :param std_alpha_v_deg: standard deviation of alpha_v. Defaults to 0.2.</span>
+<span class="sd">        :type std_alpha_v_deg: float, optional  </span>
+<span class="sd">        </span>
+<span class="sd">        :param alpha_h_deg: horizontal angle. Defaults to 0..</span>
+<span class="sd">        :type alpha_h_deg: float, optional</span>
+<span class="sd">        </span>
+<span class="sd">        :param std_alpha_h_deg: standard deviation of alpha_h. Defaults to 2..</span>
+<span class="sd">        :type std_alpha_h_deg: float, optional</span>
+<span class="sd">        </span>
+<span class="sd">        :param min_distance_m: minimal distance from the runway in meters. Defaults to 150..</span>
+<span class="sd">        :type min_distance_m: float, optional</span>
+<span class="sd">        </span>
+<span class="sd">        :param max_distance_m:  maximal distance from the runway in meters. Defaults to 10000..</span>
+<span class="sd">        :type max_distance_m: float, optional</span>
+<span class="sd">        </span>
+<span class="sd">        :param roll_deg: roll angle. Defaults to 0..</span>
+<span class="sd">        :type roll_deg: float, optional</span>
+<span class="sd">        </span>
+<span class="sd">        :param std_roll_deg: standard deviation of roll angle. Defaults to 5..</span>
+<span class="sd">        :type std_roll_deg: float, optional</span>
+<span class="sd">        </span>
+<span class="sd">        :param pitch_deg:  pitch angle. Defaults to -4..</span>
+<span class="sd">        :type pitch_deg: float, optional</span>
+<span class="sd">        </span>
+<span class="sd">        :param std_pitch_deg: standard deviation of the pitch angle. Defaults to 2.</span>
+<span class="sd">        :type std_pitch_deg: float, optional</span>
+<span class="sd">        </span>
+<span class="sd">        :param std_yaw_deg:  standard deviation of the yaw angle. Defaults to 5.</span>
+<span class="sd">        :type std_yaw_deg: float, optional</span>
+<span class="sd">        </span>
+<span class="sd">        :param sample_number:  number of footages. Defaults to 1000.</span>
+<span class="sd">        :type sample_number: int, optional</span>
+<span class="sd">        </span>
+<span class="sd">        :param plot_scatter: Defaults to True.</span>
+<span class="sd">        :type plot_scatter: bool, optional</span>
+<span class="sd">        </span>
+<span class="sd">        :return: The flight plan(ie positions and camera angles)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># get runway points</span>
+        <span class="n">ap_long</span><span class="p">,</span> <span class="n">ap_lat</span><span class="p">,</span> <span class="n">rwy_psi</span><span class="p">,</span> <span class="n">ltp</span><span class="p">,</span> <span class="n">fpap</span> <span class="o">=</span> <span class="n">compute_aiming_point</span><span class="p">(</span><span class="n">runaway_db</span><span class="p">,</span> <span class="n">airport</span><span class="p">,</span> <span class="n">runway</span><span class="p">,</span> <span class="n">trajectory</span><span class="o">.</span><span class="n">dist_ap_m</span><span class="p">)</span>
+        <span class="c1"># define offsets</span>
+
+        <span class="c1"># Here, we define all the positions of the camera</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">phi_deg</span><span class="p">,</span> <span class="n">theta_deg</span><span class="p">,</span> <span class="n">psi_deg</span><span class="p">,</span> <span class="n">lon_deg</span><span class="p">,</span> <span class="n">lat_deg</span><span class="p">,</span> <span class="n">alt_m</span> <span class="o">=</span> <span class="n">define_offset</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">ap_long</span><span class="p">,</span> <span class="n">ap_lat</span><span class="p">],</span>
+            <span class="n">rwy_psi</span><span class="p">,</span>
+            <span class="n">ltp</span><span class="p">,</span>
+            <span class="n">fpap</span><span class="p">,</span>
+            <span class="n">trajectory</span>
+        <span class="p">)</span>
+
+        <span class="c1"># We put all the camera positions into the flight_data list</span>
+        <span class="n">flight_data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span>
+                <span class="n">lon_deg</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>  <span class="c1">#</span>
+                <span class="n">lat_deg</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>  <span class="c1"># camera coordinates</span>
+                <span class="n">alt_m</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>  <span class="c1">#</span>
+                <span class="p">(</span><span class="n">rwy_psi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">psi_deg</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>  <span class="c1"># back azimuth angle + yaw angle</span>
+                <span class="p">(</span><span class="mi">90</span> <span class="o">+</span> <span class="n">theta_deg</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>  <span class="c1"># pitch deg</span>
+                <span class="n">phi_deg</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>  <span class="c1"># roll deg</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">flight_data</span></div>
+
+<div class="viewcode-block" id="GESDataset.create_scenario"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_dataset.GESDataset.create_scenario">[docs]</a>    <span class="k">def</span> <span class="nf">create_scenario</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flight_data</span><span class="p">,</span> <span class="n">fov_vertical</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+                        <span class="n">fov_horizontal</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+                        <span class="n">width</span><span class="o">=</span><span class="mi">3840</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">2160</span><span class="p">,</span> <span class="n">nb_frames</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+                        <span class="n">times</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">export_metadata</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        </span>
+<span class="sd">        Take the flight_plan generated by generate_landing_poses() to convert it into a esp format file</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;template.json&#39;</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">scenario</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;settings&#39;</span><span class="p">][</span><span class="s1">&#39;frameRate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fps</span>
+        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;settings&#39;</span><span class="p">][</span><span class="s1">&#39;dimensions&#39;</span><span class="p">][</span><span class="s1">&#39;width&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">width</span>
+        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;settings&#39;</span><span class="p">][</span><span class="s1">&#39;dimensions&#39;</span><span class="p">][</span><span class="s1">&#39;height&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">height</span>
+
+        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;settings&#39;</span><span class="p">][</span><span class="s1">&#39;metadata_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;keyframes&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+
+        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span>
+            <span class="s1">&#39;keyframes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># longitude</span>
+        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span>
+            <span class="s1">&#39;keyframes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># latitude</span>
+        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span>
+            <span class="s1">&#39;keyframes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># altitude</span>
+
+        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;keyframes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># yaw</span>
+        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;keyframes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># pitch</span>
+        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;keyframes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># roll</span>
+
+        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;keyframes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># lens</span>
+
+        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;keyframes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># time</span>
+        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;keyframes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># cloud</span>
+        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">4</span><span class="p">][</span><span class="s1">&#39;keyframes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># buildings</span>
+
+        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nb_frames</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;settings&#39;</span><span class="p">][</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nb_frames</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;playbackManager&#39;</span><span class="p">][</span><span class="s1">&#39;range&#39;</span><span class="p">][</span><span class="s1">&#39;end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;settings&#39;</span><span class="p">][</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span>
+
+        <span class="c1"># if fov_horizontal:</span>
+        <span class="c1">#     fov_vertical = fov_horizontal * height / width</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     fov_horizontal = fov_vertical * width / height</span>
+
+        <span class="k">if</span> <span class="n">export_metadata</span><span class="p">:</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flight_data</span><span class="p">)):</span>
+
+            <span class="n">row</span> <span class="o">=</span> <span class="n">flight_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">time</span> <span class="o">=</span> <span class="n">times</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="n">year</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span>
+            <span class="n">month</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">]</span>
+            <span class="n">day</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">]</span>
+            <span class="n">minute</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="s1">&#39;minute&#39;</span><span class="p">]</span>
+            <span class="n">second</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">]</span>
+            <span class="n">myhour</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="s1">&#39;hour&#39;</span><span class="p">]</span>
+
+            <span class="n">date_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">myhour</span><span class="p">,</span> <span class="n">minute</span><span class="p">,</span> <span class="n">second</span><span class="p">)</span><span class="o">.</span><span class="n">timestamp</span><span class="p">())</span> <span class="o">*</span> <span class="mi">1000</span>
+            <span class="n">date_time_max</span> <span class="o">=</span> <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">][</span><span class="s1">&#39;maxValueRange&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                <span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">59</span><span class="p">,</span> <span class="mi">59</span><span class="p">)</span><span class="o">.</span><span class="n">timestamp</span><span class="p">())</span> <span class="o">*</span> <span class="mi">1000</span>
+            <span class="n">date_time_min</span> <span class="o">=</span> <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">][</span><span class="s1">&#39;minValueRange&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                <span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">timestamp</span><span class="p">())</span> <span class="o">*</span> <span class="mi">1000</span>
+            <span class="n">date_time</span> <span class="o">=</span> <span class="p">(</span><span class="n">date_time</span> <span class="o">-</span> <span class="n">date_time_min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">date_time_max</span> <span class="o">-</span> <span class="n">date_time_min</span><span class="p">)</span>
+
+            <span class="n">longitude</span> <span class="o">=</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span>
+                         <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span>
+                             <span class="s1">&#39;value&#39;</span><span class="p">][</span><span class="s1">&#39;minValueRange&#39;</span><span class="p">])</span> <span class="o">/</span> \
+                        <span class="p">(</span><span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span>
+                             <span class="s1">&#39;value&#39;</span><span class="p">][</span><span class="s1">&#39;maxValueRange&#39;</span><span class="p">]</span> <span class="o">-</span>
+                         <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span>
+                             <span class="s1">&#39;value&#39;</span><span class="p">][</span><span class="s1">&#39;minValueRange&#39;</span><span class="p">])</span>
+            <span class="n">latitude</span> <span class="o">=</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span>
+                        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span>
+                            <span class="s1">&#39;value&#39;</span><span class="p">][</span><span class="s1">&#39;minValueRange&#39;</span><span class="p">])</span> <span class="o">/</span> \
+                       <span class="p">(</span><span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span>
+                            <span class="s1">&#39;value&#39;</span><span class="p">][</span><span class="s1">&#39;maxValueRange&#39;</span><span class="p">]</span> <span class="o">-</span>
+                        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span>
+                            <span class="s1">&#39;value&#39;</span><span class="p">][</span><span class="s1">&#39;minValueRange&#39;</span><span class="p">])</span>
+            <span class="n">altitude</span> <span class="o">=</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span>
+                        <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span>
+                            <span class="s1">&#39;value&#39;</span><span class="p">][</span><span class="s1">&#39;minValueRange&#39;</span><span class="p">])</span> \
+                       <span class="o">/</span> <span class="p">(</span><span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span>
+                              <span class="s1">&#39;value&#39;</span><span class="p">][</span><span class="s1">&#39;maxValueRange&#39;</span><span class="p">]</span> <span class="o">-</span>
+                          <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span>
+                              <span class="s1">&#39;value&#39;</span><span class="p">][</span><span class="s1">&#39;minValueRange&#39;</span><span class="p">])</span>
+
+            <span class="n">yaw</span> <span class="o">=</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span>
+                   <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">][</span>
+                       <span class="s1">&#39;minValueRange&#39;</span><span class="p">])</span> <span class="o">/</span> \
+                  <span class="p">(</span><span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">][</span>
+                       <span class="s1">&#39;maxValueRange&#39;</span><span class="p">]</span> <span class="o">-</span>
+                   <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">][</span>
+                       <span class="s1">&#39;minValueRange&#39;</span><span class="p">])</span>
+            <span class="n">pitch</span> <span class="o">=</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">-</span>
+                     <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">][</span>
+                         <span class="s1">&#39;minValueRange&#39;</span><span class="p">])</span> <span class="o">/</span> \
+                    <span class="p">(</span><span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">][</span>
+                         <span class="s1">&#39;maxValueRange&#39;</span><span class="p">]</span> <span class="o">-</span>
+                     <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">][</span>
+                         <span class="s1">&#39;minValueRange&#39;</span><span class="p">])</span>
+            <span class="n">roll</span> <span class="o">=</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">-</span>
+                    <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">][</span>
+                        <span class="s1">&#39;minValueRange&#39;</span><span class="p">])</span> <span class="o">/</span> \
+                   <span class="p">(</span><span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">][</span>
+                        <span class="s1">&#39;maxValueRange&#39;</span><span class="p">]</span> <span class="o">-</span>
+                    <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">][</span>
+                        <span class="s1">&#39;minValueRange&#39;</span><span class="p">])</span>
+
+            <span class="n">fov</span> <span class="o">=</span> <span class="p">(</span><span class="n">fov_vertical</span> <span class="o">-</span> <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">][</span>
+                <span class="s1">&#39;minValueRange&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span>
+                          <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">][</span>
+                              <span class="s1">&#39;maxValueRange&#39;</span><span class="p">]</span> <span class="o">-</span>
+                          <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">][</span>
+                              <span class="s1">&#39;minValueRange&#39;</span><span class="p">])</span>
+
+            <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span>
+                <span class="s1">&#39;keyframes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">index</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flight_data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">longitude</span><span class="p">})</span>  <span class="c1"># longitude</span>
+            <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span>
+                <span class="s1">&#39;keyframes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">index</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flight_data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">latitude</span><span class="p">})</span>  <span class="c1"># latitude</span>
+            <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span>
+                <span class="s1">&#39;keyframes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">index</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flight_data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">altitude</span><span class="p">})</span>  <span class="c1"># altitude</span>
+
+            <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;keyframes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">index</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flight_data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">yaw</span><span class="p">})</span>  <span class="c1"># yaw</span>
+            <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;keyframes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">index</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flight_data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">pitch</span><span class="p">})</span>  <span class="c1"># pitch</span>
+            <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;keyframes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">index</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flight_data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">roll</span><span class="p">})</span>  <span class="c1"># roll</span>
+
+            <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;keyframes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">index</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flight_data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">fov</span><span class="p">})</span>  <span class="c1"># fov</span>
+
+            <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;keyframes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">index</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flight_data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">date_time</span><span class="p">})</span>  <span class="c1"># time</span>
+            <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;keyframes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">index</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flight_data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;transitionIn&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;step&#39;</span><span class="p">},</span>
+                 <span class="s1">&#39;transitionOut&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;step&#39;</span><span class="p">},</span>
+                 <span class="s1">&#39;transitionLinked&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>  <span class="c1"># cloud</span>
+
+            <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="mi">4</span><span class="p">][</span><span class="s1">&#39;keyframes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">index</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flight_data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>  <span class="c1"># buildings</span>
+
+            <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;settings&#39;</span><span class="p">][</span><span class="s1">&#39;metadata_index&#39;</span><span class="p">][</span><span class="s1">&#39;keyframes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">index</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flight_data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">})</span>  <span class="c1"># actual GMTs and flight data file index</span>
+            <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="n">export_metadata</span><span class="p">:</span>
+                <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">scenario</span><span class="p">,</span> <span class="n">metadata</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">Lard</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Mussot Vincent.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

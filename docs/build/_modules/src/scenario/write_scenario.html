@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.scenario.write_scenario &#8212; Lard 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.scenario.write_scenario</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">src.scenario.write_scenario_utils</span> <span class="kn">import</span> <span class="n">initialize_dataset</span><span class="p">,</span> <span class="n">generate_scenario</span><span class="p">,</span> <span class="n">generate_poses</span>
+<span class="kn">from</span> <span class="nn">src.scenario.scenario_config</span> <span class="kn">import</span> <span class="n">ScenarioConfig</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">asdict</span>
+
+
+<div class="viewcode-block" id="write_scenario"><a class="viewcode-back" href="../../../src.scenario.html#src.scenario.write_scenario.write_scenario">[docs]</a><span class="k">def</span> <span class="nf">write_scenario</span><span class="p">(</span><span class="n">scenario_config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">ScenarioConfig</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Export a scenario from a yaml config file to eps format</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">scenario_config</span><span class="o">.</span><span class="n">update_fields</span><span class="p">()</span>
+    <span class="n">scenario_content</span> <span class="o">=</span> <span class="n">scenario_config</span><span class="o">.</span><span class="n">content</span>
+    <span class="n">dataset_dir</span> <span class="o">=</span> <span class="n">scenario_config</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">dataset_directory</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">ges_dataset</span> <span class="o">=</span> <span class="n">initialize_dataset</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">)</span>
+
+    <span class="c1"># Watermark management</span>
+    <span class="k">if</span> <span class="n">scenario_content</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">watermark_height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">scenario_content</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">height</span> <span class="o">/</span> <span class="mf">2.</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">scenario_content</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">fov</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">))</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="n">scenario_content</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">height</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">scenario_content</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">watermark_height</span>
+        <span class="n">fov</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">height</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fov</span> <span class="o">=</span> <span class="n">scenario_content</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">fov</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="n">scenario_content</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">height</span>
+
+    <span class="c1"># Generate poses</span>
+    <span class="n">scenario_content</span><span class="o">.</span><span class="n">poses</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">runaways_db</span> <span class="o">=</span> <span class="n">scenario_content</span><span class="o">.</span><span class="n">runways_database</span>
+    <span class="n">generate_poses</span><span class="p">(</span><span class="n">runaways_db</span><span class="p">,</span> <span class="n">scenario_content</span><span class="p">,</span> <span class="n">ges_dataset</span><span class="p">)</span>
+
+    <span class="c1"># Generate scenario</span>
+    <span class="n">poses</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;pose&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">scenario_content</span><span class="o">.</span><span class="n">poses</span><span class="p">]</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">scenario_content</span><span class="o">.</span><span class="n">poses</span><span class="p">]</span>
+    <span class="n">scenario</span> <span class="o">=</span> <span class="n">generate_scenario</span><span class="p">(</span><span class="n">scenario_content</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">poses</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">fov</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">ges_dataset</span><span class="p">)</span>
+
+    <span class="c1"># Write scenario in esp format (google engine format)</span>
+    <span class="n">out_google_file</span> <span class="o">=</span> <span class="n">scenario_config</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">earth_studio_scenario</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">out_google_file</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_google_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">scenario</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scenario exported as esp : </span><span class="si">{</span><span class="n">out_google_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Save scenario configuration as yaml</span>
+    <span class="n">output_scenario_file</span> <span class="o">=</span> <span class="n">scenario_config</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">scenario_metadata</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_scenario_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">asdict</span><span class="p">(</span><span class="n">scenario_content</span><span class="p">),</span> <span class="n">f</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scenario exported as yaml : </span><span class="si">{</span><span class="n">output_scenario_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># Parse arguments</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+        <span class="n">prog</span><span class="o">=</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span><span class="o">.</span><span class="n">stem</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;Generate a Google Earth Scenario file based on the </span><span class="se">\</span>
+<span class="s2">configuration file provided.&quot;&quot;&quot;</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;config_filepath&#39;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;YAML configuration filepath&#39;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;params/example_generation.yaml&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;--verbose&#39;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Verbose mode&#39;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span>
+    <span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    airport = &quot;BGBW&quot;</span>
+<span class="sd">    runway = &quot;06&quot;</span>
+<span class="sd">    output_directory = Path(&quot;scenarios/debug_test&quot;)</span>
+<span class="sd">    sample_number = 61</span>
+<span class="sd">    config = ScenarioConfig(airport,</span>
+<span class="sd">                          [runway],</span>
+<span class="sd">                          scenario_dir=output_directory / f&quot;{airport}_{runway}_{sample_number}&quot;)</span>
+<span class="sd">    config.sample_number = 61</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">ScenarioConfig</span><span class="p">(</span><span class="n">yaml_file</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">config_filepath</span><span class="p">)</span>
+    <span class="n">write_scenario</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">Lard</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Mussot Vincent.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

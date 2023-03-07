@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.scenario.write_scenario_utils &#8212; Lard 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.scenario.write_scenario_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">src.ges.ges_dataset</span> <span class="kn">import</span> <span class="n">GESDataset</span>
+<span class="kn">from</span> <span class="nn">src.scenario.default_scenario_values</span> <span class="kn">import</span> <span class="n">ScenarioContent</span>
+
+
+<div class="viewcode-block" id="initialize_dataset"><a class="viewcode-back" href="../../../src.scenario.html#src.scenario.write_scenario_utils.initialize_dataset">[docs]</a><span class="k">def</span> <span class="nf">initialize_dataset</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GESDataset</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Returns an instance of GESDataset with the config.yaml parameters in it</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">GESDataset</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="load_runways_database"><a class="viewcode-back" href="../../../src.scenario.html#src.scenario.write_scenario_utils.load_runways_database">[docs]</a><span class="k">def</span> <span class="nf">load_runways_database</span><span class="p">(</span><span class="n">runways_database_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    load the runways database</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">runways_database_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">runways</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">runways</span></div>
+
+
+<div class="viewcode-block" id="generate_poses"><a class="viewcode-back" href="../../../src.scenario.html#src.scenario.write_scenario_utils.generate_poses">[docs]</a><span class="k">def</span> <span class="nf">generate_poses</span><span class="p">(</span><span class="n">runaway_db</span><span class="p">,</span> <span class="n">scenario</span><span class="p">:</span> <span class="n">ScenarioContent</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">GESDataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    generate all the camera poses with the config c and the GESDataset d</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">scenario</span><span class="o">.</span><span class="n">time</span>
+    <span class="k">for</span> <span class="n">runway</span> <span class="ow">in</span> <span class="n">scenario</span><span class="o">.</span><span class="n">runways</span><span class="p">:</span>
+        <span class="n">poses</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">generate_landing_poses</span><span class="p">(</span><span class="n">runaway_db</span><span class="p">,</span>
+                                         <span class="n">scenario</span><span class="o">.</span><span class="n">airport</span><span class="p">,</span>
+                                         <span class="n">runway</span><span class="p">,</span>
+                                         <span class="n">scenario</span><span class="o">.</span><span class="n">trajectory</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">poses</span><span class="p">:</span>
+            <span class="n">scenario</span><span class="o">.</span><span class="n">poses</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s1">&#39;airport&#39;</span><span class="p">:</span> <span class="n">scenario</span><span class="o">.</span><span class="n">airport</span><span class="p">,</span>
+                <span class="s1">&#39;runway&#39;</span><span class="p">:</span> <span class="n">runway</span><span class="p">,</span>
+                <span class="s1">&#39;pose&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">p</span><span class="p">),</span>  <span class="c1"># list of flight data</span>
+                <span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;year&#39;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">year_min</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">year_max</span><span class="p">),</span>
+                    <span class="s1">&#39;month&#39;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">month_min</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">month_max</span><span class="p">),</span>
+                    <span class="s1">&#39;day&#39;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">day_min</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">day_max</span><span class="p">),</span>
+                    <span class="s1">&#39;hour&#39;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">hour_min</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">hour_max</span><span class="p">),</span>
+                    <span class="s1">&#39;minute&#39;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">minute_min</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">minute_max</span><span class="p">),</span>
+                    <span class="s1">&#39;second&#39;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">second_min</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">second_max</span><span class="p">),</span>
+                <span class="p">}</span>
+            <span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="generate_scenario"><a class="viewcode-back" href="../../../src.scenario.html#src.scenario.write_scenario_utils.generate_scenario">[docs]</a><span class="k">def</span> <span class="nf">generate_scenario</span><span class="p">(</span><span class="n">image_width</span><span class="p">,</span> <span class="n">poses</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">fov</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">GESDataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    generate the scenario (format for GES)</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">scenario</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">create_scenario</span><span class="p">(</span>
+        <span class="n">flight_data</span><span class="o">=</span><span class="n">poses</span><span class="p">,</span>
+        <span class="n">nb_frames</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">poses</span><span class="p">),</span>
+        <span class="n">fov_vertical</span><span class="o">=</span><span class="n">fov</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">image_width</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+        <span class="n">times</span><span class="o">=</span><span class="n">times</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">scenario</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">Lard</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Mussot Vincent.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

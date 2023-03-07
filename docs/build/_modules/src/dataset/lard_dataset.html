@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.dataset.lard_dataset &mdash; Lard 1.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Lard
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Lard</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.dataset.lard_dataset</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.dataset.lard_dataset</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span><span class="p">,</span> <span class="n">PureWindowsPath</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">src.labeling.labels</span> <span class="kn">import</span> <span class="n">Labels</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+
+
+<div class="viewcode-block" id="LardDataset"><a class="viewcode-back" href="../../../src.dataset.html#src.dataset.lard_dataset.LardDataset">[docs]</a><span class="k">class</span> <span class="nc">LardDataset</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to load, merge (in the case of a splitted dataset), remove watermark and easily export a LardDataset to other</span>
+<span class="sd">    detection formats  (coco, tlbr,..).</span>
+
+<span class="sd">    Usage :</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        dataset = LardDataset(train_path=PATH_TO_TRAIN_DATASET, test_path=PATH_TO_TEST_DATASET)</span>
+<span class="sd">        # Coco format</span>
+<span class="sd">        dataset.export(output_directory,</span>
+<span class="sd">                       bbx_format=&quot;xywh&quot;,     # other formats are tlbr (top left bottom right), tlwh (top left width</span>
+<span class="sd">                                              # height, corners (keep corner instead of bbox)</span>
+<span class="sd">                       normalized=True,       # are bbox positions normalized with respect to image size or kept as pixel</span>
+<span class="sd">                       label_file=&quot;multiple&quot;, # one file per image, &quot;single&quot; for a single label file</span>
+<span class="sd">                       crop=True)             # crop each synthetized image to remove watermarks</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="LardDataset.__init__"><a class="viewcode-back" href="../../../src.dataset.html#src.dataset.lard_dataset.LardDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">test_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load a Lard dataset as obtained after the labeling phase. At least one of train_path or test_path must be</span>
+<span class="sd">        provided.</span>
+
+<span class="sd">        :param train_path: path to a labeled (after labeling phase) Lard dataset.</span>
+<span class="sd">        :type train_path: Union[Path, str]</span>
+<span class="sd">        :param test_path: path to a labeled (after labeling phase) Lard dataset.</span>
+<span class="sd">        :type test_path: Union[Path, str]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datasets_dirs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">train_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dataset_name</span> <span class="o">=</span> <span class="s2">&quot;train&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">datasets_dirs</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">train_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_labels_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets_dirs</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">test_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dataset_name</span> <span class="o">=</span> <span class="s2">&quot;test&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">datasets_dirs</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">test_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_labels_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets_dirs</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">],</span> <span class="n">dataset_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_cols</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">x_corners_names</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_cols</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y_corners_names</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_load_labels_file</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;train&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Labels</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load lard label metadata.csv in the provided path.</span>
+<span class="sd">        If the dataset was splitted in multiple subdir, all the metadata csv will be merged and included in the</span>
+<span class="sd">        resulting Label object</span>
+
+<span class="sd">        :param path: Path to a Lard dataset.</span>
+<span class="sd">        :type path: Path</span>
+<span class="sd">        :param dataset: dataset name, train or test</span>
+<span class="sd">        :type dataset: str</span>
+<span class="sd">        :return: Labels instance of the dataset, merged if multiple csv were found.</span>
+<span class="sd">        :rtype: Labels</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">Labels</span><span class="p">(</span><span class="n">path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span>
+            <span class="n">labels</span><span class="o">.</span><span class="n">as_working_dir_paths</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="c1"># Try check if we can find one in the current repo</span>
+            <span class="n">csv_candidates</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">*.csv&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">csv_candidates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="n">Labels</span><span class="p">(</span><span class="n">csv_candidates</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">labels</span><span class="o">.</span><span class="n">as_working_dir_paths</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Try check if the dataset was splitted in different parts</span>
+                <span class="n">csv_candidates</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}{</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="si">}</span><span class="s2">*</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="si">}</span><span class="s2">*.csv&quot;</span><span class="p">))</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">csv_candidates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">labels</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">for</span> <span class="n">csv_candidate</span> <span class="ow">in</span> <span class="n">csv_candidates</span><span class="p">:</span>
+                        <span class="n">lbl</span> <span class="o">=</span> <span class="n">Labels</span><span class="p">(</span><span class="n">csv_candidate</span><span class="p">)</span>
+                        <span class="n">lbl</span><span class="o">.</span><span class="n">as_working_dir_paths</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">labels</span> <span class="o">=</span> <span class="n">lbl</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">labels</span> <span class="o">+=</span> <span class="n">lbl</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No metadata csv for </span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s2"> was not found in </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">labels</span>
+
+<div class="viewcode-block" id="LardDataset.to_tlbr"><a class="viewcode-back" href="../../../src.dataset.html#src.dataset.lard_dataset.LardDataset.to_tlbr">[docs]</a>    <span class="k">def</span> <span class="nf">to_tlbr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Labels</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert labels with corners position to bboxes in tlbr (top left and bottom right points ) format.</span>
+
+<span class="sd">        :param labels: Lard dataset labels with corner positions</span>
+<span class="sd">        :type labels: Labels</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">df</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y_tl&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">y_corners_names</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y_br&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">y_corners_names</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x_tl&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">x_corners_names</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x_br&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">x_corners_names</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x_tl&quot;</span><span class="p">,</span> <span class="s2">&quot;x_br&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;y_tl&quot;</span><span class="p">,</span> <span class="s2">&quot;y_br&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="LardDataset.to_tlwh"><a class="viewcode-back" href="../../../src.dataset.html#src.dataset.lard_dataset.LardDataset.to_tlwh">[docs]</a>    <span class="k">def</span> <span class="nf">to_tlwh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Labels</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert corners position to tlwh bbox labels.</span>
+
+<span class="sd">        :param labels: Lard dataset labels with corner positions</span>
+<span class="sd">        :type labels: Labels</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">df</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">y_corners_names</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;h&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">y_corners_names</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">x_corners_names</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;w&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">x_corners_names</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;h&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="LardDataset.tlwh_to_xywh"><a class="viewcode-back" href="../../../src.dataset.html#src.dataset.lard_dataset.LardDataset.tlwh_to_xywh">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">tlwh_to_xywh</span><span class="p">(</span><span class="n">labels</span><span class="p">:</span> <span class="n">Labels</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert tlwh bboxes to xywh.</span>
+
+<span class="sd">        :param labels: Lard dataset Labels in tlwh format.</span>
+<span class="sd">        :type labels: Labels</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">df</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">df</span><span class="o">.</span><span class="n">w</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">df</span><span class="o">.</span><span class="n">h</span> <span class="o">/</span> <span class="mi">2</span></div>
+
+<div class="viewcode-block" id="LardDataset.normalize_labels"><a class="viewcode-back" href="../../../src.dataset.html#src.dataset.lard_dataset.LardDataset.normalize_labels">[docs]</a>    <span class="k">def</span> <span class="nf">normalize_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Labels</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Normalize label with the image size. Input labels should be in pixels, and will be divided by image width/height</span>
+
+<span class="sd">        :param labels: Lard dataset Labels, with target positions in pixels.</span>
+<span class="sd">        :type labels: Labels</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">df</span>
+        <span class="k">for</span> <span class="n">x_col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_cols</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">x_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">x_col</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;width&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">y_col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_cols</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">y_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">y_col</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;height&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="LardDataset.get_ordered_cols"><a class="viewcode-back" href="../../../src.dataset.html#src.dataset.lard_dataset.LardDataset.get_ordered_cols">[docs]</a>    <span class="k">def</span> <span class="nf">get_ordered_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the names of the columns containing target position in a specific order.</span>
+<span class="sd">        Order is x coordinate, then y coordinate, for each of the position columns in ``self.x_cols`` order.</span>
+
+<span class="sd">        :return: ordered list of columns names for target position.</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">cols</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_cols</span><span class="p">))</span> <span class="k">for</span> <span class="n">cols</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_cols</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_cols</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="LardDataset.crop_labels"><a class="viewcode-back" href="../../../src.dataset.html#src.dataset.lard_dataset.LardDataset.crop_labels">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">crop_labels</span><span class="p">(</span><span class="n">labels</span><span class="p">:</span> <span class="n">Labels</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update labels to positions in cropped images.</span>
+
+<span class="sd">        :param labels: dataset labels</span>
+<span class="sd">        :type labels: Labels</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">df</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">df</span><span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">watermark_size</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">(),</span> <span class="s2">&quot;height&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;height&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">watermark_size</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">labels</span><span class="o">.</span><span class="n">y_corners_names</span><span class="p">:</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">df</span><span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">watermark_size</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">(),</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">watermark_size</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="LardDataset.export"><a class="viewcode-back" href="../../../src.dataset.html#src.dataset.lard_dataset.LardDataset.export">[docs]</a>    <span class="k">def</span> <span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+               <span class="n">bbx_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">normalized</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+               <span class="n">label_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;single&quot;</span><span class="p">,</span>
+               <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;;&quot;</span><span class="p">,</span>
+               <span class="n">header</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">crop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+               <span class="n">ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;txt&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export the Lard dataset to another format</span>
+
+<span class="sd">        :param output_dir: directory where the converted dataset will be saved</span>
+<span class="sd">        :type output_dir: Path or string</span>
+<span class="sd">        :param bbx_format: Format for label bbox. Options are :</span>
+<span class="sd">        - &quot;tlbr&quot; (x,y of top left then x,y of bottom rights corners of the bbox)</span>
+<span class="sd">        - &quot;tlwh&quot; (x, y of top left, bbox width and height)</span>
+<span class="sd">        - &quot;xywh&quot; (x, y of the center of the bbox, bbox width and height)</span>
+<span class="sd">        - &quot;corners&quot; (x,y of each corner)</span>
+<span class="sd">        :type bbx_format: str</span>
+<span class="sd">        :param normalized: option to normalize the bbox position by the image size. If true, bbox labels are expressed</span>
+<span class="sd">        in fraction of the image width and height, if False, left in pixels. Default = False.</span>
+<span class="sd">        :type normalized: bool</span>
+<span class="sd">        :param label_file: &quot;single&quot; (all the labels are in a single csv, with a column with image path) or</span>
+<span class="sd">        &quot;multiple&quot; (one label file per image, saved in output_dir/labels).</span>
+<span class="sd">        :type label_file: str</span>
+<span class="sd">        :param sep: label file(s) separator, default is &quot;;&quot;.</span>
+<span class="sd">        :type sep: &quot; &quot;</span>
+<span class="sd">        :param header: If True, an header with column names is added to each label file.</span>
+<span class="sd">        :type header: bool</span>
+<span class="sd">        :param crop: If True, crop during export all images with watermarks and updates bboxes position for the cropped</span>
+<span class="sd">        image. If False, the image will be copied without modifications.</span>
+<span class="sd">        :type crop: bool</span>
+<span class="sd">        :param ext: Extension format for labels files. Default is &quot;txt&quot;.</span>
+<span class="sd">        :type ext: str</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;------ Exporting </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> dataset -------&quot;</span><span class="p">)</span>
+            <span class="n">dataset_dir</span> <span class="o">=</span> <span class="n">output_dir</span> <span class="o">/</span> <span class="n">name</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">image_dir</span> <span class="o">=</span> <span class="n">dataset_dir</span> <span class="o">/</span> <span class="s2">&quot;images&quot;</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">image_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">crop</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cropping labels bbox&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">crop_labels</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">bbx_format</span> <span class="o">==</span> <span class="s2">&quot;tlbr&quot;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Converting bboxes to tlbr format&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">to_tlbr</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">bbx_format</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;tlwh&quot;</span><span class="p">,</span> <span class="s2">&quot;xywh&quot;</span><span class="p">]:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Converting bboxes to tlwh format&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">to_tlwh</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">bbx_format</span> <span class="o">==</span> <span class="s2">&quot;xywh&quot;</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Converting bboxes from tlwh to xywh&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">tlwh_to_xywh</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">normalized</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Normalizing bboxes&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">normalize_labels</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">label_file</span> <span class="o">==</span> <span class="s2">&quot;multiple&quot;</span><span class="p">:</span>
+                <span class="n">out_label_dir</span> <span class="o">=</span> <span class="n">dataset_dir</span> <span class="o">/</span> <span class="s2">&quot;labels&quot;</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">out_label_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out_label_file</span> <span class="o">=</span> <span class="n">dataset_dir</span> <span class="o">/</span> <span class="p">(</span><span class="s2">&quot;labels.&quot;</span><span class="o">+</span><span class="n">ext</span><span class="p">)</span>
+            <span class="n">bbox_id</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">bbox_id</span><span class="p">]}</span>
+            <span class="n">last_image</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">coco_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ordered_cols</span><span class="p">())</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting images export&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                <span class="k">if</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">index</span> <span class="o">%</span> <span class="mi">100</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Progress : </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> images on </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">img_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">last_image</span> <span class="o">!=</span> <span class="n">img_path</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">crop</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;watermark_height&quot;</span><span class="p">]):</span>
+                        <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">img_path</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="n">img</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># older versions of the dataset might contain windows not posix paths</span>
+                            <span class="n">row</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">PureWindowsPath</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">image</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+                            <span class="n">img_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets_dirs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">row</span><span class="o">.</span><span class="n">image</span>
+                            <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">img_path</span><span class="p">))</span>
+                        <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;watermark_height&quot;</span><span class="p">]):</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;watermark_height&quot;</span><span class="p">]),</span> <span class="p">:]</span>
+                        <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">((</span><span class="n">image_dir</span> <span class="o">/</span> <span class="n">img_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span> <span class="n">img</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">img_path</span><span class="p">,</span> <span class="n">image_dir</span> <span class="o">/</span> <span class="n">img_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">label_file</span> <span class="o">==</span> <span class="s2">&quot;multiple&quot;</span><span class="p">:</span>
+                        <span class="n">last_image</span> <span class="o">=</span> <span class="n">img_path</span>
+                        <span class="n">out_label_file</span> <span class="o">=</span> <span class="n">out_label_dir</span> <span class="o">/</span> <span class="p">(</span><span class="n">img_path</span><span class="o">.</span><span class="n">stem</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">ext</span><span class="p">)</span>
+                        <span class="n">coco_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">get_ordered_cols</span><span class="p">())</span>
+
+                <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_cols</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_cols</span><span class="p">:</span>
+                    <span class="n">out</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">col</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">label_file</span> <span class="o">==</span> <span class="s2">&quot;single&quot;</span><span class="p">:</span>
+                    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">img_path</span><span class="o">.</span><span class="n">resolve</span><span class="p">())]</span>
+                <span class="n">coco_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">coco_df</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">out</span><span class="p">)])</span>
+                <span class="k">if</span> <span class="n">label_file</span> <span class="o">==</span> <span class="s2">&quot;multiple&quot;</span><span class="p">:</span>
+                    <span class="n">coco_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_label_file</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">label_file</span> <span class="o">==</span> <span class="s2">&quot;single&quot;</span><span class="p">:</span>
+                <span class="n">coco_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_label_file</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">lard_dataset</span> <span class="o">=</span> <span class="n">LardDataset</span><span class="p">(</span><span class="s2">&quot;data/multiple_train&quot;</span><span class="p">,</span> <span class="s2">&quot;data/test_dataset&quot;</span><span class="p">)</span>
+    <span class="n">lard_dataset</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;data/converted_dataset_no_crop&quot;</span><span class="p">,</span>
+                        <span class="n">bbx_format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">label_file</span><span class="o">=</span><span class="s2">&quot;single&quot;</span><span class="p">,</span>
+                        <span class="n">crop</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span>
+                        <span class="n">header</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Mussot Vincent.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

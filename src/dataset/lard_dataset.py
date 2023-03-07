@@ -13,18 +13,33 @@ from glob import glob
 class LardDataset:
     """
     Class to load, merge (in the case of a splitted dataset), remove watermark and easily export a LardDataset to other
-     detection formats  (coco, tlbr,..).
+    detection formats  (coco, tlbr,..).
+
     Usage :
-    dataset = LardDataset(train_path=PATH_TO_TRAIN_DATASET, test_path=PATH_TO_TEST_DATASET)
-    # Coco format
-    dataset.export(output_directory,
-                   bbx_format="xywh",   # other formats are tlbr (top left bottom right), tlwh (top left width height,
-                                        # corners (keep corner instead of bbox)
-                   normalized=True,  # are bbox positions normalized with respect to image size or kept as pixel
-                   label_file="multiple", # one file per image, "single" for a single label file
-                   crop=True) # crop each synthetized image to remove watermarks
+
+    .. code-block:: python
+
+        dataset = LardDataset(train_path=PATH_TO_TRAIN_DATASET, test_path=PATH_TO_TEST_DATASET)
+        # Coco format
+        dataset.export(output_directory,
+                       bbx_format="xywh",     # other formats are tlbr (top left bottom right), tlwh (top left width
+                                              # height, corners (keep corner instead of bbox)
+                       normalized=True,       # are bbox positions normalized with respect to image size or kept as pixel
+                       label_file="multiple", # one file per image, "single" for a single label file
+                       crop=True)             # crop each synthetized image to remove watermarks
+
     """
-    def __init__(self, train_path: Union[Path, str] = None, test_path: Union[Path, str] = None) -> None:
+    def __init__(self, train_path: Union[Path, str] = None,
+                 test_path: Union[Path, str] = None) -> None:
+        """
+        Load a Lard dataset as obtained after the labeling phase. At least one of train_path or test_path must be
+        provided.
+
+        :param train_path: path to a labeled (after labeling phase) Lard dataset.
+        :type train_path: Union[Path, str]
+        :param test_path: path to a labeled (after labeling phase) Lard dataset.
+        :type test_path: Union[Path, str]
+        """
         self.datasets: dict = {}
         self.datasets_dirs = {}
         if train_path is not None:
@@ -138,10 +153,10 @@ class LardDataset:
         for y_col in self.y_cols:
             df[y_col] = df[y_col] / df["height"]
 
-    def get_ordered_cols(self):
+    def get_ordered_cols(self) -> None:
         """
-        Return the names of the columns containing target position in order.
-        Order is x coordinate, then y coordinate, for each of the position columns in self.x_cols order.
+        Returns the names of the columns containing target position in a specific order.
+        Order is x coordinate, then y coordinate, for each of the position columns in ``self.x_cols`` order.
 
         :return: ordered list of columns names for target position.
         :rtype: list
@@ -153,7 +168,7 @@ class LardDataset:
         """
         Update labels to positions in cropped images.
 
-        :param labels: dataset Label
+        :param labels: dataset labels
         :type labels: Labels
         :return: None
         """

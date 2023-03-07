@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.tools.split_airport_database &#8212; Lard 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.tools.split_airport_database</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+
+<span class="n">TRAIN_AIPORTS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;BGBW&#39;</span><span class="p">,</span> <span class="s1">&#39;BGPT&#39;</span><span class="p">,</span> <span class="s1">&#39;BIRK&#39;</span><span class="p">,</span> <span class="s1">&#39;DAAG&#39;</span><span class="p">,</span> <span class="s1">&#39;LFMP&#39;</span><span class="p">,</span> <span class="s1">&#39;LFPO&#39;</span><span class="p">,</span> <span class="s1">&#39;LFQQ&#39;</span><span class="p">,</span> <span class="s1">&#39;LFRN&#39;</span><span class="p">,</span> <span class="s1">&#39;LFRS&#39;</span><span class="p">,</span> <span class="s1">&#39;LFST&#39;</span><span class="p">,</span> <span class="s1">&#39;LPPT&#39;</span><span class="p">,</span> <span class="s1">&#39;VABB&#39;</span><span class="p">,</span> <span class="s1">&#39;YBBN&#39;</span><span class="p">]</span>
+
+
+<span class="n">TEST_AIPORTS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LTAI&#39;</span><span class="p">,</span> <span class="s1">&#39;LICJ&#39;</span><span class="p">,</span> <span class="s1">&#39;LIRN&#39;</span><span class="p">,</span> <span class="s1">&#39;EDDV&#39;</span><span class="p">,</span> <span class="s1">&#39;LAX&#39;</span><span class="p">,</span> <span class="s1">&#39;LSZH&#39;</span><span class="p">,</span> <span class="s1">&#39;LEMD&#39;</span><span class="p">,</span> <span class="s1">&#39;LWSK&#39;</span><span class="p">,</span> <span class="s1">&#39;VHHH&#39;</span><span class="p">,</span> <span class="s1">&#39;CYUL&#39;</span><span class="p">,</span> <span class="s1">&#39;VRMM&#39;</span><span class="p">,</span> <span class="s1">&#39;LFSB&#39;</span><span class="p">,</span> <span class="s1">&#39;LCPH&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;LFML&#39;</span><span class="p">,</span> <span class="s1">&#39;GCRR&#39;</span><span class="p">,</span> <span class="s1">&#39;EHAM&#39;</span><span class="p">,</span> <span class="s1">&#39;SAEZ&#39;</span><span class="p">,</span> <span class="s1">&#39;CYVR&#39;</span><span class="p">,</span> <span class="s1">&#39;CYYZ&#39;</span><span class="p">,</span> <span class="s1">&#39;KIAH&#39;</span><span class="p">,</span> <span class="s1">&#39;KJFK&#39;</span><span class="p">,</span> <span class="s1">&#39;KMIA&#39;</span><span class="p">,</span> <span class="s1">&#39;KSFO&#39;</span><span class="p">,</span> <span class="s1">&#39;LFMN&#39;</span><span class="p">,</span> <span class="s1">&#39;MDSD&#39;</span><span class="p">,</span> <span class="s1">&#39;OMDB&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;RJAA&#39;</span><span class="p">,</span> <span class="s1">&#39;RJTT&#39;</span><span class="p">,</span> <span class="s1">&#39;WSSS&#39;</span><span class="p">,</span> <span class="s1">&#39;FMEP&#39;</span><span class="p">,</span> <span class="s1">&#39;VQPR&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../src.tools.html#src.tools.split_airport_database.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">database_path</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">database_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">runways_database</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="n">train_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">airport</span><span class="p">:</span> <span class="n">runways_database</span><span class="p">[</span><span class="n">airport</span><span class="p">]</span> <span class="k">for</span> <span class="n">airport</span> <span class="ow">in</span> <span class="n">TRAIN_AIPORTS</span><span class="p">}</span>
+    <span class="n">test_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">airport</span><span class="p">:</span> <span class="n">runways_database</span><span class="p">[</span><span class="n">airport</span><span class="p">]</span> <span class="k">for</span> <span class="n">airport</span> <span class="ow">in</span> <span class="n">TEST_AIPORTS</span><span class="p">}</span>
+    <span class="n">not_found</span> <span class="o">=</span> <span class="p">{</span><span class="n">airport</span><span class="p">:</span> <span class="n">data</span> <span class="k">for</span> <span class="n">airport</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">runways_database</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">airport</span> <span class="ow">in</span> <span class="n">train_dict</span>
+                                                                                      <span class="ow">or</span> <span class="n">airport</span> <span class="ow">in</span> <span class="n">test_dict</span><span class="p">)}</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Airports not found : </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">not_found</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">database_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="p">(</span><span class="n">database_path</span><span class="o">.</span><span class="n">stem</span><span class="o">+</span><span class="s2">&quot;_train.json&quot;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">train_dict</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">database_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="p">(</span><span class="n">database_path</span><span class="o">.</span><span class="n">stem</span><span class="o">+</span><span class="s2">&quot;_test.json&quot;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">test_dict</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">(</span>
+        <span class="n">prog</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span><span class="o">.</span><span class="n">stem</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;Sanitize the names of every image file of the real dataset&quot;&quot;&quot;</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;-i&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;--input_database&#39;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Path to a dataset export configuration. Example : params/export_test_dataset.yaml&#39;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s1">&#39;data/runways_database.json&#39;</span>
+    <span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">main</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">input_database</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">Lard</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Mussot Vincent.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

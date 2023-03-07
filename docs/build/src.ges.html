@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.ges package &mdash; Lard 1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Lard
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">src.ges package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.ges.geo_utils">src.ges.geo_utils module</a></li>
+<li><a class="reference internal" href="#module-src.ges.ges_camera">src.ges.ges_camera module</a></li>
+<li><a class="reference internal" href="#module-src.ges.ges_dataset">src.ges.ges_dataset module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Lard</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">src.ges package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.ges.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-src.ges">
+<span id="src-ges-package"></span><h1>src.ges package<a class="headerlink" href="#module-src.ges" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-src.ges.geo_utils">
+<span id="src-ges-geo-utils-module"></span><h2>src.ges.geo_utils module<a class="headerlink" href="#module-src.ges.geo_utils" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.adjust_index">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">adjust_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points_2d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#adjust_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.adjust_index" title="Permalink to this definition"></a></dt>
+<dd><p>Adjust the points that are outside of the images, finding the intersection with the bounds of the image.
+:param points_2d:
+:param height:
+:param width:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.adjust_point_projection">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">adjust_point_projection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points_3d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#adjust_point_projection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.adjust_point_projection" title="Permalink to this definition"></a></dt>
+<dd><p>Find if the point 3d are in front of the camera (z distance), in case of any of the points are outside of the field
+of view, an  equivalent point shall be found.
+:param points_3d:
+:param z: positive value corresponding to plane in front of the camera.
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.body2ecef_angles">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">body2ecef_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">longitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heading</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roll</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#body2ecef_angles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.body2ecef_angles" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.closest_point">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">closest_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point_2d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_points</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#closest_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.closest_point" title="Permalink to this definition"></a></dt>
+<dd><p>Find the closes point.
+:param point_2d:
+:param array_points:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.closest_point_on_line">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">closest_point_on_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#closest_point_on_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.closest_point_on_line" title="Permalink to this definition"></a></dt>
+<dd><p>find closest point of another point on a line created by two points a and b</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.cos">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">cos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">valueDegrees</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#cos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.cos" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the cosine of a value in degrees.
+:param valueDegrees:
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.ecef2body_angles">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">ecef2body_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">longitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rz</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#ecef2body_angles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.ecef2body_angles" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.ecef2llh">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">ecef2llh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#ecef2llh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.ecef2llh" title="Permalink to this definition"></a></dt>
+<dd><p>convert ECEF coordinates into llh coordinates</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – </p></li>
+<li><p><strong>y</strong> – </p></li>
+<li><p><strong>z</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Lat Long degrees decimal</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.find_angle_between_vectors">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">find_angle_between_vectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vec1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#find_angle_between_vectors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.find_angle_between_vectors" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.find_azimuth_between_2_coordinates">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">find_azimuth_between_2_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">long1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#find_azimuth_between_2_coordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.find_azimuth_between_2_coordinates" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple(distance, angle1, angle2)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.find_center">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">find_center</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#find_center"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.find_center" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.find_closest_point">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">find_closest_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#find_closest_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.find_closest_point" title="Permalink to this definition"></a></dt>
+<dd><p>return the closest point from a set of points to another point</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.fit_3d_plane_from_points">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">fit_3d_plane_from_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#fit_3d_plane_from_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.fit_3d_plane_from_points" title="Permalink to this definition"></a></dt>
+<dd><p>return the plane generated by 3 points</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.forward_pos">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">forward_pos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">long</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">azimut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#forward_pos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.forward_pos" title="Permalink to this definition"></a></dt>
+<dd><p>return the point at the distance dist from an origin point on the geodesic WGS84 following an azimut angle</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.get_distance_between_2_points">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">get_distance_between_2_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pt1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pt2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#get_distance_between_2_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.get_distance_between_2_points" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.llh2ecef">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">llh2ecef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">altitude</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#llh2ecef"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.llh2ecef" title="Permalink to this definition"></a></dt>
+<dd><p>convert latitude, longitude, height (llh) coordintes into ECEF coordinates</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>latitude</strong> – </p></li>
+<li><p><strong>longitude</strong> – </p></li>
+<li><p><strong>altitude</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>x, y and z in ECEF frame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.llh_relative2absolute">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">llh_relative2absolute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relative</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_range</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_range</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#llh_relative2absolute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.llh_relative2absolute" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.projection_3d_point_on_plane">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">projection_3d_point_on_plane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plane</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#projection_3d_point_on_plane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.projection_3d_point_on_plane" title="Permalink to this definition"></a></dt>
+<dd><p>return the projection of a point on a 3d plan</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.rotate_vector">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">rotate_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#rotate_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.rotate_vector" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.geo_utils.sin">
+<span class="sig-prename descclassname"><span class="pre">src.ges.geo_utils.</span></span><span class="sig-name descname"><span class="pre">sin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">valueDegrees</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/geo_utils.html#sin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.geo_utils.sin" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the sine of a value in degrees.
+:param valueDegrees:
+:return:</p>
+</dd></dl>
+
+</section>
+<section id="module-src.ges.ges_camera">
+<span id="src-ges-ges-camera-module"></span><h2>src.ges.ges_camera module<a class="headerlink" href="#module-src.ges.ges_camera" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.ges.ges_camera.GESCamera">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.ges.ges_camera.</span></span><span class="sig-name descname"><span class="pre">GESCamera</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_camera.html#GESCamera"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_camera.GESCamera" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ges.ges_camera.GESCamera.adjust_point_position">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">adjust_point_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points_3d_camera</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_camera.html#GESCamera.adjust_point_position"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_camera.GESCamera.adjust_point_position" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ges.ges_camera.GESCamera.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runways_database</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">airport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runway</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_camera.html#GESCamera.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_camera.GESCamera.compute" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ges.ges_camera.GESCamera.compute_extrinsics_matrix">
+<span class="sig-name descname"><span class="pre">compute_extrinsics_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_camera.html#GESCamera.compute_extrinsics_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_camera.GESCamera.compute_extrinsics_matrix" title="Permalink to this definition"></a></dt>
+<dd><p>compute extrinsics matrix</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ges.ges_camera.GESCamera.compute_intrinsics_matrix">
+<span class="sig-name descname"><span class="pre">compute_intrinsics_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_camera.html#GESCamera.compute_intrinsics_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_camera.GESCamera.compute_intrinsics_matrix" title="Permalink to this definition"></a></dt>
+<dd><p>compute the intrinsics matrix from the camera</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ges.ges_camera.GESCamera.compute_rotation_matrix">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compute_rotation_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rX</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rY</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rZ</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_camera.html#GESCamera.compute_rotation_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_camera.GESCamera.compute_rotation_matrix" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the rotation matrix 3X3 based on three angle rotations for each axis.
+:param rX: Rotation angle around x-axis [in degrees]
+:param rY: Rotation angle around y-axis [in degrees]
+:param rZ: Rotation angle around z-axis [in degrees]
+:return:  Rotation matrix R</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ges.ges_camera.GESCamera.compute_runway_axis_projection">
+<span class="sig-name descname"><span class="pre">compute_runway_axis_projection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runways_database</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">airport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runway</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_camera.html#GESCamera.compute_runway_axis_projection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_camera.GESCamera.compute_runway_axis_projection" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ges.ges_camera.GESCamera.compute_runway_corners_projection">
+<span class="sig-name descname"><span class="pre">compute_runway_corners_projection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runways_database</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">airport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runway</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_camera.html#GESCamera.compute_runway_corners_projection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_camera.GESCamera.compute_runway_corners_projection" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ges.ges_camera.GESCamera.display_points">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">display_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points_2d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_camera.html#GESCamera.display_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_camera.GESCamera.display_points" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ges.ges_camera.GESCamera.display_runway">
+<span class="sig-name descname"><span class="pre">display_runway</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runways_database</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">airport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bbox</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">centerline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contours</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sidelines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corners</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_camera.html#GESCamera.display_runway"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_camera.GESCamera.display_runway" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ges.ges_camera.GESCamera.display_runway_centerline">
+<span class="sig-name descname"><span class="pre">display_runway_centerline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runways_database</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">airport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_camera.html#GESCamera.display_runway_centerline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_camera.GESCamera.display_runway_centerline" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ges.ges_camera.GESCamera.image_boundary">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">image_boundary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points_2d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_camera.html#GESCamera.image_boundary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_camera.GESCamera.image_boundary" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ges.ges_camera.GESCamera.projection3d_2d">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">projection3d_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intrinsics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extrinsics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points_3d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_camera.html#GESCamera.projection3d_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_camera.GESCamera.projection3d_2d" title="Permalink to this definition"></a></dt>
+<dd><p>compute the projection of points in the image coordonate system
+using intrinsics and extrinsincs matrix from the camera taking the picture</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.ges.ges_dataset">
+<span id="src-ges-ges-dataset-module"></span><h2>src.ges.ges_dataset module<a class="headerlink" href="#module-src.ges.ges_dataset" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.ges.ges_dataset.GESDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.ges.ges_dataset.</span></span><span class="sig-name descname"><span class="pre">GESDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loc_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_dataset.html#GESDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_dataset.GESDataset" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ges.ges_dataset.GESDataset.create_scenario">
+<span class="sig-name descname"><span class="pre">create_scenario</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flight_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fov_vertical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fov_horizontal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3840</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2160</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nb_frames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_dataset.html#GESDataset.create_scenario"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_dataset.GESDataset.create_scenario" title="Permalink to this definition"></a></dt>
+<dd><p>Take the flight_plan generated by generate_landing_poses() to convert it into a esp format file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ges.ges_dataset.GESDataset.generate_landing_poses">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate_landing_poses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runaway_db</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">airport</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runway</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="src.scenario.html#src.scenario.default_scenario_values.DefaultTrajectory" title="src.scenario.default_scenario_values.DefaultTrajectory"><span class="pre">DefaultTrajectory</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_dataset.html#GESDataset.generate_landing_poses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_dataset.GESDataset.generate_landing_poses" title="Permalink to this definition"></a></dt>
+<dd><p>distribution: str = ‘exp’,
+distrib_param: float = math.sqrt(2),
+alpha_v_deg: float = -3,
+std_alpha_v_deg: float = 0.2,
+alpha_h_deg: float = 0.,
+std_alpha_h_deg: float = 2.,
+min_distance_m: float = 150.,
+max_distance_m: float = 10000.,
+roll_deg: float = 0.,
+std_roll_deg: float = 5.,
+pitch_deg: float = -4.,
+std_pitch_deg: float = 2.,
+std_yaw_deg: float = 5.,
+sample_number: int = 1000,
+dist_ap_m: float = 300.):</p>
+<p>Take a trajectory config and return a flight plan (ie. all the camera positions and 
+rotations according to the config file)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>airport</strong> (<em>str</em>) – code of the airport</p></li>
+<li><p><strong>runway</strong> (<em>str</em>) – code of the runway</p></li>
+<li><p><strong>alpha_v_deg</strong> (<em>float</em><em>, </em><em>optional</em>) – vertical angle. Defaults to -3.</p></li>
+<li><p><strong>std_alpha_v_deg</strong> (<em>float</em><em>, </em><em>optional</em>) – standard deviation of alpha_v. Defaults to 0.2.</p></li>
+<li><p><strong>alpha_h_deg</strong> (<em>float</em><em>, </em><em>optional</em>) – horizontal angle. Defaults to 0..</p></li>
+<li><p><strong>std_alpha_h_deg</strong> (<em>float</em><em>, </em><em>optional</em>) – standard deviation of alpha_h. Defaults to 2..</p></li>
+<li><p><strong>min_distance_m</strong> (<em>float</em><em>, </em><em>optional</em>) – minimal distance from the runway in meters. Defaults to 150..</p></li>
+<li><p><strong>max_distance_m</strong> (<em>float</em><em>, </em><em>optional</em>) – maximal distance from the runway in meters. Defaults to 10000..</p></li>
+<li><p><strong>roll_deg</strong> (<em>float</em><em>, </em><em>optional</em>) – roll angle. Defaults to 0..</p></li>
+<li><p><strong>std_roll_deg</strong> (<em>float</em><em>, </em><em>optional</em>) – standard deviation of roll angle. Defaults to 5..</p></li>
+<li><p><strong>pitch_deg</strong> (<em>float</em><em>, </em><em>optional</em>) – pitch angle. Defaults to -4..</p></li>
+<li><p><strong>std_pitch_deg</strong> (<em>float</em><em>, </em><em>optional</em>) – standard deviation of the pitch angle. Defaults to 2.</p></li>
+<li><p><strong>std_yaw_deg</strong> (<em>float</em><em>, </em><em>optional</em>) – standard deviation of the yaw angle. Defaults to 5.</p></li>
+<li><p><strong>sample_number</strong> (<em>int</em><em>, </em><em>optional</em>) – number of footages. Defaults to 1000.</p></li>
+<li><p><strong>plot_scatter</strong> (<em>bool</em><em>, </em><em>optional</em>) – Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The flight plan(ie positions and camera angles)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.ges.ges_dataset.GESDataset.load_data">
+<span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_dataset.html#GESDataset.load_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_dataset.GESDataset.load_data" title="Permalink to this definition"></a></dt>
+<dd><p>Extract the frame parameters which are in a json file generated by GoogleEarth Studio.</p>
+<dl>
+<dt>Frame information:</dt><dd><dl>
+<dt>“cameraFrames”:[</dt><dd><dl class="simple">
+<dt>{ “position”: {“x”: … , “y”: … , “z”: …}</dt><dd><p>“rotation”: {“x”: … , “y”: … , “z”: …}
+“coordinate”: {“latitude”: … , “longitude”: … , “altitude”: … }
+“fovVertical”:</p>
+</dd>
+</dl>
+<p>},
+{ “position”: ….
+},
+…</p>
+</dd>
+</dl>
+<p>]</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.ges_dataset.add_or_update_runways">
+<span class="sig-prename descclassname"><span class="pre">src.ges.ges_dataset.</span></span><span class="sig-name descname"><span class="pre">add_or_update_runways</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">airport_ocai</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runways</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordinates</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_dataset.html#add_or_update_runways"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_dataset.add_or_update_runways" title="Permalink to this definition"></a></dt>
+<dd><p>Update the database with new runways or update the coordinates of existing ones.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>database_file</strong> (<em>str</em>) – file containing coordinates of the runways</p></li>
+<li><p><strong>airport_ocai</strong> (<em>str</em>) – code of the airport</p></li>
+<li><p><strong>runways</strong> (<em>array of str</em><em>, </em><em>max length of 2</em>) – Runway code and optionally the id of the opposite runway</p></li>
+<li><p><strong>coordinates</strong> (<em>numpy array of floats</em><em>, </em><em>with shape</em><em> (</em><em>4</em><em>, </em><em>3</em><em>)</em>) – table of 4 points, each defined by latitude, longitude and altitude</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.ges_dataset.compute_aiming_point">
+<span class="sig-prename descclassname"><span class="pre">src.ges.ges_dataset.</span></span><span class="sig-name descname"><span class="pre">compute_aiming_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">airport_ocai</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runway_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_dataset.html#compute_aiming_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_dataset.compute_aiming_point" title="Permalink to this definition"></a></dt>
+<dd><p>get the aiming point on the runway at a distance ‘dist’ from the LTP</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>database_file</strong> (<em>str</em>) – file containing coordinates of the runways</p></li>
+<li><p><strong>airport_ocai</strong> (<em>str</em>) – code of the airport</p></li>
+<li><p><strong>runway_id</strong> (<em>str</em>) – code of the runway</p></li>
+<li><p><strong>dist_m</strong> (<em>float</em>) – distance of the aiming point from the LTP</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.ges_dataset.define_offset">
+<span class="sig-prename descclassname"><span class="pre">src.ges.ges_dataset.</span></span><span class="sig-name descname"><span class="pre">define_offset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aiming_point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rwy_psi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ltp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_dataset.html#define_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_dataset.define_offset" title="Permalink to this definition"></a></dt>
+<dd><p>distribution,</p>
+<p>alpha_v_deg: float = -3,
+std_alpha_v_deg: float = 0.2,
+alpha_h_deg: float = 0.,
+std_alpha_h_deg: float = 2.,
+min_distance_m: float = 150.,
+max_distance_m: float = 10000.,
+roll_deg: float = 0.,
+std_roll_deg: float = 5.,
+pitch_deg: float = -4.,
+std_pitch_deg: float = 2.,
+std_yaw_deg: float = 5.,
+sample_number: int = 1000,
+par_distrib1=0,
+return all the camera positions and angle with the deviations
+we get more footage when close to the aiming point with the exp(sqrt(2))</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.ges_dataset.generate_dist">
+<span class="sig-prename descclassname"><span class="pre">src.ges.ges_dataset.</span></span><span class="sig-name descname"><span class="pre">generate_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distribution:</span> <span class="pre">&lt;module</span> <span class="pre">'string'</span> <span class="pre">from</span> <span class="pre">'C:\\Users\\maxime.carrere\\Miniconda3\\envs\\datasprint\\lib\\string.py'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">par_distrib1=0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_dataset.html#generate_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_dataset.generate_dist" title="Permalink to this definition"></a></dt>
+<dd><p>generate the distances from the runway</p>
+<p>uniform: uniform between min and max distances
+exp: uniform(0,1)**par_distrib1 then reshape to [min, max] par_distrib &lt;1 -&gt; more images far from the runway</p>
+<blockquote>
+<div><p>par_distrib &gt;1 -&gt; more images near the runway</p>
+</div></blockquote>
+<p>normal: normal distribution troncated to have the maximum of the distribution at 1</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.ges.ges_dataset.get_runway_points">
+<span class="sig-prename descclassname"><span class="pre">src.ges.ges_dataset.</span></span><span class="sig-name descname"><span class="pre">get_runway_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">airport_oaci</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runway_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/ges/ges_dataset.html#get_runway_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.ges.ges_dataset.get_runway_points" title="Permalink to this definition"></a></dt>
+<dd><p>Return the points around the runway (4 corners, ltp and fpap)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>database_file</strong> (<em>str</em>) – file containing coordinates of the runways</p></li>
+<li><p><strong>airport_oaci</strong> (<em>str</em>) – code of the airport</p></li>
+<li><p><strong>runway_id</strong> – code of the runway</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Mussot Vincent.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

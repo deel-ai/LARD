@@ -1,0 +1,496 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.ges.ges_camera &#8212; Lard 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.ges.ges_camera</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+
+<span class="kn">from</span> <span class="nn">src.ges.geo_utils</span> <span class="kn">import</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">fit_3d_plane_from_points</span><span class="p">,</span> <span class="n">projection_3d_point_on_plane</span><span class="p">,</span> \
+    <span class="n">closest_point_on_line</span><span class="p">,</span> <span class="n">find_angle_between_vectors</span><span class="p">,</span> \
+    <span class="n">get_distance_between_2_points</span><span class="p">,</span> <span class="n">find_center</span><span class="p">,</span> <span class="n">adjust_index</span><span class="p">,</span> \
+    <span class="n">adjust_point_projection</span>
+
+<span class="kn">from</span> <span class="nn">skspatial.objects</span> <span class="kn">import</span> <span class="n">Point</span>
+
+
+
+<div class="viewcode-block" id="GESCamera"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_camera.GESCamera">[docs]</a><span class="k">class</span> <span class="nc">GESCamera</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_shape</span><span class="p">,</span> <span class="n">frame_data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frame_data</span> <span class="o">=</span> <span class="n">frame_data</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">frame_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">frame_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fov_vertical</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fov_horizontal</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intrinsics</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extrinsics</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">frame_data</span><span class="p">[</span><span class="s1">&#39;position&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span> <span class="o">=</span> <span class="n">frame_data</span><span class="p">[</span><span class="s1">&#39;rotation&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rotation_matrix</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coordinate</span> <span class="o">=</span> <span class="n">frame_data</span><span class="p">[</span><span class="s1">&#39;coordinate&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">runway_plane</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projected_position_on_runway_plane</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projected_position_along_track</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">along_track_distance</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cross_track_distance</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height_above_runway</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slant_distance</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lateral_path_angle</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lateral_path_angle_reference_point</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_path_angle</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_path_angle_reference_point</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bbox</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runway_corners</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pitch</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roll</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="GESCamera.compute_rotation_matrix"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_camera.GESCamera.compute_rotation_matrix">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">compute_rotation_matrix</span><span class="p">(</span><span class="n">rX</span><span class="p">,</span> <span class="n">rY</span><span class="p">,</span> <span class="n">rZ</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the rotation matrix 3X3 based on three angle rotations for each axis.</span>
+<span class="sd">        :param rX: Rotation angle around x-axis [in degrees]</span>
+<span class="sd">        :param rY: Rotation angle around y-axis [in degrees]</span>
+<span class="sd">        :param rZ: Rotation angle around z-axis [in degrees]</span>
+<span class="sd">        :return:  Rotation matrix R</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Rx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">cos</span><span class="p">(</span><span class="n">rX</span><span class="p">),</span> <span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">rX</span><span class="p">)],</span>
+                        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">sin</span><span class="p">(</span><span class="n">rX</span><span class="p">),</span> <span class="n">cos</span><span class="p">(</span><span class="n">rX</span><span class="p">)]])</span>
+
+        <span class="n">Ry</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">([[</span><span class="n">cos</span><span class="p">(</span><span class="n">rY</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sin</span><span class="p">(</span><span class="n">rY</span><span class="p">)],</span>
+                        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                        <span class="p">[</span><span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">rY</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cos</span><span class="p">(</span><span class="n">rY</span><span class="p">)]])</span>
+
+        <span class="n">Rz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">([[</span><span class="n">cos</span><span class="p">(</span><span class="n">rZ</span><span class="p">),</span> <span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">rZ</span><span class="p">),</span> <span class="mi">0</span><span class="p">],</span>
+                        <span class="p">[</span><span class="n">sin</span><span class="p">(</span><span class="n">rZ</span><span class="p">),</span> <span class="n">cos</span><span class="p">(</span><span class="n">rZ</span><span class="p">),</span> <span class="mi">0</span><span class="p">],</span>
+                        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">Rx</span> <span class="o">*</span> <span class="n">Ry</span> <span class="o">*</span> <span class="n">Rz</span>
+
+        <span class="k">return</span> <span class="n">R</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="GESCamera.compute_intrinsics_matrix"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_camera.GESCamera.compute_intrinsics_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">compute_intrinsics_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="sd">&quot;&quot;&quot;  </span>
+<span class="sd">        compute the intrinsics matrix from the camera</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># K Matrix or Intrinsic matrix.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fov_vertical</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_data</span><span class="p">[</span><span class="s1">&#39;fovVertical&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fov_horizontal</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span>
+            <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fov_vertical</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">))</span>
+
+        <span class="n">fy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fov_vertical</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)))</span>
+        <span class="n">fx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fov_horizontal</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)))</span>
+
+        <span class="n">cy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">cx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intrinsics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">([[</span><span class="n">fx</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cx</span><span class="p">],</span>
+                                     <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">fy</span><span class="p">,</span> <span class="n">cy</span><span class="p">],</span>
+                                     <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span></div>
+
+
+<div class="viewcode-block" id="GESCamera.compute_extrinsics_matrix"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_camera.GESCamera.compute_extrinsics_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">compute_extrinsics_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        compute extrinsics matrix</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">rX</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
+        <span class="n">rY</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span>
+        <span class="n">rZ</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rotation_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_rotation_matrix</span><span class="p">(</span><span class="n">rX</span><span class="p">,</span> <span class="n">rY</span><span class="p">,</span> <span class="n">rZ</span><span class="p">)</span>
+
+        <span class="c1"># Position Camera 3D</span>
+        <span class="n">camera_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">([[</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]],</span>
+                               <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]],</span>
+                               <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">]]])</span>
+        <span class="c1"># Translation Vector</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_matrix</span> <span class="o">*</span> <span class="n">camera_position</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extrinsics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">([[</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span>
+                                     <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_matrix</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span>
+                                     <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_matrix</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]])</span></div>
+
+<div class="viewcode-block" id="GESCamera.projection3d_2d"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_camera.GESCamera.projection3d_2d">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">projection3d_2d</span><span class="p">(</span><span class="n">intrinsics</span><span class="p">,</span> <span class="n">extrinsics</span><span class="p">,</span> <span class="n">points_3d</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;  </span>
+<span class="sd">        compute the projection of points in the image coordonate system</span>
+<span class="sd">        using intrinsics and extrinsincs matrix from the camera taking the picture</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">points_2d</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">points_3d_camera</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">adjust_flag</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">point_3d</span> <span class="ow">in</span> <span class="n">points_3d</span><span class="p">:</span>
+            <span class="n">Xw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">([[</span><span class="n">point_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                            <span class="p">[</span><span class="n">point_3d</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+                            <span class="p">[</span><span class="n">point_3d</span><span class="p">[</span><span class="mi">2</span><span class="p">]],</span>
+                            <span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+            <span class="n">Xw_c</span> <span class="o">=</span> <span class="n">extrinsics</span><span class="o">*</span><span class="n">Xw</span>
+            <span class="n">points_3d_camera</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Xw_c</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">Xw_c</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">adjust_flag</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">adjust_flag</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">points_3d_camera</span> <span class="o">=</span> <span class="n">GESCamera</span><span class="o">.</span><span class="n">adjust_point_position</span><span class="p">(</span><span class="n">points_3d_camera</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">point_3d</span> <span class="ow">in</span> <span class="n">points_3d_camera</span><span class="p">:</span>
+            <span class="n">Xw_c</span> <span class="o">=</span><span class="n">point_3d</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">intrinsics</span> <span class="o">*</span> <span class="n">Xw_c</span>
+            <span class="n">points_2d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">u</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">])],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">points_2d</span></div>
+
+
+<div class="viewcode-block" id="GESCamera.adjust_point_position"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_camera.GESCamera.adjust_point_position">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">adjust_point_position</span><span class="p">(</span><span class="n">points_3d_camera</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">points_3d_camera</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="c1">#Points C - A</span>
+            <span class="n">points_3d_camera</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">points_3d_camera</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">adjust_point_projection</span><span class="p">([</span><span class="n">points_3d_camera</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">points_3d_camera</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                                                             <span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+            <span class="c1"># Points D - B</span>
+            <span class="n">points_3d_camera</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">points_3d_camera</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">adjust_point_projection</span><span class="p">([</span><span class="n">points_3d_camera</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">points_3d_camera</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+                                                                               <span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">points_3d_camera</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">points_3d_camera</span> <span class="o">=</span> <span class="n">adjust_point_projection</span><span class="p">(</span><span class="n">points_3d_camera</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">points_3d_camera</span></div>
+
+
+<div class="viewcode-block" id="GESCamera.image_boundary"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_camera.GESCamera.image_boundary">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">image_boundary</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">points_2d</span><span class="p">):</span>
+        <span class="n">crop_images</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">points_2d</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="c1">#Points D - A</span>
+            <span class="n">new_points</span> <span class="o">=</span>  <span class="n">adjust_index</span><span class="p">([</span><span class="n">points_2d</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">points_2d</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">new_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">crop_images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_points</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">new_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">crop_images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_points</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="c1">#Points A - B</span>
+            <span class="n">new_points</span> <span class="o">=</span> <span class="n">adjust_index</span><span class="p">([</span><span class="n">points_2d</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">points_2d</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">new_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">crop_images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_points</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">new_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">crop_images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_points</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="c1"># Points C - B</span>
+            <span class="n">new_points</span> <span class="o">=</span> <span class="n">adjust_index</span><span class="p">([</span><span class="n">points_2d</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">points_2d</span><span class="p">[</span><span class="mi">2</span><span class="p">]],</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">new_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">crop_images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_points</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">new_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">crop_images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_points</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="c1">#Points C - D</span>
+            <span class="n">new_points</span><span class="o">=</span> <span class="n">adjust_index</span><span class="p">([</span><span class="n">points_2d</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">points_2d</span><span class="p">[</span><span class="mi">3</span><span class="p">]],</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">new_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">crop_images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_points</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">new_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">crop_images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_points</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">points_2d</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">new_points</span> <span class="o">=</span> <span class="n">adjust_index</span><span class="p">(</span><span class="n">points_2d</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">new_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">crop_images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_points</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">new_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">crop_images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_points</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">crop_images</span></div>
+
+<div class="viewcode-block" id="GESCamera.display_points"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_camera.GESCamera.display_points">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">display_points</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">points_2d</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">points</span> <span class="ow">in</span> <span class="n">points_2d</span><span class="p">:</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span> <span class="mi">15</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">],</span> <span class="n">thickness</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+
+        <span class="n">cv2</span><span class="o">.</span><span class="n">namedWindow</span><span class="p">(</span><span class="s1">&#39;Frame&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s1">&#39;Frame&#39;</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">frame</span></div>
+
+<div class="viewcode-block" id="GESCamera.compute_runway_corners_projection"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_camera.GESCamera.compute_runway_corners_projection">[docs]</a>    <span class="k">def</span> <span class="nf">compute_runway_corners_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runways_database</span><span class="p">,</span> <span class="n">airport</span><span class="p">,</span> <span class="n">runway</span><span class="p">,</span> <span class="n">delta_x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">delta_y</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">runway_points</span> <span class="o">=</span> <span class="n">runways_database</span><span class="p">[</span><span class="n">airport</span><span class="p">][</span><span class="n">runway</span><span class="p">]</span>
+
+        <span class="n">runway_corners_3d</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+                          <span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+                          <span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+                          <span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;D&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())]</span>
+
+        <span class="c1">#noralized vectors</span>
+        <span class="n">vectorAB</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">vectorDC</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="n">vectorAD</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+        <span class="n">vectorBC</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="c1">#We add deltax and deltay to the corners (in order to have a margin)</span>
+        <span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="o">+</span> <span class="n">vectorAB</span> <span class="o">*</span> <span class="n">delta_x</span> <span class="o">+</span> <span class="n">vectorAD</span> <span class="o">*</span> <span class="n">delta_y</span>
+        <span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">vectorAB</span> <span class="o">*</span> <span class="n">delta_x</span> <span class="o">+</span> <span class="n">vectorBC</span> <span class="o">*</span> <span class="n">delta_y</span>
+        <span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>  <span class="o">-</span> <span class="n">vectorDC</span> <span class="o">*</span> <span class="n">delta_x</span> <span class="o">-</span> <span class="n">vectorBC</span> <span class="o">*</span> <span class="n">delta_y</span>
+        <span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_3d</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">+</span> <span class="n">vectorDC</span> <span class="o">*</span> <span class="n">delta_x</span> <span class="o">-</span> <span class="n">vectorAD</span> <span class="o">*</span> <span class="n">delta_y</span>
+
+        <span class="k">return</span> <span class="n">GESCamera</span><span class="o">.</span><span class="n">projection3d_2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intrinsics</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">extrinsics</span><span class="p">,</span> <span class="n">runway_corners_3d</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GESCamera.compute_runway_axis_projection"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_camera.GESCamera.compute_runway_axis_projection">[docs]</a>    <span class="k">def</span> <span class="nf">compute_runway_axis_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runways_database</span><span class="p">,</span> <span class="n">airport</span><span class="p">,</span> <span class="n">runway</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">runway_points</span> <span class="o">=</span> <span class="n">runways_database</span><span class="p">[</span><span class="n">airport</span><span class="p">][</span><span class="n">runway</span><span class="p">]</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">ltp</span> <span class="o">=</span> <span class="n">find_center</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;D&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())])</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">fpap</span> <span class="o">=</span> <span class="n">find_center</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())])</span>
+
+        <span class="n">runway_axis_3d</span> <span class="o">=</span> <span class="p">[</span><span class="n">ltp</span><span class="p">,</span> <span class="n">fpap</span><span class="p">]</span>
+
+        <span class="n">vector</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_axis_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_axis_3d</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_axis_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_axis_3d</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="n">runway_axis_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_axis_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="o">+</span> <span class="n">vector</span> <span class="o">*</span> <span class="n">delta</span>
+        <span class="n">runway_axis_3d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_axis_3d</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">vector</span> <span class="o">*</span> <span class="n">delta</span>
+
+        <span class="k">return</span> <span class="n">GESCamera</span><span class="o">.</span><span class="n">projection3d_2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intrinsics</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">extrinsics</span><span class="p">,</span> <span class="n">runway_axis_3d</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GESCamera.display_runway"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_camera.GESCamera.display_runway">[docs]</a>    <span class="k">def</span> <span class="nf">display_runway</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">runways_database</span><span class="p">,</span> <span class="n">airport</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                       <span class="n">centerline</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">contours</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sidelines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">corners</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                       <span class="n">delta_x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">delta_y</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+
+        <span class="n">runway_corners_2d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_runway_corners_projection</span><span class="p">(</span><span class="n">runways_database</span><span class="p">,</span> <span class="n">airport</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">delta_x</span><span class="p">,</span> <span class="n">delta_y</span><span class="p">)</span>
+        <span class="n">runway_axis_2d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_runway_axis_projection</span><span class="p">(</span><span class="n">runways_database</span><span class="p">,</span> <span class="n">airport</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">delta_y</span><span class="p">)</span>
+
+        <span class="n">frame_</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">bbox_meta</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">contours</span><span class="p">:</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">drawContours</span><span class="p">(</span><span class="n">frame_</span><span class="p">,</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_2d</span><span class="p">)],</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">bbox</span><span class="p">:</span>
+
+            <span class="n">runway_corners_image</span> <span class="o">=</span> <span class="n">GESCamera</span><span class="o">.</span><span class="n">image_boundary</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">runway_corners_2d</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">points</span> <span class="ow">in</span> <span class="n">runway_corners_image</span><span class="p">:</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">frame_</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span> <span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">],</span> <span class="n">thickness</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="n">cv2</span><span class="o">.</span><span class="n">drawContours</span><span class="p">(</span><span class="n">frame_</span><span class="p">,</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">runway_corners_image</span><span class="p">])],</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">runway_corners_image</span><span class="p">))</span>
+            <span class="n">bbox_meta</span> <span class="o">=</span> <span class="p">[[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">],[</span><span class="n">x</span><span class="o">+</span><span class="n">w</span><span class="p">,</span> <span class="n">y</span><span class="o">+</span><span class="n">h</span><span class="p">]]</span>
+
+            <span class="c1"># cv2.rectangle(frame_, (x, y), (x + w, y + h), (255, 0, 0), 3)</span>
+
+            <span class="c1"># cv2.namedWindow(&#39;bbox&#39;, 0)</span>
+            <span class="c1"># cv2.imshow(&#39;bbox&#39;, frame[y:y+h, x:x+w,:])</span>
+            <span class="c1"># cv2.waitKey(1)</span>
+
+        <span class="k">if</span> <span class="n">corners</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">points</span> <span class="ow">in</span> <span class="n">runway_corners_2d</span><span class="p">:</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">frame_</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span> <span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">],</span> <span class="n">thickness</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">centerline</span><span class="p">:</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">frame_</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">runway_axis_2d</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">runway_axis_2d</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">sidelines</span><span class="p">:</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">frame_</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">runway_corners_2d</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">runway_corners_2d</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">frame_</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">runway_corners_2d</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">runway_corners_2d</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;NB CORNERS </span><span class="si">%d</span><span class="s2">&quot;</span><span class="o">%</span><span class="nb">len</span><span class="p">(</span><span class="n">runway_corners_image</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">frame_</span><span class="p">,</span> <span class="n">runway_corners_image</span><span class="p">,</span> <span class="n">bbox_meta</span></div>
+
+
+
+<div class="viewcode-block" id="GESCamera.display_runway_centerline"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_camera.GESCamera.display_runway_centerline">[docs]</a>    <span class="k">def</span> <span class="nf">display_runway_centerline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">runways_database</span><span class="p">,</span> <span class="n">airport</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+
+        <span class="n">runway_corners_2d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_runway_corners_projection</span><span class="p">(</span><span class="n">runways_database</span><span class="p">,</span> <span class="n">airport</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">runway_axis_2d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_runway_axis_projection</span><span class="p">(</span><span class="n">runways_database</span><span class="p">,</span> <span class="n">airport</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">camera_projected_position</span> <span class="o">=</span> <span class="n">GESCamera</span><span class="o">.</span><span class="n">projection3d_2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intrinsics</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">extrinsics</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">projected_position_along_track</span><span class="p">])</span>
+
+        <span class="n">frame_</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">frame_</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">camera_projected_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">runway_axis_2d</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">frame_</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">runway_corners_2d</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">runway_corners_2d</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">frame_</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">runway_corners_2d</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">runway_corners_2d</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">cv2</span><span class="o">.</span><span class="n">namedWindow</span><span class="p">(</span><span class="s1">&#39;Frame&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s1">&#39;Frame&#39;</span><span class="p">,</span> <span class="n">frame_</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">frame_</span></div>
+
+
+
+<div class="viewcode-block" id="GESCamera.compute"><a class="viewcode-back" href="../../../src.ges.html#src.ges.ges_camera.GESCamera.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runways_database</span><span class="p">,</span> <span class="n">airport</span><span class="p">,</span> <span class="n">runway</span><span class="p">):</span>
+
+        <span class="n">runway_points</span> <span class="o">=</span> <span class="n">runways_database</span><span class="p">[</span><span class="n">airport</span><span class="p">][</span><span class="n">runway</span><span class="p">]</span>
+        <span class="n">runway_pts</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+                             <span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+                             <span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+                             <span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;D&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())]</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">ltp</span> <span class="o">=</span> <span class="n">find_center</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;D&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())])</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">fpap</span> <span class="o">=</span> <span class="n">find_center</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="nb">list</span><span class="p">(</span><span class="n">runway_points</span><span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">][</span><span class="s1">&#39;position&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())])</span>
+
+        <span class="c1"># Warning: 4 points bestfit produces differents plan.normal depending on the order of the points.</span>
+        <span class="c1"># It is a problem, especially for computing the right values for &#39;height_above_runway&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runway_plane</span> <span class="o">=</span> <span class="n">fit_3d_plane_from_points</span><span class="p">(</span><span class="n">runway_pts</span><span class="p">)</span>
+        <span class="n">centerline_vector</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ltp</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fpap</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ltp</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fpap</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projected_position_on_runway_plane</span> <span class="o">=</span> <span class="n">projection_3d_point_on_plane</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">values</span><span class="p">())),</span> <span class="bp">self</span><span class="o">.</span><span class="n">runway_plane</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projected_position_along_track</span> <span class="o">=</span> <span class="n">closest_point_on_line</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ltp</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fpap</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">projected_position_on_runway_plane</span><span class="p">)</span>
+
+
+        <span class="c1"># The lateral path angle reference point is located 3050 meters along the extended runway centerline from the runway</span>
+        <span class="c1"># reference point. At this distance, 4 deg of full angular width gives a standard 700 ft full width at the threshold,</span>
+        <span class="c1"># which is the standard used in WAAS LPV approaches and is consistent with existing localizers</span>
+        <span class="c1"># (scaled between 3 deg and 6 deg to achieve a 700 ft full width at the runway threshold).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lateral_path_angle_reference_point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ltp</span><span class="p">)</span> <span class="o">-</span> <span class="n">centerline_vector</span> <span class="o">*</span> <span class="mi">3050</span>
+
+
+        <span class="c1"># The vertical path angle reference point is located horizontally 305 meters along the extended runway centerline</span>
+        <span class="c1"># from the runway reference point, and vertically at runway elevation. This is approximately 1000 ft from the threshold</span>
+        <span class="c1"># and is consistent with most existing touchdown zones, which are commonly located 800-1200 ft from the threshold.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_path_angle_reference_point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ltp</span><span class="p">)</span> <span class="o">-</span> <span class="n">centerline_vector</span> <span class="o">*</span> <span class="mi">305</span>
+
+        <span class="c1"># The along-track distance, or the distance along the X axis, points along the extended runway centerline but in the</span>
+        <span class="c1"># opposite direction of the runway, such that a positive value indicates a position before the runway threshold.</span>
+        <span class="n">sign_along_track_distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">get_distance_between_2_points</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projected_position_along_track</span><span class="p">,</span> <span class="n">fpap</span><span class="p">)</span> <span class="o">-</span> <span class="n">get_distance_between_2_points</span><span class="p">(</span><span class="n">ltp</span><span class="p">,</span> <span class="n">fpap</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">along_track_distance</span> <span class="o">=</span> <span class="n">sign_along_track_distance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projected_position_along_track</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ltp</span><span class="p">))</span>
+
+
+        <span class="c1"># The cross-track distance, or the distance along the Y axis, points perpendicular to the extended runway centerline,</span>
+        <span class="c1"># such that a positive value indicates a position right of centerline from the perspective of the aircraft.</span>
+        <span class="n">sign_cross_track_distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">get_distance_between_2_points</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projected_position_on_runway_plane</span><span class="p">,</span> <span class="n">runway_pts</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">-</span> <span class="n">get_distance_between_2_points</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projected_position_on_runway_plane</span><span class="p">,</span> <span class="n">runway_pts</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cross_track_distance</span> <span class="o">=</span> <span class="n">sign_cross_track_distance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projected_position_on_runway_plane</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">projected_position_along_track</span><span class="p">)</span>
+
+
+        <span class="c1"># The height above runway, or the distance along the Z axis, is defined as the difference between the aircrafts true</span>
+        <span class="c1"># altitude and the runway elevation, such that a positive value indicates a position above runway elevation.</span>
+        <span class="c1"># Note that it is critical to use the same datum (e.g. MSL or WGS84 HAE) for both the aircrafts altitude and</span>
+        <span class="c1"># runway elevation in computing this height. distance_point_signed caused troubles with the normal of the plan. </span>
+        <span class="c1"># - patch for now: changed into &#39;unsigned&#39; to always represent a position above runway.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height_above_runway</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runway_plane</span><span class="o">.</span><span class="n">distance_point</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">values</span><span class="p">())))</span>
+
+
+        <span class="c1"># The slant distance is defined as the 3D Cartesian distance from the aircraft position to the runway reference point.</span>
+        <span class="c1"># Note that unlike the along-track distance, the slant distance will always be positive.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slant_distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ltp</span><span class="p">))</span>
+
+
+        <span class="c1"># The lateral path angle is defined as the angle in the horizontal plane formed between the runways extended centerline</span>
+        <span class="c1"># and the line segment drawn from the lateral path angle reference point to the aircrafts position.</span>
+        <span class="c1"># The sign is positive when the aircraft is right of the extended centerline while on the approach and</span>
+        <span class="c1"># negative when the aircraft is left of the extended centerline. The lateral path angle differs from a</span>
+        <span class="c1"># localizer angle in that the reference point is fixed, whereas localizers may be located at various distances</span>
+        <span class="c1"># from the threshold depending on runway length.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lateral_path_angle</span> <span class="o">=</span> <span class="n">sign_cross_track_distance</span> <span class="o">*</span> <span class="n">find_angle_between_vectors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lateral_path_angle_reference_point</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">projected_position_along_track</span><span class="p">,</span>
+                                                             <span class="bp">self</span><span class="o">.</span><span class="n">lateral_path_angle_reference_point</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">projected_position_on_runway_plane</span><span class="p">)</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+
+
+        <span class="c1"># The vertical path angle is defined as the angle in the vertical plane formed between the local horizontal plane</span>
+        <span class="c1"># and the line segment drawn from the vertical path angle reference point to the aircrafts position.</span>
+        <span class="c1"># Most existing precision and APV instrument approaches have glidepath angles between 2.5 deg and 4 deg, with the majority</span>
+        <span class="c1"># being 3 deg. The sign is positive when the aircraft is above the runway elevation. The vertical path angle differs</span>
+        <span class="c1"># from an ILS or RNAV glideslope in that the point of intersection with the runway is fixed at the vertical path</span>
+        <span class="c1"># angle reference point instead of varying per runway.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_path_angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">height_above_runway</span><span class="p">)</span><span class="o">*</span><span class="n">find_angle_between_vectors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertical_path_angle_reference_point</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">projected_position_along_track</span><span class="p">,</span>
+                                                             <span class="bp">self</span><span class="o">.</span><span class="n">vertical_path_angle_reference_point</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">projected_position_along_track</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">runway_plane</span><span class="o">.</span><span class="n">normal</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">height_above_runway</span><span class="p">)</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span></div></div>
+
+
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">Lard</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Mussot Vincent.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

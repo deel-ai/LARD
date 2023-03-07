@@ -13,7 +13,7 @@ __pycache__/
 models/
 scenarios/
 env/
-build/
+# build/
 develop-eggs/
 dist/
 downloads/
@@ -56,7 +56,7 @@ coverage.xml
 *.log
 
 # Sphinx documentation
-docs/_build/
+#docs/_build/
 
 # PyBuilder
 target/
@@ -71,3 +71,6 @@ target/
 # *.jpg
 # *.jpeg
 # *.png
+
+# Old generator
+GESGenerator

@@ -1,17 +1,20 @@
 """
-Script to export a lard dataset to popular format.
-Use:
+Command-line script to export a lard dataset to most of the popular formats.
+
+To get the list of available options :
+
+.. code-block:: console
 
     python lard_export.py -h
 
-to get the list of availables options.
-
 Usage example for coco format:
 
-python src/dataset/lard_export.py --train data/multiple_train --test data/test_dataset -o data/converted_coco -b "xywh"
--n -lf "multiple" -c -s " "
+.. code-block:: console
 
-Parameters values and expected format are the same as the python methods, described in notebooks/lard_export.py
+    python src/dataset/lard_export.py --train data/multiple_train --test data/test_dataset -o data/converted_coco -b "xywh"
+    -n -lf "multiple" -c -s " "
+
+Parameters values and expected format are the same as the python methods, described in ``notebooks/lard_export.py``
 """
 import os
 import argparse

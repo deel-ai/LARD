@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.scenario package &mdash; Lard 1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Lard
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">src.scenario package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.scenario.default_scenario_values">src.scenario.default_scenario_values module</a></li>
+<li><a class="reference internal" href="#module-src.scenario.scenario_config">src.scenario.scenario_config module</a></li>
+<li><a class="reference internal" href="#module-src.scenario.write_scenario">src.scenario.write_scenario module</a></li>
+<li><a class="reference internal" href="#module-src.scenario.write_scenario_utils">src.scenario.write_scenario_utils module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Lard</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">src.scenario package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.scenario.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-src.scenario">
+<span id="src-scenario-package"></span><h1>src.scenario package<a class="headerlink" href="#module-src.scenario" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-src.scenario.default_scenario_values">
+<span id="src-scenario-default-scenario-values-module"></span><h2>src.scenario.default_scenario_values module<a class="headerlink" href="#module-src.scenario.default_scenario_values" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultImage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.scenario.default_scenario_values.</span></span><span class="sig-name descname"><span class="pre">DefaultImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2048</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2448</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fov</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">33.50717983885091</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">watermark_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/scenario/default_scenario_values.html#DefaultImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultImage" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultImage.fov">
+<span class="sig-name descname"><span class="pre">fov</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">33.50717983885091</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultImage.fov" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultImage.height">
+<span class="sig-name descname"><span class="pre">height</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2048</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultImage.height" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultImage.watermark_height">
+<span class="sig-name descname"><span class="pre">watermark_height</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">300</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultImage.watermark_height" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultImage.width">
+<span class="sig-name descname"><span class="pre">width</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2448</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultImage.width" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultOutputs">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.scenario.default_scenario_values.</span></span><span class="sig-name descname"><span class="pre">DefaultOutputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'scenarios'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">earth_studio_scenario</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scenario_metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_generated_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/scenario/default_scenario_values.html#DefaultOutputs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultOutputs" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultOutputs.dataset_directory">
+<span class="sig-name descname"><span class="pre">dataset_directory</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'scenarios'</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultOutputs.dataset_directory" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultOutputs.earth_studio_scenario">
+<span class="sig-name descname"><span class="pre">earth_studio_scenario</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultOutputs.earth_studio_scenario" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultOutputs.plot_generated_points">
+<span class="sig-name descname"><span class="pre">plot_generated_points</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultOutputs.plot_generated_points" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultOutputs.scenario_metadata">
+<span class="sig-name descname"><span class="pre">scenario_metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultOutputs.scenario_metadata" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTime">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.scenario.default_scenario_values.</span></span><span class="sig-name descname"><span class="pre">DefaultTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">day_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hour_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hour_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minute_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minute_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">month_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">month_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2020</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2020</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/scenario/default_scenario_values.html#DefaultTime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTime" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTime.day_max">
+<span class="sig-name descname"><span class="pre">day_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTime.day_max" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTime.day_min">
+<span class="sig-name descname"><span class="pre">day_min</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTime.day_min" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTime.hour_max">
+<span class="sig-name descname"><span class="pre">hour_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTime.hour_max" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTime.hour_min">
+<span class="sig-name descname"><span class="pre">hour_min</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTime.hour_min" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTime.minute_max">
+<span class="sig-name descname"><span class="pre">minute_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTime.minute_max" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTime.minute_min">
+<span class="sig-name descname"><span class="pre">minute_min</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTime.minute_min" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTime.month_max">
+<span class="sig-name descname"><span class="pre">month_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTime.month_max" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTime.month_min">
+<span class="sig-name descname"><span class="pre">month_min</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTime.month_min" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTime.second_max">
+<span class="sig-name descname"><span class="pre">second_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTime.second_max" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTime.second_min">
+<span class="sig-name descname"><span class="pre">second_min</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTime.second_min" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTime.year_max">
+<span class="sig-name descname"><span class="pre">year_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2020</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTime.year_max" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTime.year_min">
+<span class="sig-name descname"><span class="pre">year_min</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2020</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTime.year_min" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTrajectory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.scenario.default_scenario_values.</span></span><span class="sig-name descname"><span class="pre">DefaultTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_number</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_h_deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_v_deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-</span> <span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_ap_m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distrib_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.41</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distribution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'exp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_distance_m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance_m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">150</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch_deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-</span> <span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roll_deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_alpha_h_deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_alpha_v_deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_pitch_deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_roll_deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_yaw_deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/scenario/default_scenario_values.html#DefaultTrajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTrajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTrajectory.alpha_h_deg">
+<span class="sig-name descname"><span class="pre">alpha_h_deg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTrajectory.alpha_h_deg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTrajectory.alpha_v_deg">
+<span class="sig-name descname"><span class="pre">alpha_v_deg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-3</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTrajectory.alpha_v_deg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTrajectory.dist_ap_m">
+<span class="sig-name descname"><span class="pre">dist_ap_m</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">300.0</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTrajectory.dist_ap_m" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTrajectory.distrib_param">
+<span class="sig-name descname"><span class="pre">distrib_param</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.41</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTrajectory.distrib_param" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTrajectory.distribution">
+<span class="sig-name descname"><span class="pre">distribution</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'exp'</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTrajectory.distribution" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTrajectory.max_distance_m">
+<span class="sig-name descname"><span class="pre">max_distance_m</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8000</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTrajectory.max_distance_m" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTrajectory.min_distance_m">
+<span class="sig-name descname"><span class="pre">min_distance_m</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">150</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTrajectory.min_distance_m" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTrajectory.pitch_deg">
+<span class="sig-name descname"><span class="pre">pitch_deg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-4</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTrajectory.pitch_deg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTrajectory.roll_deg">
+<span class="sig-name descname"><span class="pre">roll_deg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTrajectory.roll_deg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTrajectory.sample_number">
+<span class="sig-name descname"><span class="pre">sample_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTrajectory.sample_number" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTrajectory.std_alpha_h_deg">
+<span class="sig-name descname"><span class="pre">std_alpha_h_deg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTrajectory.std_alpha_h_deg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTrajectory.std_alpha_v_deg">
+<span class="sig-name descname"><span class="pre">std_alpha_v_deg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.4</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTrajectory.std_alpha_v_deg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTrajectory.std_pitch_deg">
+<span class="sig-name descname"><span class="pre">std_pitch_deg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTrajectory.std_pitch_deg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTrajectory.std_roll_deg">
+<span class="sig-name descname"><span class="pre">std_roll_deg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTrajectory.std_roll_deg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.DefaultTrajectory.std_yaw_deg">
+<span class="sig-name descname"><span class="pre">std_yaw_deg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5.0</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.DefaultTrajectory.std_yaw_deg" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.ScenarioContent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.scenario.default_scenario_values.</span></span><span class="sig-name descname"><span class="pre">ScenarioContent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">airport:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runways_database:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'data/runways_database.json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runways:</span> <span class="pre">list</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image:</span> <span class="pre">src.scenario.default_scenario_values.DefaultImage</span> <span class="pre">=</span> <span class="pre">DefaultImage(height=2048</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width=2448</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fov=33.50717983885091</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">watermark_height=300)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time:</span> <span class="pre">src.scenario.default_scenario_values.DefaultTime</span> <span class="pre">=</span> <span class="pre">DefaultTime(day_max=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day_min=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hour_max=12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hour_min=12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minute_max=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minute_min=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">month_max=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">month_min=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second_max=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second_min=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year_max=2020</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year_min=2020)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectory:</span> <span class="pre">src.scenario.default_scenario_values.DefaultTrajectory</span> <span class="pre">=</span> <span class="pre">DefaultTrajectory(sample_number=10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_h_deg=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_v_deg=-3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_ap_m=300.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distrib_param=1.41</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distribution='exp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_distance_m=8000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance_m=150</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch_deg=-4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roll_deg=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_alpha_h_deg=2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_alpha_v_deg=0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_pitch_deg=2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_roll_deg=5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_yaw_deg=5.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poses:</span> <span class="pre">list</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/scenario/default_scenario_values.html#ScenarioContent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.scenario.default_scenario_values.ScenarioContent" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.ScenarioContent.airport">
+<span class="sig-name descname"><span class="pre">airport</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.ScenarioContent.airport" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.ScenarioContent.from_dict">
+<span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/scenario/default_scenario_values.html#ScenarioContent.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.scenario.default_scenario_values.ScenarioContent.from_dict" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.ScenarioContent.image">
+<span class="sig-name descname"><span class="pre">image</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.scenario.default_scenario_values.DefaultImage" title="src.scenario.default_scenario_values.DefaultImage"><span class="pre">DefaultImage</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DefaultImage(height=2048,</span> <span class="pre">width=2448,</span> <span class="pre">fov=33.50717983885091,</span> <span class="pre">watermark_height=300)</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.ScenarioContent.image" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.ScenarioContent.poses">
+<span class="sig-name descname"><span class="pre">poses</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.ScenarioContent.poses" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.ScenarioContent.runways">
+<span class="sig-name descname"><span class="pre">runways</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.ScenarioContent.runways" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.ScenarioContent.runways_database">
+<span class="sig-name descname"><span class="pre">runways_database</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'data/runways_database.json'</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.ScenarioContent.runways_database" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.ScenarioContent.time">
+<span class="sig-name descname"><span class="pre">time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.scenario.default_scenario_values.DefaultTime" title="src.scenario.default_scenario_values.DefaultTime"><span class="pre">DefaultTime</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DefaultTime(day_max=1,</span> <span class="pre">day_min=1,</span> <span class="pre">hour_max=12,</span> <span class="pre">hour_min=12,</span> <span class="pre">minute_max=1,</span> <span class="pre">minute_min=1,</span> <span class="pre">month_max=1,</span> <span class="pre">month_min=1,</span> <span class="pre">second_max=1,</span> <span class="pre">second_min=1,</span> <span class="pre">year_max=2020,</span> <span class="pre">year_min=2020)</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.ScenarioContent.time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.ScenarioContent.trajectory">
+<span class="sig-name descname"><span class="pre">trajectory</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.scenario.default_scenario_values.DefaultTrajectory" title="src.scenario.default_scenario_values.DefaultTrajectory"><span class="pre">DefaultTrajectory</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DefaultTrajectory(sample_number=10,</span> <span class="pre">alpha_h_deg=0,</span> <span class="pre">alpha_v_deg=-3,</span> <span class="pre">dist_ap_m=300.0,</span> <span class="pre">distrib_param=1.41,</span> <span class="pre">distribution='exp',</span> <span class="pre">max_distance_m=8000,</span> <span class="pre">min_distance_m=150,</span> <span class="pre">pitch_deg=-4,</span> <span class="pre">roll_deg=0,</span> <span class="pre">std_alpha_h_deg=2,</span> <span class="pre">std_alpha_v_deg=0.4,</span> <span class="pre">std_pitch_deg=2,</span> <span class="pre">std_roll_deg=5,</span> <span class="pre">std_yaw_deg=5.0)</span></em><a class="headerlink" href="#src.scenario.default_scenario_values.ScenarioContent.trajectory" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.scenario.default_scenario_values.ScenarioContent.update_if_exists">
+<span class="sig-name descname"><span class="pre">update_if_exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/scenario/default_scenario_values.html#ScenarioContent.update_if_exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.scenario.default_scenario_values.ScenarioContent.update_if_exists" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.scenario.scenario_config">
+<span id="src-scenario-scenario-config-module"></span><h2>src.scenario.scenario_config module<a class="headerlink" href="#module-src.scenario.scenario_config" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.scenario.scenario_config.ScenarioConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.scenario.scenario_config.</span></span><span class="sig-name descname"><span class="pre">ScenarioConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">airport</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runway</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scenario_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaml_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/scenario/scenario_config.html#ScenarioConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.scenario.scenario_config.ScenarioConfig" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.scenario.scenario_config.ScenarioConfig.autofill_empty_outputs">
+<span class="sig-name descname"><span class="pre">autofill_empty_outputs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/scenario/scenario_config.html#ScenarioConfig.autofill_empty_outputs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.scenario.scenario_config.ScenarioConfig.autofill_empty_outputs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.scenario.scenario_config.ScenarioConfig.scenario_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scenario_name</span></span><a class="headerlink" href="#src.scenario.scenario_config.ScenarioConfig.scenario_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.scenario.scenario_config.ScenarioConfig.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/scenario/scenario_config.html#ScenarioConfig.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.scenario.scenario_config.ScenarioConfig.to_dict" title="Permalink to this definition"></a></dt>
+<dd><p>generate the config.yaml file according to the class attributes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.scenario.scenario_config.ScenarioConfig.update_fields">
+<span class="sig-name descname"><span class="pre">update_fields</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/scenario/scenario_config.html#ScenarioConfig.update_fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.scenario.scenario_config.ScenarioConfig.update_fields" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.scenario.write_scenario">
+<span id="src-scenario-write-scenario-module"></span><h2>src.scenario.write_scenario module<a class="headerlink" href="#module-src.scenario.write_scenario" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.scenario.write_scenario.write_scenario">
+<span class="sig-prename descclassname"><span class="pre">src.scenario.write_scenario.</span></span><span class="sig-name descname"><span class="pre">write_scenario</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scenario_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#src.scenario.scenario_config.ScenarioConfig" title="src.scenario.scenario_config.ScenarioConfig"><span class="pre">ScenarioConfig</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/scenario/write_scenario.html#write_scenario"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.scenario.write_scenario.write_scenario" title="Permalink to this definition"></a></dt>
+<dd><p>Export a scenario from a yaml config file to eps format</p>
+</dd></dl>
+
+</section>
+<section id="module-src.scenario.write_scenario_utils">
+<span id="src-scenario-write-scenario-utils-module"></span><h2>src.scenario.write_scenario_utils module<a class="headerlink" href="#module-src.scenario.write_scenario_utils" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.scenario.write_scenario_utils.generate_poses">
+<span class="sig-prename descclassname"><span class="pre">src.scenario.write_scenario_utils.</span></span><span class="sig-name descname"><span class="pre">generate_poses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runaway_db</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scenario</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.scenario.default_scenario_values.ScenarioContent" title="src.scenario.default_scenario_values.ScenarioContent"><span class="pre">ScenarioContent</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="src.ges.html#src.ges.ges_dataset.GESDataset" title="src.ges.ges_dataset.GESDataset"><span class="pre">GESDataset</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/scenario/write_scenario_utils.html#generate_poses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.scenario.write_scenario_utils.generate_poses" title="Permalink to this definition"></a></dt>
+<dd><p>generate all the camera poses with the config c and the GESDataset d</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.scenario.write_scenario_utils.generate_scenario">
+<span class="sig-prename descclassname"><span class="pre">src.scenario.write_scenario_utils.</span></span><span class="sig-name descname"><span class="pre">generate_scenario</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fov</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="src.ges.html#src.ges.ges_dataset.GESDataset" title="src.ges.ges_dataset.GESDataset"><span class="pre">GESDataset</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/scenario/write_scenario_utils.html#generate_scenario"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.scenario.write_scenario_utils.generate_scenario" title="Permalink to this definition"></a></dt>
+<dd><p>generate the scenario (format for GES)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.scenario.write_scenario_utils.initialize_dataset">
+<span class="sig-prename descclassname"><span class="pre">src.scenario.write_scenario_utils.</span></span><span class="sig-name descname"><span class="pre">initialize_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="src.ges.html#src.ges.ges_dataset.GESDataset" title="src.ges.ges_dataset.GESDataset"><span class="pre">GESDataset</span></a></span></span><a class="reference internal" href="_modules/src/scenario/write_scenario_utils.html#initialize_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.scenario.write_scenario_utils.initialize_dataset" title="Permalink to this definition"></a></dt>
+<dd><p>Returns an instance of GESDataset with the config.yaml parameters in it</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.scenario.write_scenario_utils.load_runways_database">
+<span class="sig-prename descclassname"><span class="pre">src.scenario.write_scenario_utils.</span></span><span class="sig-name descname"><span class="pre">load_runways_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runways_database_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/scenario/write_scenario_utils.html#load_runways_database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.scenario.write_scenario_utils.load_runways_database" title="Permalink to this definition"></a></dt>
+<dd><p>load the runways database</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Mussot Vincent.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.labeling package &mdash; Lard 1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Lard
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">src.labeling package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.labeling.earth_studio_export">src.labeling.earth_studio_export module</a></li>
+<li><a class="reference internal" href="#module-src.labeling.export_config">src.labeling.export_config module</a></li>
+<li><a class="reference internal" href="#module-src.labeling.generate_dataset">src.labeling.generate_dataset module</a></li>
+<li><a class="reference internal" href="#module-src.labeling.json_export">src.labeling.json_export module</a></li>
+<li><a class="reference internal" href="#module-src.labeling.labels">src.labeling.labels module</a></li>
+<li><a class="reference internal" href="#module-src.labeling.labels_utils">src.labeling.labels_utils module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Lard</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">src.labeling package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.labeling.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-src.labeling">
+<span id="src-labeling-package"></span><h1>src.labeling package<a class="headerlink" href="#module-src.labeling" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-src.labeling.earth_studio_export">
+<span id="src-labeling-earth-studio-export-module"></span><h2>src.labeling.earth_studio_export module<a class="headerlink" href="#module-src.labeling.earth_studio_export" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.labeling.earth_studio_export.convert_label">
+<span class="sig-prename descclassname"><span class="pre">src.labeling.earth_studio_export.</span></span><span class="sig-name descname"><span class="pre">convert_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runways_database</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_nb</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/labeling/earth_studio_export.html#convert_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.earth_studio_export.convert_label" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.labeling.earth_studio_export.export_labels">
+<span class="sig-prename descclassname"><span class="pre">src.labeling.earth_studio_export.</span></span><span class="sig-name descname"><span class="pre">export_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yaml_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">google_export_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_labels_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_images_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/labeling/earth_studio_export.html#export_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.earth_studio_export.export_labels" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-src.labeling.export_config">
+<span id="src-labeling-export-config-module"></span><h2>src.labeling.export_config module<a class="headerlink" href="#module-src.labeling.export_config" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.labeling.export_config.DatasetTypes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.labeling.export_config.</span></span><span class="sig-name descname"><span class="pre">DatasetTypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/labeling/export_config.html#DatasetTypes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.export_config.DatasetTypes" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.labeling.export_config.DatasetTypes.EARTH_STUDIO">
+<span class="sig-name descname"><span class="pre">EARTH_STUDIO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'earth_studio'</span></em><a class="headerlink" href="#src.labeling.export_config.DatasetTypes.EARTH_STUDIO" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.labeling.export_config.DatasetTypes.REAL">
+<span class="sig-name descname"><span class="pre">REAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'real'</span></em><a class="headerlink" href="#src.labeling.export_config.DatasetTypes.REAL" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.labeling.export_config.ExportConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.labeling.export_config.</span></span><span class="sig-name descname"><span class="pre">ExportConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yaml_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/labeling/export_config.html#ExportConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.export_config.ExportConfig" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to load and store configuration for Lard dataset creation, merge and export.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.labeling.export_config.ExportConfig.add_dataset_for_export">
+<span class="sig-name descname"><span class="pre">add_dataset_for_export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/labeling/export_config.html#ExportConfig.add_dataset_for_export"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.export_config.ExportConfig.add_dataset_for_export" title="Permalink to this definition"></a></dt>
+<dd><p>Add an acquisition dataset to the ones being exported and merged.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.labeling.generate_dataset">
+<span id="src-labeling-generate-dataset-module"></span><h2>src.labeling.generate_dataset module<a class="headerlink" href="#module-src.labeling.generate_dataset" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.labeling.generate_dataset.export_datasets">
+<span class="sig-prename descclassname"><span class="pre">src.labeling.generate_dataset.</span></span><span class="sig-name descname"><span class="pre">export_datasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.labeling.export_config.ExportConfig" title="src.labeling.export_config.ExportConfig"><span class="pre">ExportConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/labeling/generate_dataset.html#export_datasets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.generate_dataset.export_datasets" title="Permalink to this definition"></a></dt>
+<dd><p>Main dataset labelisation and export method. Take as input an ExportConfig with all parameters, inputs and outputs
+targets for export, and generate a single, merged dataset with all the Lard metadatas.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>export_config</strong> (<a class="reference internal" href="#src.labeling.export_config.ExportConfig" title="src.labeling.export_config.ExportConfig"><em>ExportConfig</em></a>) – export configuration</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.labeling.generate_dataset.export_real_directory">
+<span class="sig-prename descclassname"><span class="pre">src.labeling.generate_dataset.</span></span><span class="sig-name descname"><span class="pre">export_real_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_images_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/src/labeling/generate_dataset.html#export_real_directory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.generate_dataset.export_real_directory" title="Permalink to this definition"></a></dt>
+<dd><p>Parse and return the metadata for a real dataset and associated files.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.labeling.generate_dataset.export_synthesized_directory">
+<span class="sig-prename descclassname"><span class="pre">src.labeling.generate_dataset.</span></span><span class="sig-name descname"><span class="pre">export_synthesized_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_images_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/src/labeling/generate_dataset.html#export_synthesized_directory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.generate_dataset.export_synthesized_directory" title="Permalink to this definition"></a></dt>
+<dd><p>Parse and return the metadata for a synthetized google earth dataset.</p>
+</dd></dl>
+
+</section>
+<section id="module-src.labeling.json_export">
+<span id="src-labeling-json-export-module"></span><h2>src.labeling.json_export module<a class="headerlink" href="#module-src.labeling.json_export" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.labeling.json_export.from_json">
+<span class="sig-prename descclassname"><span class="pre">src.labeling.json_export.</span></span><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/src/labeling/json_export.html#from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.json_export.from_json" title="Permalink to this definition"></a></dt>
+<dd><p>Return label dictionary from a json file. Only the information required is returned, and not the entirety of the
+content of the json file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – path to the json file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>labels loaded in a python dict</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.labeling.labels">
+<span id="src-labeling-labels-module"></span><h2>src.labeling.labels module<a class="headerlink" href="#module-src.labeling.labels" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.labeling.labels.Labels">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.labeling.labels.</span></span><span class="sig-name descname"><span class="pre">Labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/labeling/labels.html#Labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.labels.Labels" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class :
+- defines the different fields of the labels and metadata of the LARD dataset
+- provided utility method to add, export or manipulate them.</p>
+<p>The exact metadata is stored in an internal pandas Dataframe, which can be directly accessed for custom usage :
+lbl = Labels(csv_metadata_path)
+metadata_in_pandas_dataframe = lbl.df</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.labeling.labels.Labels.add_label">
+<span class="sig-name descname"><span class="pre">add_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_infos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/labeling/labels.html#Labels.add_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.labels.Labels.add_label" title="Permalink to this definition"></a></dt>
+<dd><p>Add additional labels and metadata, provided as a python dictionary, to the current ones.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>label_infos</strong> – dict with metadata and labels information. Keys should be columns names as described in</p>
+</dd>
+</dl>
+<p>Labels.default_cols
+:type label_infos: dict
+:return: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.labeling.labels.Labels.add_metadata">
+<span class="sig-name descname"><span class="pre">add_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_value</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/labeling/labels.html#Labels.add_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.labels.Labels.add_metadata" title="Permalink to this definition"></a></dt>
+<dd><p>Add a metadata column and values for each image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metadata_name</strong> (<em>str</em>) – new metadata field</p></li>
+<li><p><strong>metadata_value</strong> (<em>list</em>) – list of the field value for each image</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.labeling.labels.Labels.as_relative_paths">
+<span class="sig-name descname"><span class="pre">as_relative_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/labeling/labels.html#Labels.as_relative_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.labels.Labels.as_relative_paths" title="Permalink to this definition"></a></dt>
+<dd><p>Convert the image path in the metadata as path relative to the provided reference path</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em><em> or </em><em>Path</em>) – reference path</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.labeling.labels.Labels.as_working_dir_paths">
+<span class="sig-name descname"><span class="pre">as_working_dir_paths</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/labeling/labels.html#Labels.as_working_dir_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.labels.Labels.as_working_dir_paths" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Convert the image path as path relative to the working directory (at the moment of the Labels instance</dt><dd><p>creation)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.labeling.labels.Labels.default_cols">
+<span class="sig-name descname"><span class="pre">default_cols</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['image',</span> <span class="pre">'height',</span> <span class="pre">'width',</span> <span class="pre">'type',</span> <span class="pre">'original_dataset',</span> <span class="pre">'scenario',</span> <span class="pre">'airport',</span> <span class="pre">'runway',</span> <span class="pre">'time_to_landing',</span> <span class="pre">'weather',</span> <span class="pre">'night',</span> <span class="pre">'time',</span> <span class="pre">'slant_distance',</span> <span class="pre">'along_track_distance',</span> <span class="pre">'height_above_runway',</span> <span class="pre">'lateral_path_angle',</span> <span class="pre">'vertical_path_angle',</span> <span class="pre">'yaw',</span> <span class="pre">'pitch',</span> <span class="pre">'roll',</span> <span class="pre">'watermark_height',</span> <span class="pre">'x_A',</span> <span class="pre">'y_A',</span> <span class="pre">'x_B',</span> <span class="pre">'y_B',</span> <span class="pre">'x_C',</span> <span class="pre">'y_C',</span> <span class="pre">'x_D',</span> <span class="pre">'y_D']</span></em><a class="headerlink" href="#src.labeling.labels.Labels.default_cols" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.labeling.labels.Labels.export">
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/labeling/labels.html#Labels.export"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.labels.Labels.export" title="Permalink to this definition"></a></dt>
+<dd><p>Export metadata in a csv file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>out_file</strong> (<em>str</em>) – path of the output csv file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.labeling.labels.Labels.get_corners_list">
+<span class="sig-name descname"><span class="pre">get_corners_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/src/labeling/labels.html#Labels.get_corners_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.labels.Labels.get_corners_list" title="Permalink to this definition"></a></dt>
+<dd><p>Return the list of corner positions in a given image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>img</strong> (<em>str</em><em>, </em><em>int</em>) – img path or index</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of tuples (x,y), with x, y position of each corner in the image.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.labeling.labels.Labels.get_label">
+<span class="sig-name descname"><span class="pre">get_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/labeling/labels.html#Labels.get_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.labels.Labels.get_label" title="Permalink to this definition"></a></dt>
+<dd><p>Return all the image information from the image path or dataframe index</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>img_idx</strong> (<em>str</em><em> or </em><em>int</em>) – image path or index</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict with all the image metadata</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.labeling.labels.Labels.reorder_corners">
+<span class="sig-name descname"><span class="pre">reorder_corners</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/labeling/labels.html#Labels.reorder_corners"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.labels.Labels.reorder_corners" title="Permalink to this definition"></a></dt>
+<dd><p>Ensures the names of the corners in the dataset matches their order in the image.
+The order is the order of corner obtained by reading the image row by row.
+I.e. the order obtained by sorting the corners on their value (y_corner * image_width + x_corner).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.labeling.labels.Labels.sep">
+<span class="sig-name descname"><span class="pre">sep</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">';'</span></em><a class="headerlink" href="#src.labeling.labels.Labels.sep" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.labeling.labels.Labels.watermark_size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">watermark_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.labeling.labels.Labels.watermark_size" title="Permalink to this definition"></a></dt>
+<dd><p>Return the name of the field with the watermark size of each image</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>name of the columns with the watermark size of each image.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.labeling.labels.Labels.x_corners_names">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">x_corners_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#src.labeling.labels.Labels.x_corners_names" title="Permalink to this definition"></a></dt>
+<dd><p>Get the list of columns names for the x coordinates of the corners</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of columns names</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.labeling.labels.Labels.y_corners_names">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">y_corners_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#src.labeling.labels.Labels.y_corners_names" title="Permalink to this definition"></a></dt>
+<dd><p>Get the list of columns names for the y coordinates of the corners</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of columns names</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of string</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.labeling.labels_utils">
+<span id="src-labeling-labels-utils-module"></span><h2>src.labeling.labels_utils module<a class="headerlink" href="#module-src.labeling.labels_utils" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.labeling.labels_utils.compute_bbox">
+<span class="sig-prename descclassname"><span class="pre">src.labeling.labels_utils.</span></span><span class="sig-name descname"><span class="pre">compute_bbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">corners</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">array</span></span></span><a class="reference internal" href="_modules/src/labeling/labels_utils.html#compute_bbox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.labels_utils.compute_bbox" title="Permalink to this definition"></a></dt>
+<dd><p>create the smallest box countaining all the corners of a corner set
+return [x_min, y_min, x_max, y_max]</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.labeling.labels_utils.crop_bbox">
+<span class="sig-prename descclassname"><span class="pre">src.labeling.labels_utils.</span></span><span class="sig-name descname"><span class="pre">crop_bbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bbox</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">array</span></span></span><a class="reference internal" href="_modules/src/labeling/labels_utils.html#crop_bbox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.labels_utils.crop_bbox" title="Permalink to this definition"></a></dt>
+<dd><p>crop a box by the dimensions of the image (width, height)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.labeling.labels_utils.is_runway_image_valid">
+<span class="sig-prename descclassname"><span class="pre">src.labeling.labels_utils.</span></span><span class="sig-name descname"><span class="pre">is_runway_image_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/src/labeling/labels_utils.html#is_runway_image_valid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.labeling.labels_utils.is_runway_image_valid" title="Permalink to this definition"></a></dt>
+<dd><p>Check if a dataset image is valid :
+- it contains exactly one runway visible in it
+- the runway in its entirety is visible in the image</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Mussot Vincent.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

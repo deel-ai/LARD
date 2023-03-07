@@ -1,0 +1,478 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.ges.geo_utils &#8212; Lard 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.ges.geo_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">skspatial.objects</span> <span class="kn">import</span> <span class="n">Plane</span>
+<span class="kn">from</span> <span class="nn">skspatial.objects</span> <span class="kn">import</span> <span class="n">Point</span>
+<span class="kn">from</span> <span class="nn">skspatial.objects</span> <span class="kn">import</span> <span class="n">Vector</span>
+<span class="kn">from</span> <span class="nn">skspatial.objects</span> <span class="kn">import</span> <span class="n">Points</span>
+<span class="kn">from</span> <span class="nn">skspatial.objects</span> <span class="kn">import</span> <span class="n">Line</span>
+
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">cross</span><span class="p">,</span> <span class="n">eye</span><span class="p">,</span> <span class="n">dot</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">expm</span><span class="p">,</span> <span class="n">norm</span>
+<span class="kn">import</span> <span class="nn">pyproj</span>
+
+
+<div class="viewcode-block" id="cos"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.cos">[docs]</a><span class="k">def</span> <span class="nf">cos</span><span class="p">(</span><span class="n">valueDegrees</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the cosine of a value in degrees.</span>
+<span class="sd">    :param valueDegrees:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">valueDegrees</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">valueDegrees</span><span class="p">)))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="sin"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.sin">[docs]</a><span class="k">def</span> <span class="nf">sin</span><span class="p">(</span><span class="n">valueDegrees</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the sine of a value in degrees.</span>
+<span class="sd">    :param valueDegrees:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">valueDegrees</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">valueDegrees</span><span class="p">)))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ecef2llh"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.ecef2llh">[docs]</a><span class="k">def</span> <span class="nf">ecef2llh</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    convert ECEF coordinates into llh coordinates</span>
+<span class="sd">    </span>
+<span class="sd">    :param x:</span>
+<span class="sd">    :param y:</span>
+<span class="sd">    :param z:</span>
+<span class="sd">    :return: Lat Long degrees decimal</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="mi">6371010</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">z</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="c1">#compute longitude</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">longi</span> <span class="o">=</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span>
+            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">longi</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span>
+    
+    <span class="k">elif</span> <span class="n">x</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">y</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">longi</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="n">y</span><span class="o">/</span><span class="n">x</span><span class="p">)</span> <span class="c1"># Check here if 180-x or not, as well as longi = -longi</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">longi</span> <span class="o">=</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="n">y</span><span class="o">/</span><span class="n">x</span><span class="p">)</span>
+    
+    <span class="k">else</span><span class="p">:</span>
+        
+        <span class="n">longi</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="n">y</span><span class="o">/</span><span class="n">x</span><span class="p">)</span>
+            
+    <span class="c1">#compute latitude</span>
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">asin</span><span class="p">(</span><span class="n">z</span> <span class="o">/</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="n">t</span> <span class="o">-</span> <span class="n">R</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">lat</span><span class="p">),</span> <span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">longi</span><span class="p">),</span> <span class="n">height</span></div>
+
+
+<div class="viewcode-block" id="llh2ecef"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.llh2ecef">[docs]</a><span class="k">def</span> <span class="nf">llh2ecef</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">altitude</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    convert latitude, longitude, height (llh) coordintes into ECEF coordinates</span>
+<span class="sd">    </span>
+<span class="sd">    :param latitude:</span>
+<span class="sd">    :param longitude:</span>
+<span class="sd">    :param altitude:</span>
+<span class="sd">    </span>
+<span class="sd">    :return: x, y and z in ECEF frame</span>
+<span class="sd">    </span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="mi">6371010</span>
+    <span class="n">x_2</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">altitude</span> <span class="o">+</span> <span class="n">R</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">latitude</span><span class="p">)),</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
+                <span class="mi">1</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">longitude</span><span class="p">)),</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x_2</span><span class="p">)</span>
+
+    <span class="n">y_2</span> <span class="o">=</span> <span class="n">x_2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">longitude</span><span class="p">)),</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">y_2</span><span class="p">)</span>
+    <span class="c1"># print(type(longitude))</span>
+    
+    <span class="k">if</span> <span class="p">(</span><span class="n">longitude</span><span class="o">&gt;-</span><span class="mi">180</span> <span class="ow">and</span> <span class="n">longitude</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">90</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="n">y</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="o">-</span><span class="n">x</span>
+        
+    <span class="k">elif</span> <span class="p">(</span><span class="n">longitude</span><span class="o">&gt;-</span><span class="mi">90</span> <span class="ow">and</span> <span class="n">longitude</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="n">y</span>
+        
+    <span class="k">elif</span> <span class="p">(</span><span class="n">longitude</span><span class="o">&gt;</span><span class="mi">90</span> <span class="ow">and</span> <span class="n">longitude</span> <span class="o">&lt;</span> <span class="mi">180</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="o">-</span><span class="n">x</span>
+    
+    
+    <span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="n">altitude</span> <span class="o">+</span> <span class="n">R</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">latitude</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span></div>
+
+
+<div class="viewcode-block" id="llh_relative2absolute"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.llh_relative2absolute">[docs]</a><span class="k">def</span> <span class="nf">llh_relative2absolute</span><span class="p">(</span><span class="n">relative</span><span class="p">,</span> <span class="n">min_range</span><span class="p">,</span> <span class="n">max_range</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">max_range</span> <span class="o">-</span> <span class="n">min_range</span><span class="p">)</span> <span class="o">*</span> <span class="n">relative</span> <span class="o">+</span> <span class="n">min_range</span></div>
+
+
+<div class="viewcode-block" id="closest_point_on_line"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.closest_point_on_line">[docs]</a><span class="k">def</span> <span class="nf">closest_point_on_line</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+    
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    find closest point of another point on a line created by two points a and b </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">line</span> <span class="o">=</span> <span class="n">Line</span><span class="p">(</span><span class="n">point</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">))</span>
+    <span class="n">point_projected</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">project_point</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">point_projected</span></div>
+
+
+<div class="viewcode-block" id="fit_3d_plane_from_points"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.fit_3d_plane_from_points">[docs]</a><span class="k">def</span> <span class="nf">fit_3d_plane_from_points</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    return the plane generated by 3 points</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">points</span> <span class="o">=</span> <span class="n">Points</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+    <span class="n">plane</span> <span class="o">=</span> <span class="n">Plane</span><span class="o">.</span><span class="n">best_fit</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">plane</span></div>
+
+
+<div class="viewcode-block" id="projection_3d_point_on_plane"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.projection_3d_point_on_plane">[docs]</a><span class="k">def</span> <span class="nf">projection_3d_point_on_plane</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">plane</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    return the projection of a point on a 3d plan</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">point</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+    <span class="n">point_projected</span> <span class="o">=</span> <span class="n">plane</span><span class="o">.</span><span class="n">project_point</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">point_projected</span></div>
+
+
+<div class="viewcode-block" id="find_closest_point"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.find_closest_point">[docs]</a><span class="k">def</span> <span class="nf">find_closest_point</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">points</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    return the closest point from a set of points to another point</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">closest_point</span> <span class="o">=</span> <span class="n">point</span>
+    <span class="n">closest_distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+    <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">points</span><span class="p">:</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="n">point</span><span class="p">))</span><span class="o">.</span><span class="n">distance_point</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="n">pt</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="n">closest_distance</span><span class="p">:</span>
+            <span class="n">closest_distance</span> <span class="o">=</span> <span class="n">dist</span>
+            <span class="n">closest_point</span> <span class="o">=</span> <span class="n">pt</span>
+    <span class="k">return</span> <span class="n">closest_point</span></div>
+
+
+<div class="viewcode-block" id="find_angle_between_vectors"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.find_angle_between_vectors">[docs]</a><span class="k">def</span> <span class="nf">find_angle_between_vectors</span><span class="p">(</span><span class="n">vec1</span><span class="p">,</span> <span class="n">vec2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="n">vec1</span><span class="p">)</span><span class="o">.</span><span class="n">angle_between</span><span class="p">(</span><span class="n">vec2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="get_distance_between_2_points"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.get_distance_between_2_points">[docs]</a><span class="k">def</span> <span class="nf">get_distance_between_2_points</span><span class="p">(</span><span class="n">pt1</span><span class="p">,</span> <span class="n">pt2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="n">pt1</span><span class="p">))</span><span class="o">.</span><span class="n">distance_point</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="n">pt2</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="rotate_vector"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.rotate_vector">[docs]</a><span class="k">def</span> <span class="nf">rotate_vector</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">theta</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">expm</span><span class="p">(</span><span class="n">cross</span><span class="p">(</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">axis</span> <span class="o">/</span> <span class="n">norm</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span> <span class="o">*</span> <span class="n">theta</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="find_center"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.find_center">[docs]</a><span class="k">def</span> <span class="nf">find_center</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Points</span><span class="p">(</span><span class="n">points</span><span class="p">)</span><span class="o">.</span><span class="n">mean_center</span><span class="p">(</span><span class="n">return_centroid</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<span class="c1">#inputs: longitude, latitude, x rotation, y rotation, z rotation</span>
+<span class="c1">#output: yaw, pitch, roll (rotations in the NED frame)</span>
+<div class="viewcode-block" id="ecef2body_angles"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.ecef2body_angles">[docs]</a><span class="k">def</span> <span class="nf">ecef2body_angles</span><span class="p">(</span><span class="n">longitude</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">ry</span><span class="p">,</span> <span class="n">rz</span><span class="p">):</span>
+
+    <span class="n">N0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">E0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">D0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">z0</span> <span class="o">=</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span>
+
+    <span class="n">x1</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">z0</span><span class="p">,</span> <span class="n">rz</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">x0</span><span class="p">)</span>
+    <span class="n">y1</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">z0</span><span class="p">,</span> <span class="n">rz</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">y0</span><span class="p">)</span>
+    <span class="n">z1</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">z0</span><span class="p">,</span> <span class="n">rz</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">z0</span><span class="p">)</span>
+
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">ry</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">x1</span><span class="p">)</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">ry</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">y1</span><span class="p">)</span>
+    <span class="n">z2</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">ry</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">z1</span><span class="p">)</span>
+
+    <span class="n">x3</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">rx</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">x2</span><span class="p">)</span>
+    <span class="n">y3</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">rx</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">y2</span><span class="p">)</span>
+    <span class="n">z3</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">rx</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">z2</span><span class="p">)</span>
+
+    <span class="c1">#Définition du repère NED</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">N0</span><span class="p">,</span> <span class="n">longitude</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">E0</span><span class="p">)</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="o">-</span><span class="n">E</span><span class="p">,</span> <span class="n">latitude</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">N0</span><span class="p">)</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">E</span><span class="p">)</span>
+    <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">z0</span> <span class="o">=</span> <span class="n">N</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">D</span>
+
+    <span class="c1">#rotations dans ce repère</span>
+    <span class="n">yaw</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span> <span class="n">y0</span><span class="p">),</span> <span class="n">dot</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span> <span class="n">x0</span><span class="p">))</span> <span class="o">*</span> <span class="mi">180</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="n">pitch</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="o">-</span><span class="n">dot</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span> <span class="n">z0</span><span class="p">),</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">dot</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span> <span class="n">x0</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span> <span class="n">y0</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="mi">180</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="n">roll</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">y3</span><span class="p">,</span> <span class="n">z2</span><span class="p">),</span> <span class="n">dot</span><span class="p">(</span><span class="n">y3</span><span class="p">,</span> <span class="n">y2</span><span class="p">))</span> <span class="o">*</span> <span class="mi">180</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+
+    <span class="k">return</span> <span class="n">yaw</span><span class="p">,</span> <span class="n">pitch</span><span class="p">,</span> <span class="n">roll</span></div>
+
+
+<div class="viewcode-block" id="body2ecef_angles"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.body2ecef_angles">[docs]</a><span class="k">def</span> <span class="nf">body2ecef_angles</span><span class="p">(</span><span class="n">longitude</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">heading</span><span class="p">,</span> <span class="n">pitch</span><span class="p">,</span> <span class="n">roll</span><span class="p">):</span>
+
+    <span class="n">N0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">E0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">D0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">E</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">N0</span><span class="p">,</span> <span class="n">longitude</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">E0</span><span class="p">)</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="o">-</span><span class="n">E</span><span class="p">,</span> <span class="n">latitude</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">N0</span><span class="p">)</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="n">E</span><span class="p">)</span>
+
+    <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">z0</span> <span class="o">=</span> <span class="n">N</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">D</span>
+
+    <span class="n">x1</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">z0</span><span class="p">,</span> <span class="n">heading</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">x0</span><span class="p">)</span>
+    <span class="n">y1</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">z0</span><span class="p">,</span> <span class="n">heading</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">y0</span><span class="p">)</span>
+    <span class="n">z1</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">z0</span><span class="p">,</span> <span class="n">heading</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">z0</span><span class="p">)</span>
+
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">pitch</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">x1</span><span class="p">)</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">pitch</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">y1</span><span class="p">)</span>
+    <span class="n">z2</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">pitch</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">z1</span><span class="p">)</span>
+
+    <span class="n">x3</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">roll</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">x2</span><span class="p">)</span>
+    <span class="n">y3</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">roll</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">y2</span><span class="p">)</span>
+    <span class="n">z3</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">rotate_vector</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">roll</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">),</span> <span class="n">z2</span><span class="p">)</span>
+
+    <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">z0</span> <span class="o">=</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span>
+
+    <span class="n">rz</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span><span class="n">y0</span><span class="p">),</span> <span class="n">dot</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span><span class="n">x0</span><span class="p">))</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="n">ry</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="o">-</span><span class="n">dot</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span><span class="n">z0</span><span class="p">),</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">dot</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span><span class="n">x0</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span><span class="n">y0</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="n">rx</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">y3</span><span class="p">,</span><span class="n">z2</span><span class="p">),</span> <span class="n">dot</span><span class="p">(</span><span class="n">y3</span><span class="p">,</span><span class="n">y2</span><span class="p">))</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+
+    <span class="k">return</span> <span class="n">rz</span><span class="p">,</span> <span class="n">ry</span><span class="p">,</span> <span class="n">rx</span></div>
+
+
+<div class="viewcode-block" id="find_azimuth_between_2_coordinates"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.find_azimuth_between_2_coordinates">[docs]</a><span class="k">def</span> <span class="nf">find_azimuth_between_2_coordinates</span><span class="p">(</span><span class="n">long1</span><span class="p">,</span> <span class="n">lat1</span><span class="p">,</span> <span class="n">long2</span><span class="p">,</span> <span class="n">lat2</span><span class="p">):</span>
+    
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    :return type: tuple(distance, angle1, angle2)    </span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">geodesic</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Geod</span><span class="p">(</span><span class="n">ellps</span><span class="o">=</span><span class="s1">&#39;WGS84&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">geodesic</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">long1</span><span class="p">,</span> <span class="n">lat1</span><span class="p">,</span> <span class="n">long2</span><span class="p">,</span> <span class="n">lat2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="forward_pos"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.forward_pos">[docs]</a><span class="k">def</span> <span class="nf">forward_pos</span><span class="p">(</span><span class="n">long</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">azimut</span><span class="p">,</span> <span class="n">dist</span><span class="p">):</span>
+    
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    return the point at the distance dist from an origin point on the geodesic WGS84 following an azimut angle</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">geodesic</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Geod</span><span class="p">(</span><span class="n">ellps</span><span class="o">=</span><span class="s1">&#39;WGS84&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">geodesic</span><span class="o">.</span><span class="n">fwd</span><span class="p">(</span><span class="n">long</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">azimut</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">radians</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1">#back azimut</span></div>
+
+<div class="viewcode-block" id="adjust_point_projection"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.adjust_point_projection">[docs]</a><span class="k">def</span> <span class="nf">adjust_point_projection</span><span class="p">(</span><span class="n">points_3d</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find if the point 3d are in front of the camera (z distance), in case of any of the points are outside of the field</span>
+<span class="sd">    of view, an  equivalent point shall be found.</span>
+<span class="sd">    :param points_3d:</span>
+<span class="sd">    :param z: positive value corresponding to plane in front of the camera.</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pointA</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">points_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">points_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">points_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">])]</span>
+    <span class="n">pointB</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">points_3d</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">points_3d</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">points_3d</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">])]</span>
+    <span class="n">line_equation</span> <span class="o">=</span> <span class="n">Line</span><span class="o">.</span><span class="n">from_points</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pointA</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pointB</span><span class="p">))</span>
+
+    <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">z</span><span class="o">-</span><span class="n">pointA</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="n">line_equation</span><span class="o">.</span><span class="n">vector</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">pointA</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">z</span><span class="p">:</span>
+        <span class="n">points_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_equation</span><span class="o">.</span><span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">t</span> <span class="o">+</span> <span class="n">pointA</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">points_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_equation</span><span class="o">.</span><span class="n">vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">t</span> <span class="o">+</span> <span class="n">pointA</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">points_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span>
+
+    <span class="k">if</span> <span class="n">pointB</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">z</span><span class="p">:</span>
+        <span class="n">points_3d</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_equation</span><span class="o">.</span><span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">t</span> <span class="o">+</span> <span class="n">pointB</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">points_3d</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_equation</span><span class="o">.</span><span class="n">vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">t</span> <span class="o">+</span> <span class="n">pointB</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">points_3d</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span>
+
+    <span class="k">return</span> <span class="n">points_3d</span></div>
+
+
+<div class="viewcode-block" id="adjust_index"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.adjust_index">[docs]</a><span class="k">def</span> <span class="nf">adjust_index</span><span class="p">(</span><span class="n">points_2d</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adjust the points that are outside of the images, finding the intersection with the bounds of the image.</span>
+<span class="sd">    :param points_2d:</span>
+<span class="sd">    :param height:</span>
+<span class="sd">    :param width:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">pointA</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">points_2d</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">points_2d</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])]</span>
+    <span class="n">pointB</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">points_2d</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">points_2d</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])]</span>
+    <span class="n">line_equation</span> <span class="o">=</span> <span class="n">Line</span><span class="o">.</span><span class="n">from_points</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pointA</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pointB</span><span class="p">))</span>
+
+
+    <span class="c1">#Equation between two points</span>
+    <span class="k">if</span> <span class="n">line_equation</span><span class="o">.</span><span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+       <span class="n">slope</span> <span class="o">=</span> <span class="n">line_equation</span><span class="o">.</span><span class="n">vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">line_equation</span><span class="o">.</span><span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+       <span class="n">b</span> <span class="o">=</span> <span class="n">line_equation</span><span class="o">.</span><span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">slope</span><span class="o">*</span><span class="n">line_equation</span><span class="o">.</span><span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">slope</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">inter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                      <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                      <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                      <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+    <span class="k">if</span> <span class="n">slope</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># TOP</span>
+        <span class="k">if</span> <span class="n">b</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">b</span> <span class="o">&lt;</span> <span class="n">height</span><span class="p">:</span>
+            <span class="n">inter</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
+
+        <span class="c1"># RIGHT</span>
+        <span class="k">if</span> <span class="n">slope</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="o">-</span><span class="n">b</span><span class="o">/</span><span class="n">slope</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="o">-</span><span class="n">b</span><span class="o">/</span><span class="n">slope</span> <span class="o">&lt;</span> <span class="n">width</span><span class="p">:</span>
+                <span class="n">inter</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span><span class="o">/</span><span class="n">slope</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># BOTTOM</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">slope</span><span class="o">*</span><span class="p">(</span><span class="n">width</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span>
+        <span class="k">if</span> <span class="n">y</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">height</span><span class="p">:</span>
+            <span class="n">inter</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">width</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span>
+
+        <span class="c1"># LEFT</span>
+        <span class="k">if</span> <span class="n">slope</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">height</span> <span class="o">-</span><span class="mi">1</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span><span class="o">/</span><span class="n">slope</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">width</span><span class="p">:</span>
+                <span class="n">inter</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">height</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">pointA</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">pointA</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">width</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">pointA</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">pointA</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">height</span><span class="p">):</span>
+        <span class="n">points_2d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">closest_point</span><span class="p">(</span><span class="n">pointA</span><span class="p">,</span> <span class="n">inter</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">pointB</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">pointB</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">width</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">pointB</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">pointB</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">height</span><span class="p">):</span>
+        <span class="n">points_2d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">closest_point</span><span class="p">(</span><span class="n">pointB</span><span class="p">,</span> <span class="n">inter</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">points_2d</span></div>
+
+
+<div class="viewcode-block" id="closest_point"><a class="viewcode-back" href="../../../src.ges.html#src.ges.geo_utils.closest_point">[docs]</a><span class="k">def</span> <span class="nf">closest_point</span><span class="p">(</span><span class="n">point_2d</span><span class="p">,</span> <span class="n">array_points</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the closes point.</span>
+<span class="sd">    :param point_2d:</span>
+<span class="sd">    :param array_points:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">first_flag</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">e_inter</span> <span class="ow">in</span> <span class="n">array_points</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">e_inter</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">distance</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">((</span><span class="n">point_2d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">e_inter</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">((</span><span class="n">point_2d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">e_inter</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">first_flag</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">minimal</span> <span class="o">=</span> <span class="n">distance</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">e_inter</span>
+                <span class="n">first_flag</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">elif</span> <span class="n">distance</span> <span class="o">&lt;</span> <span class="n">minimal</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">e_inter</span>
+                <span class="n">minimal</span> <span class="o">=</span> <span class="n">distance</span>
+    <span class="k">return</span> <span class="n">value</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">Lard</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Mussot Vincent.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
