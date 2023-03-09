@@ -227,7 +227,7 @@ The `.esp` file produced at *step #2* can be directly loaded into Google Earth S
 </div>
 <br>
 
-❗️ **Important:** This generation will create a folder, in which the `.yaml` file produced at step #2 must be copied, to obtain a directory organized like the example on the right:
+❗️ **Important:** This generation will create a folder, in which the `.yaml` file produced at step #2 must be copied or moved, to obtain a directory organized like the example on the right.
 
 ## 3. Automatic labeling
 - 🔥 [Notebook - **Labeling**](02_labeling.ipynb)
@@ -278,6 +278,18 @@ More from the DEEL project:
 
 
 ## 🙏 Acknowledgment
+
+<div align="center">
+    <a href="#">
+        <img src="docs/assets/logo-ONERA.png" height="60px" alt="logo-ONERA">
+    </a>&nbsp;&nbsp;
+    <a href="#">
+        <img src="docs/assets/logo-ANITI.jpg" height="60px" alt="logo-ANITI">
+    </a>&nbsp;&nbsp;
+    <a href="#">
+        <img src="docs/assets/logo-DEEL.png" height="60px" alt="logo-DEEL">
+    </a>
+</div>
 
 This project received funding from the French ”Investing for the Future – PIA3” program within the Artificial and Natural Intelligence Toulouse Institute (ANITI).
 
