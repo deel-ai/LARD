@@ -213,6 +213,22 @@ The correspondance between parameter names and names used in the code are as fol
 | Roll               | `roll_deg`, `std_roll_deg` |
 
 However all these parameters except the distance are not defined as ranges, but rather with gaussian noise around a fixed center and a standard deviation (`std_***`).
+
+This scenario generation will produce both a `.esp` file and a `.yaml` file. The first one is needed for Google Earth Studio, while the second one is needed for the labeling process.
+
+## 2-bis Google Earth generation recommendations
+The `.esp` file produced at *step #2* can be directly loaded into Google Earth Studio. User can then verify the image sequence, especially to treat any problem relative to time of day in case of night images, which may require a new scenario generation, or potential occlusions. Then the sequence of images can be rendered by the tool, with the following recommendations:
+- The image size should not be changed
+- The attribution should be placed as far as possible in the corner at the bottom of the image
+- In *'advanced'* settings, The `.json` file for 3D data must be generated with a 'global' coordinate space
+
+<div align="right">
+    <img src="data/folder_example.png" width="100px" alt="folder example from docs/assets/" align="right" />
+</div>
+<br>
+
+❗️ **Important:** This generation will create a folder, in which the `.yaml` file produced at step #2 must be copied or moved, to obtain a directory organized like the example on the right.
+
 ## 3. Automatic labeling
 - 🔥 [Notebook - **Labeling**](02_labeling.ipynb)
   - This notebook provides a comprehensive example to automatically label one or multiple Earth Studio generation results and export the corresponding dataset.
@@ -262,6 +278,18 @@ More from the DEEL project:
 
 
 ## 🙏 Acknowledgment
+
+<div align="center">
+    <a href="#">
+        <img src="docs/assets/logo-ONERA.png" height="60px" alt="logo-ONERA">
+    </a>&nbsp;&nbsp;
+    <a href="#">
+        <img src="docs/assets/logo-ANITI.jpg" height="60px" alt="logo-ANITI">
+    </a>&nbsp;&nbsp;
+    <a href="#">
+        <img src="docs/assets/logo-DEEL.png" height="60px" alt="logo-DEEL">
+    </a>
+</div>
 
 This project received funding from the French ”Investing for the Future – PIA3” program within the Artificial and Natural Intelligence Toulouse Institute (ANITI).
 
