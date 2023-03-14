@@ -3,10 +3,10 @@ import json
 from argparse import ArgumentParser
 from pathlib import Path
 
-
+# DEPRECATED -- NOT UP TO DATE WITH CURRENT DATABASE
 TRAIN_AIPORTS = ['BGBW', 'BGPT', 'BIRK', 'DAAG', 'LFMP', 'LFPO', 'LFQQ', 'LFRN', 'LFRS', 'LFST', 'LPPT', 'VABB', 'YBBN']
 
-
+# DEPRECATED -- NOT UP TO DATE WITH CURRENT DATABASE
 TEST_AIPORTS = ['LTAI', 'LICJ', 'LIRN', 'EDDV', 'LAX', 'LSZH', 'LEMD', 'LWSK', 'VHHH', 'CYUL', 'VRMM', 'LFSB', 'LCPH',
                  'LFML', 'GCRR', 'EHAM', 'SAEZ', 'CYVR', 'CYYZ', 'KIAH', 'KJFK', 'KMIA', 'KSFO', 'LFMN', 'MDSD', 'OMDB',
                  'RJAA', 'RJTT', 'WSSS', 'FMEP', 'VQPR']
