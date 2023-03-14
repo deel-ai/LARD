@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 from pathlib import Path
 
 
-def main(dataset_path: Path):
+def sanitize_dataset(dataset_path: Path):
     export_dict = {}
     for json_file in glob(f"{dataset_path}/*.json"):
         json_path = Path(json_file)
@@ -53,4 +53,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    main(args.dataset_path)
+    sanitize_dataset(args.dataset_path)

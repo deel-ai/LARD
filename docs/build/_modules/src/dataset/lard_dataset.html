@@ -96,17 +96,18 @@
 <span class="sd">                       label_file=&quot;multiple&quot;, # one file per image, &quot;single&quot; for a single label file</span>
 <span class="sd">                       crop=True)             # crop each synthetized image to remove watermarks</span>
 
+<span class="sd">    ``train_path`` and ``test paths`` should point to Lard datasets as obtained after the labeling phase. At least one of</span>
+<span class="sd">    train_path or test_path must be provided at init.</span>
+
+<span class="sd">    :param train_path: path to a labeled (after labeling phase) Lard dataset.</span>
+<span class="sd">    :type train_path: Union[Path, str]</span>
+<span class="sd">    :param test_path: path to a labeled (after labeling phase) Lard dataset.</span>
+<span class="sd">    :type test_path: Union[Path, str];</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="LardDataset.__init__"><a class="viewcode-back" href="../../../src.dataset.html#src.dataset.lard_dataset.LardDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">test_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Load a Lard dataset as obtained after the labeling phase. At least one of train_path or test_path must be</span>
-<span class="sd">        provided.</span>
-
-<span class="sd">        :param train_path: path to a labeled (after labeling phase) Lard dataset.</span>
-<span class="sd">        :type train_path: Union[Path, str]</span>
-<span class="sd">        :param test_path: path to a labeled (after labeling phase) Lard dataset.</span>
-<span class="sd">        :type test_path: Union[Path, str]</span>
+<span class="sd">        Constructor</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">datasets_dirs</span> <span class="o">=</span> <span class="p">{}</span>
@@ -121,7 +122,7 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">x_cols</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">x_corners_names</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">y_cols</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y_corners_names</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_cols</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">y_corners_names</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_load_labels_file</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;train&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Labels</span><span class="p">:</span>
@@ -260,23 +261,25 @@
 <span class="sd">        :param output_dir: directory where the converted dataset will be saved</span>
 <span class="sd">        :type output_dir: Path or string</span>
 <span class="sd">        :param bbx_format: Format for label bbox. Options are :</span>
-<span class="sd">        - &quot;tlbr&quot; (x,y of top left then x,y of bottom rights corners of the bbox)</span>
-<span class="sd">        - &quot;tlwh&quot; (x, y of top left, bbox width and height)</span>
-<span class="sd">        - &quot;xywh&quot; (x, y of the center of the bbox, bbox width and height)</span>
-<span class="sd">        - &quot;corners&quot; (x,y of each corner)</span>
+
+<span class="sd">            * ``&quot;tlbr&quot;`` - (x,y of top left then x,y of bottom rights corners of the bbox)</span>
+<span class="sd">            * ``&quot;tlwh&quot;`` - (x, y of top left, bbox width and height)</span>
+<span class="sd">            * ``&quot;xywh&quot;`` - (x, y of the center of the bbox, bbox width and height)</span>
+<span class="sd">            * ``&quot;corners&quot;`` - (x,y of each corner)</span>
+
 <span class="sd">        :type bbx_format: str</span>
 <span class="sd">        :param normalized: option to normalize the bbox position by the image size. If true, bbox labels are expressed</span>
-<span class="sd">        in fraction of the image width and height, if False, left in pixels. Default = False.</span>
+<span class="sd">            in fraction of the image width and height, if False, left in pixels. Default = False.</span>
 <span class="sd">        :type normalized: bool</span>
-<span class="sd">        :param label_file: &quot;single&quot; (all the labels are in a single csv, with a column with image path) or</span>
-<span class="sd">        &quot;multiple&quot; (one label file per image, saved in output_dir/labels).</span>
+<span class="sd">        :param label_file: &quot;single&quot; (all the labels are in a single csv, with a column with image path) or &quot;multiple&quot;</span>
+<span class="sd">            (one label file per image, saved in output_dir/labels).</span>
 <span class="sd">        :type label_file: str</span>
 <span class="sd">        :param sep: label file(s) separator, default is &quot;;&quot;.</span>
 <span class="sd">        :type sep: &quot; &quot;</span>
 <span class="sd">        :param header: If True, an header with column names is added to each label file.</span>
 <span class="sd">        :type header: bool</span>
 <span class="sd">        :param crop: If True, crop during export all images with watermarks and updates bboxes position for the cropped</span>
-<span class="sd">        image. If False, the image will be copied without modifications.</span>
+<span class="sd">            image. If False, the image will be copied without modifications.</span>
 <span class="sd">        :type crop: bool</span>
 <span class="sd">        :param ext: Extension format for labels files. Default is &quot;txt&quot;.</span>
 <span class="sd">        :type ext: str</span>

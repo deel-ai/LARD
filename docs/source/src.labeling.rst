@@ -46,6 +46,7 @@ src.labeling.labels module
 
 .. automodule:: src.labeling.labels
    :members:
+   :exclude-members: default_cols, sep
    :undoc-members:
    :show-inheritance:
 

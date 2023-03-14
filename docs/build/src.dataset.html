@@ -98,21 +98,16 @@ detection formats  (coco, tlbr,..).</p>
                <span class="n">crop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>             <span class="c1"># crop each synthetized image to remove watermarks</span>
 </pre></div>
 </div>
-<dl class="py method">
-<dt class="sig sig-object py" id="src.dataset.lard_dataset.LardDataset.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/dataset/lard_dataset.html#LardDataset.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.dataset.lard_dataset.LardDataset.__init__" title="Permalink to this definition"></a></dt>
-<dd><p>Load a Lard dataset as obtained after the labeling phase. At least one of train_path or test_path must be
-provided.</p>
+<p><code class="docutils literal notranslate"><span class="pre">train_path</span></code> and <code class="docutils literal notranslate"><span class="pre">test</span> <span class="pre">paths</span></code> should point to Lard datasets as obtained after the labeling phase. At least one of
+train_path or test_path must be provided at init.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>train_path</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em>) – path to a labeled (after labeling phase) Lard dataset.</p></li>
-<li><p><strong>test_path</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em>) – path to a labeled (after labeling phase) Lard dataset.</p></li>
+<li><p><strong>test_path</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em><em>;</em>) – path to a labeled (after labeling phase) Lard dataset.</p></li>
 </ul>
 </dd>
 </dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="src.dataset.lard_dataset.LardDataset.crop_labels">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">crop_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="src.labeling.html#src.labeling.labels.Labels" title="src.labeling.labels.Labels"><span class="pre">Labels</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/dataset/lard_dataset.html#LardDataset.crop_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.dataset.lard_dataset.LardDataset.crop_labels" title="Permalink to this definition"></a></dt>
@@ -135,36 +130,29 @@ provided.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>output_dir</strong> (<em>Path</em><em> or </em><em>string</em>) – directory where the converted dataset will be saved</p></li>
-<li><p><strong>bbx_format</strong> – Format for label bbox. Options are :</p></li>
+<li><p><strong>bbx_format</strong> (<em>str</em>) – <p>Format for label bbox. Options are :</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;tlbr&quot;</span></code> - (x,y of top left then x,y of bottom rights corners of the bbox)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;tlwh&quot;</span></code> - (x, y of top left, bbox width and height)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;xywh&quot;</span></code> - (x, y of the center of the bbox, bbox width and height)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;corners&quot;</span></code> - (x,y of each corner)</p></li>
+</ul>
+</p></li>
+<li><p><strong>normalized</strong> (<em>bool</em>) – option to normalize the bbox position by the image size. If true, bbox labels are expressed
+in fraction of the image width and height, if False, left in pixels. Default = False.</p></li>
+<li><p><strong>label_file</strong> (<em>str</em>) – “single” (all the labels are in a single csv, with a column with image path) or “multiple”
+(one label file per image, saved in output_dir/labels).</p></li>
+<li><p><strong>sep</strong> (<em>&quot; &quot;</em>) – label file(s) separator, default is “;”.</p></li>
+<li><p><strong>header</strong> (<em>bool</em>) – If True, an header with column names is added to each label file.</p></li>
+<li><p><strong>crop</strong> (<em>bool</em>) – If True, crop during export all images with watermarks and updates bboxes position for the cropped
+image. If False, the image will be copied without modifications.</p></li>
+<li><p><strong>ext</strong> (<em>str</em>) – Extension format for labels files. Default is “txt”.</p></li>
 </ul>
 </dd>
-</dl>
-<ul class="simple">
-<li><p>“tlbr” (x,y of top left then x,y of bottom rights corners of the bbox)</p></li>
-<li><p>“tlwh” (x, y of top left, bbox width and height)</p></li>
-<li><p>“xywh” (x, y of the center of the bbox, bbox width and height)</p></li>
-<li><p>“corners” (x,y of each corner)</p></li>
-</ul>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>normalized</strong> – option to normalize the bbox position by the image size. If true, bbox labels are expressed</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
-<p>in fraction of the image width and height, if False, left in pixels. Default = False.
-:type normalized: bool
-:param label_file: “single” (all the labels are in a single csv, with a column with image path) or
-“multiple” (one label file per image, saved in output_dir/labels).
-:type label_file: str
-:param sep: label file(s) separator, default is “;”.
-:type sep: ” ”
-:param header: If True, an header with column names is added to each label file.
-:type header: bool
-:param crop: If True, crop during export all images with watermarks and updates bboxes position for the cropped
-image. If False, the image will be copied without modifications.
-:type crop: bool
-:param ext: Extension format for labels files. Default is “txt”.
-:type ext: str
-:return: None</p>
 </dd></dl>
 
 <dl class="py method">
@@ -253,7 +241,7 @@ Order is x coordinate, then y coordinate, for each of the position columns in <c
 <span class="go">-n -lf &quot;multiple&quot; -c -s &quot; &quot;</span>
 </pre></div>
 </div>
-<p>Parameters values and expected format are the same as the python methods, described in <code class="docutils literal notranslate"><span class="pre">notebooks/lard_export.py</span></code></p>
+<p>Parameters values and expected format are the same as the python methods, described in <code class="docutils literal notranslate"><span class="pre">export_tool.ipynb</span></code></p>
 </section>
 </section>
 

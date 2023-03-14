@@ -14,7 +14,7 @@ Usage example for coco format:
     python src/dataset/lard_export.py --train data/multiple_train --test data/test_dataset -o data/converted_coco -b "xywh"
     -n -lf "multiple" -c -s " "
 
-Parameters values and expected format are the same as the python methods, described in ``notebooks/lard_export.py``
+Parameters values and expected format are the same as the python methods, described in ``export_tool.ipynb``
 """
 import os
 import argparse

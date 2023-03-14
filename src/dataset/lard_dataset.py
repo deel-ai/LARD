@@ -28,17 +28,18 @@ class LardDataset:
                        label_file="multiple", # one file per image, "single" for a single label file
                        crop=True)             # crop each synthetized image to remove watermarks
 
+    ``train_path`` and ``test paths`` should point to Lard datasets as obtained after the labeling phase. At least one of
+    train_path or test_path must be provided at init.
+
+    :param train_path: path to a labeled (after labeling phase) Lard dataset.
+    :type train_path: Union[Path, str]
+    :param test_path: path to a labeled (after labeling phase) Lard dataset.
+    :type test_path: Union[Path, str];
     """
     def __init__(self, train_path: Union[Path, str] = None,
                  test_path: Union[Path, str] = None) -> None:
         """
-        Load a Lard dataset as obtained after the labeling phase. At least one of train_path or test_path must be
-        provided.
-
-        :param train_path: path to a labeled (after labeling phase) Lard dataset.
-        :type train_path: Union[Path, str]
-        :param test_path: path to a labeled (after labeling phase) Lard dataset.
-        :type test_path: Union[Path, str]
+        Constructor
         """
         self.datasets: dict = {}
         self.datasets_dirs = {}
@@ -192,23 +193,25 @@ class LardDataset:
         :param output_dir: directory where the converted dataset will be saved
         :type output_dir: Path or string
         :param bbx_format: Format for label bbox. Options are :
-        - "tlbr" (x,y of top left then x,y of bottom rights corners of the bbox)
-        - "tlwh" (x, y of top left, bbox width and height)
-        - "xywh" (x, y of the center of the bbox, bbox width and height)
-        - "corners" (x,y of each corner)
+
+            * ``"tlbr"`` - (x,y of top left then x,y of bottom rights corners of the bbox)
+            * ``"tlwh"`` - (x, y of top left, bbox width and height)
+            * ``"xywh"`` - (x, y of the center of the bbox, bbox width and height)
+            * ``"corners"`` - (x,y of each corner)
+
         :type bbx_format: str
         :param normalized: option to normalize the bbox position by the image size. If true, bbox labels are expressed
-        in fraction of the image width and height, if False, left in pixels. Default = False.
+            in fraction of the image width and height, if False, left in pixels. Default = False.
         :type normalized: bool
-        :param label_file: "single" (all the labels are in a single csv, with a column with image path) or
-        "multiple" (one label file per image, saved in output_dir/labels).
+        :param label_file: "single" (all the labels are in a single csv, with a column with image path) or "multiple"
+            (one label file per image, saved in output_dir/labels).
         :type label_file: str
         :param sep: label file(s) separator, default is ";".
         :type sep: " "
         :param header: If True, an header with column names is added to each label file.
         :type header: bool
         :param crop: If True, crop during export all images with watermarks and updates bboxes position for the cropped
-        image. If False, the image will be copied without modifications.
+            image. If False, the image will be copied without modifications.
         :type crop: bool
         :param ext: Extension format for labels files. Default is "txt".
         :type ext: str

@@ -7,13 +7,24 @@ from typing import Union
 
 class Labels:
     """
-    This class :
+    The Label class :
+
     - defines the different fields of the labels and metadata of the LARD dataset
     - provided utility method to add, export or manipulate them.
 
     The exact metadata is stored in an internal pandas Dataframe, which can be directly accessed for custom usage :
-    lbl = Labels(csv_metadata_path)
-    metadata_in_pandas_dataframe = lbl.df
+
+    .. code-block:: python
+
+        lbl = Labels(csv_metadata_path)
+        metadata_in_pandas_dataframe = lbl.df
+
+    :ivar sep: separator symbol in the export file.
+    :ivar default_cols: default metadata columns. Specify all the possible metadata field and
+        their order in the exported field.
+
+    :param path: Path to a Lard metadata csv.
+    :type path: str or Path
     """
     sep = ";"
     default_cols = ["image",
@@ -42,10 +53,7 @@ class Labels:
 
     def __init__(self, path: Union[str, Path] = None) -> None:
         """
-        Init method of Labels class.
-
-        :param path: Path to a Lard metadata csv.
-        :type path: str or Path
+        Constructor
         """
         if path is None:
             self.path = None
@@ -66,10 +74,10 @@ class Labels:
 
     def add_label(self, label_infos: dict):
         """
-        Add additional labels and metadata, provided as a python dictionary, to the current ones.
+        Add additional labels and metadata, provided as a python dictionary, to the ones stored.
 
         :param label_infos: dict with metadata and labels information. Keys should be columns names as described in
-        Labels.default_cols
+            ``Labels.default_cols``
         :type label_infos: dict
         :return: None
         """
@@ -80,7 +88,7 @@ class Labels:
 
     def get_label(self, img_idx: Union[str, int]):
         """
-        Return all the image information from the image path or dataframe index
+        Return all information stored for a specific image from its image path or dataframe index
 
         :param img_idx: image path or index
         :type img_idx: str or int
@@ -108,7 +116,7 @@ class Labels:
         Return the list of corner positions in a given image.
 
         :param img: img path or index
-        :type img: str, int
+        :type img: str or int
         :return: list of tuples (x,y), with x, y position of each corner in the image.
         :rtype: list
         """
@@ -139,9 +147,9 @@ class Labels:
     @property
     def watermark_size(self) -> str:
         """
-        Return the name of the field with the watermark size of each image
+        Return the name of the field of self.df with the watermark sizes of each image
 
-        :return: name of the columns with the watermark size of each image.
+        :return: Name of the columns which contains the watermark sizes of each image.
         :rtype: str
         """
         return "watermark_height"
@@ -170,8 +178,7 @@ class Labels:
 
     def as_working_dir_paths(self) -> None:
         """
-        Convert the image path as path relative to the working directory (at the moment of the Labels instance
-         creation)
+        Convert image paths as paths relative to the working directory (at the moment of the Labels instance creation)
 
         :return: None
         """

@@ -14,7 +14,6 @@ src.dataset.lard\_dataset module
 
 .. automodule:: src.dataset.lard_dataset
    :members:
-   :special-members: __init__
    :undoc-members:
    :show-inheritance:
 

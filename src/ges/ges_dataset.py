@@ -1,6 +1,4 @@
-import math
 import pathlib
-import string
 import json
 import os
 import pyproj
@@ -130,7 +128,7 @@ def compute_aiming_point(database_file: str, airport_ocai: str, runway_id: str, 
     return ap_long, ap_lat, rwy_psi, ltp, fpap
 
 
-def generate_dist(min, max, sample_number, distribution: string, par_distrib1=0):
+def generate_dist(min, max, sample_number, distribution: str, par_distrib1=0):
     """
     generate the distances from the runway
     

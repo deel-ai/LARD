@@ -12,7 +12,7 @@ TEST_AIPORTS = ['LTAI', 'LICJ', 'LIRN', 'EDDV', 'LAX', 'LSZH', 'LEMD', 'LWSK', '
                  'RJAA', 'RJTT', 'WSSS', 'FMEP', 'VQPR']
 
 
-def main(database_path):
+def split_database(database_path):
     with open(database_path, 'r') as f:
         runways_database = json.load(f)
 
@@ -41,4 +41,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    main(args.input_database)
+    split_database(args.input_database)
