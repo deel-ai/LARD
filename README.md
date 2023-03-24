@@ -258,7 +258,6 @@ python src/labeling/generate_dataset.py params/export_train_dataset.yml
 ```
 python src/dataset/lard_export.py --train data/multiple_train --test data/test_dataset -o data/converted_coco -b "xywh" -n -lf "multiple" -c -s " "
 ```
-/!\ Not tested yet
 
 Please refer to the provided [notebook (export tool)](export_tool.ipynb) for comprehensive details about the possible export options and the folder structures.
 
