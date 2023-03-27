@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from pathlib import PurePath, Path
 from src.labeling.export_config import CORNERS_NAMES
-from typing import Union
+from typing import Union, List
 
 
 class Labels:
@@ -125,7 +125,7 @@ class Labels:
         return [(img_label[x], img_label[y]) for x, y in zip(self.x_corners_names, self.y_corners_names)]
 
     @property
-    def x_corners_names(self) -> list[str]:
+    def x_corners_names(self) -> List[str]:
         """
         Get the list of columns names for the x coordinates of the corners
 
@@ -135,7 +135,7 @@ class Labels:
         return [f"x_{name}" for name in CORNERS_NAMES]
 
     @property
-    def y_corners_names(self) -> list[str]:
+    def y_corners_names(self) -> List[str]:
         """
         Get the list of columns names for the y coordinates of the corners
 
