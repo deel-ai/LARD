@@ -40,7 +40,7 @@ We also provide a [synthetic image generator](#%EF%B8%8F-synthetic-generator) ba
   3. [Label automatically](#3-automatic-labeling)
 - [🛠️ Dataset exploitation](#%EF%B8%8F-dataset-exploitation)
 - [👀 See Also](#-see-also)
-- [🙏 Acknowledgment](#-acknowledgment)
+- [🎓 Authors](#-authors)
 - [🗞️ Citation](#%EF%B8%8F-citation)
 - [📝 License](#-license)
 
@@ -276,7 +276,7 @@ More from the DEEL project:
 - [DEEL White paper](https://arxiv.org/abs/2103.10529) a summary of the DEEL team on the challenges of certifiable AI and the role of data quality, representativity and explainability for this purpose.
 
 
-## 🙏 Acknowledgment
+## 🎓 Authors
 
 <div align="center">
     <a href="#">
@@ -289,9 +289,7 @@ More from the DEEL project:
         <img src="docs/assets/logo-DEEL.png" height="60px" alt="logo-DEEL">
     </a>
 </div>
-
-This project received funding from the French ”Investing for the Future – PIA3” program within the Artificial and Natural Intelligence Toulouse Institute (ANITI).
-
+This project is a joint work from ONERA and DEEL. It received funding from the French ”Investing for the Future – PIA3” program within the Artificial and Natural Intelligence Toulouse Institute (ANITI).
 
 ## 🗞️ Citation
 _To be published_
