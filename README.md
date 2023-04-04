@@ -280,16 +280,22 @@ More from the DEEL project:
 
 <div align="center">
     <a href="#">
-        <img src="docs/assets/logo-ONERA.png" height="60px" alt="logo-ONERA">
+        <img src="docs/assets/logo-ONERA.png" height="50px" alt="logo-ONERA">
     </a>&nbsp;&nbsp;
     <a href="#">
-        <img src="docs/assets/logo-ANITI.jpg" height="60px" alt="logo-ANITI">
+        <img src="docs/assets/logo-ANITI.jpg" height="50px" alt="logo-ANITI">
     </a>&nbsp;&nbsp;
     <a href="#">
-        <img src="docs/assets/logo-DEEL.png" height="60px" alt="logo-DEEL">
+        <img src="docs/assets/logo-IRT-StEx.png" height="50px" alt="logo-IRT-StEx">
+    </a>&nbsp;&nbsp;
+    <a href="#">
+        <img src="docs/assets/logo-DEEL.png" height="50px" alt="logo-DEEL">
+    </a>
+    <a href="#">
+        <img src="docs/assets/logo-AIRBUS.png" height="50px" alt="logo-AIRBUS">
     </a>
 </div>
-This project is a joint work from ONERA and DEEL. It received funding from the French ”Investing for the Future – PIA3” program within the Artificial and Natural Intelligence Toulouse Institute (ANITI).
+This project is a joint research work from ONERA, IRT Saint Exupéry and AIRBUS. It received funding from the French ”Investing for the Future – PIA3” program within the Artificial and Natural Intelligence Toulouse Institute (ANITI).
 
 ## 🗞️ Citation
 _To be published_
