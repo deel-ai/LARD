@@ -292,7 +292,7 @@ More from the DEEL project:
         <img src="docs/assets/logo-DEEL.png" height="50px" alt="logo-DEEL">
     </a>
     <a href="#">
-        <img src="docs/assets/logo-AIRBUS.PNG" height="50px" alt="logo-AIRBUS">
+        <img src="docs/assets/logo-AIRBUS_.png" height="50px" alt="logo-AIRBUS">
     </a>
 </div>
 This project is a joint research work from ONERA, IRT Saint Exupéry and AIRBUS. It received funding from the French ”Investing for the Future – PIA3” program within the Artificial and Natural Intelligence Toulouse Institute (ANITI).
