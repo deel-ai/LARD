@@ -29,7 +29,7 @@ We also provide a [synthetic image generator](#%EF%B8%8F-synthetic-generator) ba
 - 💾 [Download LARD dataset](https://share.deel.ai/s/H4iLKRmLkdBWqSt?path=%2Flard%2F1.0.0)
 - 🔥 [Generate scenarios (notebook)](01_scenario_generation.ipynb)
 - 🛠️ [Export tool (notebook)](export_tool.ipynb)
-- 📜 Read paper (to be published)
+- 📜 [Read paper](https://hal.science/hal-04056760)
 
 # 📚 Table of contents
 
@@ -298,7 +298,9 @@ More from the DEEL project:
 This project is a joint research work from ONERA, IRT Saint Exupéry and AIRBUS. It received funding from the French ”Investing for the Future – PIA3” program within the Artificial and Natural Intelligence Toulouse Institute (ANITI).
 
 ## 🗞️ Citation
-_To be published_
+```
+Mélanie Ducoffe, Maxime Carrere, Léo Féliers, Adrien Gauffriau, Vincent Mussot, Claire Pagetti, Thierry Sammour, LARD - Landing Approach Runway Detection - Dataset for Vision Based Landing. 2023. ⟨hal-04056760⟩
+```
 
 ## 📝 License
 The package is released under [MIT license](LICENSE).
