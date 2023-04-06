@@ -298,8 +298,22 @@ More from the DEEL project:
 This project is a joint research work from ONERA, IRT Saint Exupéry and AIRBUS. It received funding from the French ”Investing for the Future – PIA3” program within the Artificial and Natural Intelligence Toulouse Institute (ANITI).
 
 ## 🗞️ Citation
+You can read our paper at https://hal.science/hal-04056760.
+
+If you use LARD as part of your workflow in a scientific publication, please consider citing the following paper:
 ```
-Mélanie Ducoffe, Maxime Carrere, Léo Féliers, Adrien Gauffriau, Vincent Mussot, Claire Pagetti, Thierry Sammour, LARD - Landing Approach Runway Detection - Dataset for Vision Based Landing. 2023. ⟨hal-04056760⟩
+@unpublished{ducoffe:hal-04056760,
+  TITLE = {{LARD - Landing Approach Runway Detection - Dataset for Vision Based Landing}},
+  AUTHOR = {Ducoffe, M{\'e}lanie and Carrere, Maxime and F{\'e}liers, L{\'e}o and Gauffriau, Adrien and Mussot, Vincent and Pagetti, Claire and Sammour, Thierry},
+  URL = {https://hal.science/hal-04056760},
+  NOTE = {working paper or preprint},
+  YEAR = {2023},
+  MONTH = Apr,
+  KEYWORDS = {open-source dataset ; vision based landing ; ML},
+  PDF = {https://hal.science/hal-04056760/file/main.pdf},
+  HAL_ID = {hal-04056760},
+  HAL_VERSION = {v1},
+}
 ```
 
 ## 📝 License
