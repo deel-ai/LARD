@@ -3,6 +3,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import cv2
 import numpy as np
+from src.labeling.labels import Labels
 from src.labeling.labels_utils import compute_bbox
 
 
@@ -15,8 +16,8 @@ def display_img_with_labels(dataset_labels, img_idx, figsize=None, save_dir=None
     plt.rcParams['figure.figsize'] = figsize
 
     # Load metadata
-    labels = dataset_labels.get_label(img_idx)
-    img_filepath = labels["image"]
+    labels = list(dataset_labels.get_labels(img_idx).values())
+    img_filepath = labels[0]["image"]
 
     # Load image
     if dataset_dir is not None:
@@ -32,34 +33,32 @@ def display_img_with_labels(dataset_labels, img_idx, figsize=None, save_dir=None
     print("Displaying ", img_filepath)
     runway_img = img.copy()
 
-    # Add bbox
-    try:
-        corners = np.array(dataset_labels.get_corners_list(img_filepath))
+    for label in labels:
+        corners = np.array([(label[x], label[y]) for x, y in zip(dataset_labels.x_corners_names, dataset_labels.y_corners_names)])
         bbox = compute_bbox(corners)
-    except IndexError:
-        plt.title(f"No corners found for image {img_filepath}")
-        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        plt.imshow(img)
-        plt.show()
-        return
-    tl = bbox[:2]  # top left corner of bbox
-    br = bbox[2:]  # bottom right corner of bbox
-    cv2.rectangle(runway_img, tl, br, (255, 0, 0), 2)
+        tl = bbox[:2]  # top left corner of bbox
+        br = bbox[2:]  # bottom right corner of bbox
+        cv2.rectangle(runway_img, tl, br, (255, 0, 0), 2)
+        
+        # Add Text Background
+        # Finds space required by the text so that we can put a background with that amount of width.
+        label = "%s_%s" % (label['airport'], label['runway'])
+        (w, h), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 1.1, 2)
+        text_h_offset = 5
+        runway_img = cv2.rectangle(runway_img, tl, (tl[0] + w, tl[1] - h - text_h_offset), (255, 0, 0), -1)
 
-    # Add Text Background
-    # Finds space required by the text so that we can put a background with that amount of width.
-    label = "%s_%s" % (labels['airport'], labels['runway'])
-    (w, h), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 1.1, 2)
-    text_h_offset = 5
-    runway_img = cv2.rectangle(runway_img, tl, (tl[0] + w, tl[1] - h - text_h_offset), (255, 0, 0), -1)
+        # Add Text
+        runway_img = cv2.putText(runway_img, label, (tl[0], tl[1] - text_h_offset), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                                (255, 255, 255), 2)
 
-    # Add Text
-    runway_img = cv2.putText(runway_img, label, (tl[0], tl[1] - text_h_offset), cv2.FONT_HERSHEY_SIMPLEX, 1,
-                             (255, 255, 255), 2)
+        # Add Corners
+        for c in corners:
+            cv2.circle(runway_img, c, 5, [0, 0, 255], thickness=-1)
 
-    # Add Corners
-    for c in corners:
-        cv2.circle(runway_img, c, 5, [0, 0, 255], thickness=-1)
+        # Add Corners
+        for c in corners:
+            cv2.circle(runway_img, c, 5, [0, 0, 255], thickness=-1)
+
     if save_dir is not None:
         os.makedirs(save_dir, exist_ok=True)
         save_filepath = save_dir / Path(img_filepath).name
