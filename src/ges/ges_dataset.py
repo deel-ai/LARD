@@ -196,6 +196,7 @@ def define_offset(
     # fpap_lat, fpap_long, fpap_alt = ecef2llh(fpap[0], fpap[1], fpap[2])
     dh_m = generate_dist(traj.min_distance_m, traj.max_distance_m, traj.sample_number, traj.distribution, traj.distrib_param)
     dh_m = np.sort(dh_m)[::-1]
+    dh_m += traj.dist_ap_m, # approx to ltp (cos nearly 1)
     # print(std_roll_deg)
     dav_deg = np.random.normal(traj.alpha_v_deg, traj.std_alpha_v_deg, (traj.sample_number,))
     dz_m = -np.tan(np.deg2rad(dav_deg)) * dh_m
