@@ -23,37 +23,43 @@ def convert_label(image_shape, image_path, c, frame, runways_database, img_nb):
         watermark = c["watermark"]["height"]
     except KeyError:
         watermark = c["image"]["watermark_height"]
-    label = {'image': image_path,
-             'airport': airport,
-             'runway': runway,
-             'height': image_shape[0],
-             'width': image_shape[1],
-             'watermark_height': watermark,
-             'time': image_time,
-             'roll': c['poses'][img_nb]['pose'][5],
-             'pitch': c['poses'][img_nb]['pose'][4],
-             'yaw': c['poses'][img_nb]['pose'][3]
-             }
+    labels = []
     camera = GESCamera(image_shape, frame)
-    camera.compute(runways_database=runways_database, runway=runway, airport=airport)
     # compute intrinsics and extrinsics matrix
     camera.compute_intrinsics_matrix()
     camera.compute_extrinsics_matrix()
-    corners = np.array(camera.compute_runway_corners_projection(
-        runways_database,
-        airport,
-        runway
-    ))
-    label['slant_distance'] = float(np.round(camera.slant_distance / 1852, 2))
-    label['along_track_distance'] = float(np.round(camera.along_track_distance / 1852, 2))
-    label['height_above_runway'] = float(np.round(camera.height_above_runway*3.28084, 2))
-    label['lateral_path_angle'] = float(np.round(camera.lateral_path_angle, 2))
-    label['vertical_path_angle'] = float(np.round(camera.vertical_path_angle, 2))
+    for r in runways_database[airport].keys():
+        camera.compute(runways_database=runways_database, runway=r, airport=airport)
+        corners = np.array(camera.compute_runway_corners_projection(
+            runways_database,
+            airport,
+            r
+        ))
+        if camera.slant_distance <= 0:
+            continue
+        label = {
+            'image': image_path,
+            'airport': airport,
+            'runway': r,
+            'height': image_shape[0],
+            'width': image_shape[1],
+            'watermark_height': watermark,
+            'time': image_time,
+            'roll': c['poses'][img_nb]['pose'][5],
+            'pitch': c['poses'][img_nb]['pose'][4],
+            'yaw': c['poses'][img_nb]['pose'][3]
+        }
+        label['slant_distance'] = float(np.round(camera.slant_distance / 1852, 2))
+        label['along_track_distance'] = float(np.round(camera.along_track_distance / 1852, 2))
+        label['height_above_runway'] = float(np.round(camera.height_above_runway*3.28084, 2))
+        label['lateral_path_angle'] = float(np.round(camera.lateral_path_angle, 2))
+        label['vertical_path_angle'] = float(np.round(camera.vertical_path_angle, 2))
+        for i, corner in enumerate(corners):
+            label[f"x_{CORNERS_NAMES[i]}"] = corner[0]
+            label[f"y_{CORNERS_NAMES[i]}"] = corner[1]
+        labels.append(label)
 
-    for i, corner in enumerate(corners):
-        label[f"x_{CORNERS_NAMES[i]}"] = corner[0]
-        label[f"y_{CORNERS_NAMES[i]}"] = corner[1]
-    return label
+    return labels
 
 
 def export_labels(yaml_config, google_export_dir=None, out_labels_file=None, out_images_dir=None):
@@ -101,11 +107,11 @@ def export_labels(yaml_config, google_export_dir=None, out_labels_file=None, out
         #     print(f"Skipping missing image : {image_path}")
         #     continue
         output_image_path = out_images_dir / image_path.name
-        label = convert_label(image_shape, output_image_path, c, frame_position, runways_database, i)
-        if not is_runway_image_valid(image_shape, label):
-            print(f"Skipping invalid image : {image_path}")
-            continue
-        labels.add_label(label)
+        for label in convert_label(image_shape, output_image_path, c, frame_position, runways_database, i):
+            if not is_runway_image_valid(image_shape, label):
+                print(f"Skipping invalid runway for image {image_path}: {label['runway']} runway not visible")
+                continue
+            labels.add_label(label)
         shutil.copy(image_path, output_image_path)
 
     # Generate label file
