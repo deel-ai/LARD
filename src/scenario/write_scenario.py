@@ -11,11 +11,18 @@ from typing import Union
 from dataclasses import asdict
 
 
-def write_scenario(scenario_config: Union[pathlib.Path, ScenarioConfig]) -> None:
+def write_scenario(scenario_config: Union[pathlib.Path, ScenarioConfig], override: bool = False) -> bool:
     """
     Export a scenario from a yaml config file to eps format
     """
     scenario_config.update_fields()
+
+    out_google_file = Path(scenario_config.outputs.earth_studio_scenario)
+    if out_google_file.exists() and not override:
+        print(f"Warning: scenario {out_google_file.stem} already exists! \
+              Please enable overriding if necessary.")
+        return False
+    
     scenario_content = scenario_config.content
     dataset_dir = scenario_config.outputs.dataset_directory
     os.makedirs(pathlib.Path(dataset_dir), exist_ok=True)
@@ -42,17 +49,17 @@ def write_scenario(scenario_config: Union[pathlib.Path, ScenarioConfig]) -> None
     scenario = generate_scenario(scenario_content.image.width, poses, times, fov, height, ges_dataset)
 
     # Write scenario in esp format (google engine format)
-    out_google_file = scenario_config.outputs.earth_studio_scenario
-    os.makedirs(Path(out_google_file).parent, exist_ok=True)
-    with open(out_google_file, 'w') as f:
+    os.makedirs(out_google_file.parent.as_posix(), exist_ok=True)
+    with open(out_google_file.as_posix(), 'w') as f:
         json.dump(scenario, f, indent=2)
-    print(f"Scenario exported as esp : {out_google_file}")
+    print(f"Scenario exported as esp : {out_google_file.as_posix()}")
 
     # Save scenario configuration as yaml
     output_scenario_file = scenario_config.outputs.scenario_metadata
     with open(output_scenario_file, 'w') as f:
         yaml.dump(asdict(scenario_content), f)
     print(f"Scenario exported as yaml : {output_scenario_file}")
+    return True
 
 
 if __name__ == "__main__":

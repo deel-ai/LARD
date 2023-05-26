@@ -22,7 +22,7 @@ class ScenarioConfig:
 
     @property
     def scenario_name(self):
-        return f"{self.content.airport}_{self.content.runways[0]}_{self.content.trajectory.sample_number}"
+        return f"{self.content.airport}_{'-'.join(self.content.runways)}_{self.content.trajectory.sample_number}"
 
     def autofill_empty_outputs(self):
         if self.outputs.earth_studio_scenario is None:

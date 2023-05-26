@@ -11,7 +11,6 @@ __pycache__/
 # Distribution / packaging
 .Python
 models/
-scenarios/
 env/
 # build/
 develop-eggs/
@@ -74,3 +73,5 @@ target/
 
 # Old generator
 GESGenerator
+.DS_Store
+tmp
