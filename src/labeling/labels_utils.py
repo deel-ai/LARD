@@ -1,6 +1,9 @@
+from typing import Tuple
+
 import numpy as np
 import pandas as pd
 from shapely.geometry import Polygon
+
 from src.labeling.export_config import CORNERS_NAMES
 
 
@@ -40,7 +43,7 @@ def crop_bbox(bbox: np.array, width: int, height: int) -> np.array:
     return np.array([x_min, y_min, x_max, y_max])
 
 
-def is_runway_image_valid(image_shape: tuple[int], label: pd.DataFrame, debug: bool = False) -> bool:
+def is_runway_image_valid(image_shape: tuple[int], label: pd.DataFrame, strict: bool, debug: bool = False) -> Tuple[bool, str]:
     """
     Check if a dataset image is valid :
 
@@ -51,6 +54,8 @@ def is_runway_image_valid(image_shape: tuple[int], label: pd.DataFrame, debug: b
     :type image_shape: tuple[int]
     :param label: dataframe with labels
     :type label: pd.DataFrame
+    :param strict: whether to force runways be entirely within the image.
+    :type strict: bool
     :param debug: print debug information of why an image was deemed invalid.
     :type debug: bool
     :return: if the image is valid or not
@@ -61,16 +66,19 @@ def is_runway_image_valid(image_shape: tuple[int], label: pd.DataFrame, debug: b
     image_poly = Polygon([(0, 0), (0, image_shape[0]), image_shape[:2], (image_shape[1], 0)])
 
     if not runway_poly.intersects(image_poly):
+        msg = "Runway fully out of the image"
         if debug:
-            print("Invalid image : runway fully out of the image")
+            print(msg)
         # runway and image do not intersects and are not contained in one another, we continue to next runway
-        return False
+        return False, msg
     if runway_poly.contains(image_poly):
+        msg = "Runway fully contains the image"
         if debug:
-            print("Invalid image : runway fully contains the image")
-        return False
-    if not image_poly.contains(runway_poly):
+            print(msg)
+        return False, msg
+    if strict and not image_poly.contains(runway_poly):
+        msg = "At least one runway corner is outside the image "
         if debug:
-            print("Invalid image : at least one runway corner is outside the image ")
-        return False
-    return True
+            print(msg)
+        return False, msg
+    return True, "Success"
