@@ -56,7 +56,7 @@ def convert_label(image_shape, image_path, c, frame, runways_database, img_nb):
     return label
 
 
-def export_labels(yaml_config, google_export_dir=None, out_labels_file=None, out_images_dir=None):
+def export_labels(yaml_config, strict, google_export_dir=None, out_labels_file=None, out_images_dir=None):
     # Parse configuration file
     # All the dependencies
     print(f"Label export of {yaml_config} started")
@@ -69,7 +69,7 @@ def export_labels(yaml_config, google_export_dir=None, out_labels_file=None, out
         out_images_dir = google_export_dir / "exported_images"
 
     with open(yaml_config, 'r') as f:
-        c: dict = yaml.safe_load(f)
+        c: dict = yaml.full_load(f)
         if 'poses' not in c.keys():
             raise RuntimeError('The configuration file is not complete, missing poses.')
 
@@ -101,11 +101,12 @@ def export_labels(yaml_config, google_export_dir=None, out_labels_file=None, out
         #     print(f"Skipping missing image : {image_path}")
         #     continue
         output_image_path = out_images_dir / image_path.name
-        label = convert_label(image_shape, output_image_path, c, frame_position, runways_database, i)
-        if not is_runway_image_valid(image_shape, label):
-            print(f"Skipping invalid image : {image_path}")
-            continue
-        labels.add_label(label)
+        for label in convert_label(image_shape, output_image_path, c, frame_position, runways_database, i):
+            ok, msg = is_runway_image_valid(image_shape, label, strict, debug=False)
+            if not ok:
+                # print(f"Skipping invalid runway for image {image_path} {label['runway']}: {msg}")
+                continue
+            labels.add_label(label)
         shutil.copy(image_path, output_image_path)
 
     # Generate label file

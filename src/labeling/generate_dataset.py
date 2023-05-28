@@ -1,9 +1,11 @@
+import functools
+from multiprocessing import Pool
 import argparse
 import os
 import glob
 import shutil
 from pathlib import Path
-from typing import Union
+from typing import Dict, Optional, Union
 from src.labeling.earth_studio_export import export_labels
 from src.labeling.json_export import from_json
 from src.labeling.labels import Labels
@@ -17,6 +19,7 @@ def export_real_directory(folder_path: Union[str, Path], test_images_dir: Union[
     """
     Parse and return the metadata for a real dataset and associated files.
     """
+    # FIXME: strict not used
     labels = Labels()
     img_list = []
     for ext in IMG_TYPES:
@@ -31,25 +34,48 @@ def export_real_directory(folder_path: Union[str, Path], test_images_dir: Union[
     return labels
 
 
-def export_synthesized_directory(folder_path: Union[str, Path], test_images_dir: Union[str, Path]) -> dict:
+def export_synthesized_directory_worker(strict, test_images_dir, records_dirpath, acquisition_path: Path) -> Optional[Labels]:
+    scenario = acquisition_path.stem
+    if os.path.isdir(acquisition_path):
+        try:
+            folder_labels = export_labels(acquisition_path / f"{scenario}.yaml", strict, out_images_dir=test_images_dir)
+        except KeyError as e:
+            print(f"Missing data for scenario {scenario} ({e} was not found): scenario skipped ")
+            return
+        except FileNotFoundError as e:
+            print(f"File {e.filename} could not be found for scenario {scenario} : scenario skipped ")
+            return
+        folder_labels.add_metadata("scenario", scenario)
+        return folder_labels
+    elif acquisition_path.suffix == ".yaml":
+        google_export_dir=records_dirpath / acquisition_path.stem
+        if not google_export_dir.exists():
+            return
+        try:
+            
+            folder_labels = export_labels(acquisition_path, strict, out_images_dir=test_images_dir, google_export_dir=records_dirpath / scenario)
+        except KeyError as e:
+            print(f"Missing data for scenario {scenario} ({e} was not found): scenario skipped ")
+            return
+        except FileNotFoundError as e:
+            print(f"File {e.filename} could not be found for scenario {scenario} : scenario skipped ")
+            return
+        folder_labels.add_metadata("scenario", scenario)
+        return folder_labels
+
+
+def export_synthesized_directory(folder_path: Union[str, Path], strict: bool, test_images_dir: Union[str, Path], records_dirpath: Optional[Path] = None) -> dict:
     """
     Parse and return the metadata for a synthetized google earth dataset.
     """
     labels = Labels()
     folder_path = Path(folder_path)
-    for scenario in os.listdir(folder_path):
-        acquisition_path = folder_path / scenario
-        if os.path.isdir(acquisition_path):
-            try:
-                folder_labels = export_labels(acquisition_path / f"{scenario}.yaml", out_images_dir=test_images_dir)
-            except KeyError as e:
-                print(f"Missing data for scenario {scenario} ({e} was not found): scenario skipped ")
-                continue
-            except FileNotFoundError as e:
-                print(f"File {e.filename} could not be found for scenario {scenario} : scenario skipped ")
-                continue
-            folder_labels.add_metadata("scenario", scenario)
-            labels += folder_labels
+    # Enable multiprocessing
+    with Pool(os.cpu_count()) as p:
+        for folder_labels in p.imap_unordered(functools.partial(export_synthesized_directory_worker, strict, test_images_dir, records_dirpath), folder_path.glob("*")):
+            if folder_labels:
+                labels += folder_labels
+
     return labels
 
 
@@ -73,7 +99,7 @@ def export_datasets(export_config: ExportConfig) -> None:
         dataset_type = dataset_infos["type"]
         dataset_path = dataset_infos["path"]
         if dataset_type == DatasetTypes.EARTH_STUDIO:
-            dataset_labels = export_synthesized_directory(dataset_path, test_images_dir)
+            dataset_labels = export_synthesized_directory(dataset_path, export_config.strict, test_images_dir, records_dirpath=dataset_infos["records_dirpath"] if "records_dirpath" in dataset_infos else None)
         elif dataset_type == DatasetTypes.REAL:
             dataset_labels = export_real_directory(dataset_path, test_images_dir)
         else:
