@@ -10,7 +10,7 @@ class ScenarioConfig:
         If a yaml_file is provided, the parameters airport, runway, scenario dir are not used,
         and the ones from the yaml will be used instead.
         """
-        self.content = ScenarioContent(airport=airport, runways=runway)
+        self.content = ScenarioContent(airport=airport, runways=runway if isinstance(runway, list) else list(runway))
         self.outputs = DefaultOutputs()
         if scenario_dir is not None:
             self.scenario_dir = Path(scenario_dir)
