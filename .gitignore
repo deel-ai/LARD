@@ -74,3 +74,4 @@ target/
 
 # Old generator
 GESGenerator
+.DS_Store
