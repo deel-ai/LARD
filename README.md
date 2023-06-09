@@ -160,13 +160,10 @@ The simplified internal working of the generator is as follows:
 3) 🔥 [Label automatically (notebook)](02_labeling.ipynb): We provide the tool to automatically annotate the resulting images
 
 ## 🔌 Setup
-- On *`Windows`*, you can install python dependancies through `Conda`: 
+- **`pip`** install: You can use the `requirements.txt` to install packages through:
 ```
-conda env create -f env.yml -p ./env
-conda activate ./env
+pip install -r requirements.txt
 ```
-- Alternately, you can use the `requirements.txt` to install packages through `pip`
-- If neither of these intallation are available for your system, you can find the list of simplified dependencies in `env_simplified.yml` (you can install it on *`linux`* with the `conda` command mentionned above)
 
 ## 1. Enrich the runway database
 - 🔥 [Notebook - **Database generation**](00_database_generation.ipynb)
