@@ -16,7 +16,7 @@
 <br>
 
 
-Landing Approach Runway Detection (**LARD**) is a [dataset](#%EF%B8%8F-lard-dataset) of aerial front view images of runways designed for aircraft landing phase. It contains over 17K synthetic images of various runways, enriched with annotated pictures from real landing footages for comparison.
+Landing Approach Runway Detection (**LARD**) is a [dataset](#%EF%B8%8F-lard-dataset) of aerial front view images of runways designed for aircraft landing phase. It contains over 17K synthetic images of various runways, enriched with more than 1800 annotated pictures from real landing footages for comparison.
 
 We also provide a [synthetic image generator](#%EF%B8%8F-synthetic-generator) based on Google Earth Studio if you want to enrich your dataset, or *fatten your LARD*. Starting from a database of runway positions, our generator produces high quality synthetic pictures of airport runways with their metadata. Through geometric transformations, these pictures can then be automatically annotated with the position of the runway or any targeted element in the aerial picture.
 
@@ -47,6 +47,8 @@ We also provide a [synthetic image generator](#%EF%B8%8F-synthetic-generator) ba
 # ✈️ LARD Dataset
 
 - 💾 [LARD - **Download**](https://share.deel.ai/s/H4iLKRmLkdBWqSt?path=%2Flard%2F1.0.0)
+
+***[New 08/2023]*** _Over 1700 images were annotated and added to the test set of real images_
 
 This dataset is dedicated to the detection of a runway from an aircraft during approach and landing phases. Therefore the majority of images in this dataset were generated using conventional landing trajectories: the set of possible positions and orientation of the aircraft during landing was defined as a *generic landing approach cone* which corresponds to the following ranges of parameters:
 
@@ -90,10 +92,7 @@ not always available for both real and synthetic images, but the
 following columns are common:
 
 -   First, a few general information about the pictures are provided,
-    such as the relative `path` of the picture or its `width` and `height`. _It
-    is worth noting that the synthetic images all come in the same
-    2448×2648 resolution, while the pictures from real footage
-    are in majority 3840×2180 or 1920×1080 resolutions._
+    such as the relative `path` of the picture or its `width` and `height`. _It is worth noting that the synthetic images all come in the same 2448×2648 resolution, while the pictures from real footage are in majority 3840×2160 or 1920×1080 resolutions._
 
 -   Then, data about the origin of the picture are given, such as the
     `initial scenario` which generated the image, or the `type` of data,
@@ -141,6 +140,7 @@ The following channels were used to build the set of real images of LARD. These 
 - [High Pressure Aviation Films](https://www.youtube.com/c/HighPressureAviationFilms/search?query=landing)
 - [SOG Pilot](https://www.youtube.com/@sogpilot3137/search?query=landing)
 - [737 Aviation](https://www.youtube.com/@737Aviation/search?query=landing)
+- [InZeAir84](https://www.youtube.com/@INZEAIR84/search?query=landing)
 
 <!--
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/17MUtbOfdNQ/0.jpg)](http://www.youtube.com/watch?v=17MUtbOfdNQ?t=500s "Landing at PALERMO, by GreatFlyer")-->
