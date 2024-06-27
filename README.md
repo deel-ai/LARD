@@ -26,7 +26,7 @@ We also provide a [synthetic image generator](#%EF%B8%8F-synthetic-generator) ba
 
 
 ## 🚀 Quickstart
-- 💾 [Download LARD dataset](https://share.deel.ai/s/3ZyWamJWrqzCf74)
+- 💾 [Download LARD dataset](https://doi.org/10.57745/MZSH2Y) | [_secondary mirror_](https://share.deel.ai/s/3ZyWamJWrqzCf74)
 - 🔥 [Generate scenarios (notebook)](01_scenario_generation.ipynb)
 - 🛠️ [Export tool (notebook)](export_tool.ipynb)
 - 📜 [Read paper](https://hal.science/hal-04056760)
@@ -45,8 +45,9 @@ We also provide a [synthetic image generator](#%EF%B8%8F-synthetic-generator) ba
 - [📝 License](#-license)
 
 # ✈️ LARD Dataset
-
-- 💾 [LARD - **Download**](https://share.deel.ai/s/3ZyWamJWrqzCf74)
+The LARD Dataset is declared and stored at data.gouv.fr under the DOI https://doi.org/10.57745/MZSH2Y. It is available to download directly on this page, or on a secondary mirror.
+- 💾 [LARD - **Primary Download**](https://doi.org/10.57745/MZSH2Y)
+- 💾 [LARD - _Secondary Mirror_](https://share.deel.ai/s/3ZyWamJWrqzCf74)
 
 ***[New 08/2023]*** _Over 1700 images were annotated and added to the test set of real images_
 
