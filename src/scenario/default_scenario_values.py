@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-
+from typing import Dict, List
 
 @dataclass
 class DefaultOutputs:
@@ -52,30 +52,57 @@ class DefaultImage:
     watermark_height: int = 300
 
 
+
 @dataclass
 class ScenarioContent:
-    airport: str = None
     runways_database: str = "data/runways_database.json"
-    runways: list = field(default_factory=list)
+    airports_runways: Dict[str, List[str]] = field(default_factory=dict)
     image: DefaultImage = DefaultImage()
     time: DefaultTime = DefaultTime()
     trajectory: DefaultTrajectory = DefaultTrajectory()
     poses: list = field(default_factory=list)
 
-    def from_dict(self, in_dict):
-        self.airport = in_dict["airport"]
-        self.runways = in_dict["runways"]
+    def from_dict(self, in_dict): # TODO rework the json files for scenarios loading 
+        self.airports_runways = in_dict["airports_runways"]
         self.image.__dict__.update(in_dict["image"])
         self.time.__dict__.update(in_dict["time"])
         self.trajectory.__dict__.update(in_dict["trajectory"])
 
     def update_if_exists(self, key, val):
         if hasattr(self, key):
-            self.__setattr__(key, val)
+            setattr(self, key, val)
         else:
             if hasattr(self.image, key):
-                self.image.__setattr__(key, val)
+                setattr(self.image, key, val)
             if hasattr(self.time, key):
-                self.time.__setattr__(key, val)
+                setattr(self.time, key, val)
             if hasattr(self.trajectory, key):
-                self.trajectory.__setattr__(key, val)
+                setattr(self.trajectory, key, val)
+
+# @dataclass
+# class ScenarioContent: #TODO rework this class to handle multiple airports & runways
+#     airport: str = None
+#     runways_database: str = "data/runways_database.json"
+#     runways: list = field(default_factory=list)
+#     image: DefaultImage = DefaultImage()
+#     time: DefaultTime = DefaultTime()
+#     trajectory: DefaultTrajectory = DefaultTrajectory()
+#     poses: list = field(default_factory=list)
+
+#     def from_dict(self, in_dict):
+#         self.airport = in_dict["airport"]
+#         self.runways = in_dict["runways"]
+#         self.image.__dict__.update(in_dict["image"])
+#         self.time.__dict__.update(in_dict["time"])
+#         self.trajectory.__dict__.update(in_dict["trajectory"])
+
+#     def update_if_exists(self, key, val):
+#         if hasattr(self, key):
+#             self.__setattr__(key, val)
+#         else:
+#             if hasattr(self.image, key):
+#                 self.image.__setattr__(key, val)
+#             if hasattr(self.time, key):
+#                 self.time.__setattr__(key, val)
+#             if hasattr(self.trajectory, key):
+#                 self.trajectory.__setattr__(key, val)

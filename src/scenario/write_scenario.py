@@ -33,8 +33,8 @@ def write_scenario(scenario_config: Union[pathlib.Path, ScenarioConfig]) -> None
 
     # Generate poses
     scenario_content.poses = []
-    runaways_db = scenario_content.runways_database
-    generate_poses(runaways_db, scenario_content, ges_dataset)
+    runways_db = scenario_content.runways_database
+    generate_poses(runways_db, scenario_content, ges_dataset)
 
     # Generate scenario
     poses = [p['pose'] for p in scenario_content.poses]
@@ -46,7 +46,7 @@ def write_scenario(scenario_config: Union[pathlib.Path, ScenarioConfig]) -> None
     os.makedirs(Path(out_google_file).parent, exist_ok=True)
     with open(out_google_file, 'w') as f:
         json.dump(scenario, f, indent=2)
-    print(f"Scenario exported as esp : {out_google_file}")
+    print(f"Scenario exported as .esp : {out_google_file}")
 
     # Save scenario configuration as yaml
     output_scenario_file = scenario_config.outputs.scenario_metadata

@@ -23,31 +23,61 @@ def load_runways_database(runways_database_path):
     return runways
 
 
-def generate_poses(runaway_db, scenario: ScenarioContent, d: GESDataset):
+def generate_poses(runway_db, scenario: ScenarioContent, d: GESDataset):
     """
-    generate all the camera poses with the config c and the GESDataset d
+    Generate all the camera poses with the config c and the GESDataset d
 
     """
     time = scenario.time
-    for runway in scenario.runways:
-        poses = d.generate_landing_poses(runaway_db,
-                                         scenario.airport,
-                                         runway,
-                                         scenario.trajectory)
-        for p in poses:
-            scenario.poses.append({
-                'airport': scenario.airport,
-                'runway': runway,
-                'pose': list(p),  # list of flight data
-                'time': {
-                    'year': random.randint(time.year_min, time.year_max),
-                    'month': random.randint(time.month_min, time.month_max),
-                    'day': random.randint(time.day_min, time.day_max),
-                    'hour': random.randint(time.hour_min, time.hour_max),
-                    'minute': random.randint(time.minute_min, time.minute_max),
-                    'second': random.randint(time.second_min, time.second_max),
-                }
-            })
+    for airport, runways in scenario.airports_runways.items():
+        for runway in runways:
+            poses = d.generate_landing_poses(runway_db,
+                                             airport,
+                                             runway,
+                                             scenario.trajectory)
+            for p in poses:
+                scenario.poses.append({
+                    'airport': airport,
+                    'runway': runway,
+                    'pose': list(p),  # list of flight data
+                    'time': {
+                        'year': random.randint(time.year_min, time.year_max),
+                        'month': random.randint(time.month_min, time.month_max),
+                        'day': random.randint(time.day_min, time.day_max),
+                        'hour': random.randint(time.hour_min, time.hour_max),
+                        'minute': random.randint(time.minute_min, time.minute_max),
+                        'second': random.randint(time.second_min, time.second_max),
+                    }
+                })
+
+
+
+# OBSOLETE : Previous single runway-airport version
+# def generate_poses(runway_db, scenario: ScenarioContent, d: GESDataset):
+#     """
+#     generate all the camera poses with the config c and the GESDataset d
+
+#     """
+#     time = scenario.time
+#     for runway in scenario.runways:
+#         poses = d.generate_landing_poses(runway_db,
+#                                          scenario.airport,
+#                                          runway,
+#                                          scenario.trajectory)
+#         for p in poses:
+#             scenario.poses.append({
+#                 # 'airport': scenario.airport,
+#                 # 'runway': runway,
+#                 'pose': list(p),  # list of flight data
+#                 'time': {
+#                     'year': random.randint(time.year_min, time.year_max),
+#                     'month': random.randint(time.month_min, time.month_max),
+#                     'day': random.randint(time.day_min, time.day_max),
+#                     'hour': random.randint(time.hour_min, time.hour_max),
+#                     'minute': random.randint(time.minute_min, time.minute_max),
+#                     'second': random.randint(time.second_min, time.second_max),
+#                 }
+#             })
 
 
 def generate_scenario(image_width, poses, times, fov, height, d: GESDataset):
