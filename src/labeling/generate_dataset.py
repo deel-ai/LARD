@@ -39,7 +39,19 @@ def export_synthesized_directory(folder_path: Union[str, Path], test_images_dir:
     folder_path = Path(folder_path)
     for scenario in os.listdir(folder_path):
         acquisition_path = folder_path / scenario
+        yaml_file_path = acquisition_path / f"{scenario}.yaml"
+        
         if os.path.isdir(acquisition_path):
+            if not yaml_file_path.exists():
+                parent_yaml_file_path = folder_path / f"{scenario}.yaml"
+                if parent_yaml_file_path.exists():
+                    print(f"YAML file for scenario {scenario} found in the parent folder. Moving it to the correct location.")
+                    shutil.copy(parent_yaml_file_path, yaml_file_path)
+                else:
+                    parent_parent_yaml_file_path = folder_path / f"../{scenario}.yaml"
+                    if parent_parent_yaml_file_path.exists():
+                        print(f"YAML file for scenario {scenario} found in the parent-parent folder. Moving it to the correct location.")
+                        shutil.copy(parent_parent_yaml_file_path, yaml_file_path)
             try:
                 folder_labels = export_labels(acquisition_path / f"{scenario}.yaml", out_images_dir=test_images_dir)
             except KeyError as e:
@@ -62,6 +74,8 @@ def export_datasets(export_config: ExportConfig) -> None:
     :type export_config: ExportConfig
     :return: None
     """
+    #TODO: Modify to handle mutiple runways.
+        # The implementation should create a typical label line in the csv file for each runway on the same airport
     out_test_dir = Path(export_config.output_directory) / export_config.dataset_name
     test_images_dir = out_test_dir / "images"
     os.makedirs(out_test_dir, exist_ok=True)

@@ -14,6 +14,7 @@ def from_json(path: Union[str, Path]) -> dict:
     :return: labels loaded in a python dict
     :rtype: dict
     """
+    print(path)
     label = {}
     with open(path, 'r') as f:
         json_label = json.load(f)
@@ -32,7 +33,11 @@ def from_json(path: Union[str, Path]) -> dict:
     try:
         label["time_to_landing"] = json_label["timeToLanding"]
     except KeyError:
-        print(f"No time to landing in json {path}")
+        try:
+            label["time_to_landing"] = json_label["time_to_landing"]
+        except KeyError:
+            print(f"No time to landing in json {path}")
+            pass
     try:
         label["weather"] = json_label["weather"]
     except KeyError:
@@ -41,7 +46,11 @@ def from_json(path: Union[str, Path]) -> dict:
         label["night"] = json_label["night"]
     except KeyError:
         pass  # no night field is expected to happen for a lot of images
-
+    # for shape in json_label["shapes"]:
+    #     if shape["label"] == "runway":
+    #         for i, corner in enumerate(shape["points"]):
+    #             label[f"x_{CORNERS_NAMES[i]}"] = int(corner[0])
+    #             label[f"y_{CORNERS_NAMES[i]}"] = int(corner[1])
     for i, corner in enumerate(json_label["shapes"][0]["points"]):
         label[f"x_{CORNERS_NAMES[i]}"] = int(corner[0])
         label[f"y_{CORNERS_NAMES[i]}"] = int(corner[1])

@@ -6,10 +6,15 @@ from enum import Enum
 class DatasetTypes(Enum):
     EARTH_STUDIO = "earth_studio"
     REAL = "real"
+    # TODO: Add 
+    # FLSIM = "flight_simulator"
 
 
 # Corner names in export
-CORNERS_NAMES = ["A", "B", "C", "D"]
+# CORNERS_NAMES = ["A", "B", "C", "D"]
+# TODO: Change names to TL, BL, TR, BR
+CORNERS_NAMES = ["TL", "BL", "TR", "BR"]
+# 
 
 
 class ExportConfig:

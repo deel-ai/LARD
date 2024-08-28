@@ -27,17 +27,15 @@ class ScenarioConfig:
             # add all existing runways from the airport_database
             with open(runways_database_file, 'r') as f:
                 runways_database = json.load(f)
-            print(airports_runways, "before adding missing runways")
             for airport, runways in airports_runways.items():
                 if not runways:
                     airports_runways[airport] = list(runways_database[airport].keys())
-            print(airports_runways, "after adding missing runways")           
             self.content = ScenarioContent(airports_runways=airports_runways)
         elif airport is not None and runway is not None:
             airport_runways = {airport: [runway]}
             self.content = ScenarioContent(airports_runways=airport_runways)
         else:
-            raise ValueError("Provide either:\n- airports_runways,\n- an airport and its runways,\n- a yaml configuration file")
+            raise ValueError("[Scenario Config]: Provide either:\n- airports_runways,\n- an airport and its runways,\n- a yaml configuration file")
             
     @property
     def scenario_name(self):

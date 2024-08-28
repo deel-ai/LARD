@@ -232,8 +232,16 @@ class GESCamera(object):
         runway_corners_3d[1] = np.array(runway_corners_3d[1]) - vectorAB * delta_x + vectorBC * delta_y
         runway_corners_3d[2] = np.array(runway_corners_3d[2])  - vectorDC * delta_x - vectorBC * delta_y
         runway_corners_3d[3] = np.array(runway_corners_3d[3]) + vectorDC * delta_x - vectorAD * delta_y
+        corners_2D =  GESCamera.projection3d_2d(self.intrinsics, self.extrinsics, runway_corners_3d)        
+        
+        sorted_corners = sorted(corners_2D, key=lambda x: (x[1], x[0]))  # Sort primarily by y, then by x
 
-        return GESCamera.projection3d_2d(self.intrinsics, self.extrinsics, runway_corners_3d)
+        top_left = sorted_corners[0]
+        bottom_left = sorted_corners[1] if sorted_corners[1][0] < sorted_corners[2][0] else sorted_corners[2]
+        top_right = sorted_corners[3]
+        bottom_right = sorted_corners[1] if sorted_corners[1][0] > sorted_corners[2][0] else sorted_corners[2]
+
+        return [top_left, bottom_left, top_right, bottom_right]
 
     def compute_runway_axis_projection(self, runways_database, airport, runway, delta=0):
         runway_points = runways_database[airport][runway]
