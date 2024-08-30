@@ -7,6 +7,7 @@ import shutil
 import glob
 import numpy as np
 import datetime
+import re
 from pathlib import Path
 from src.labeling.labels import Labels
 from src.ges.ges_dataset import GESDataset
@@ -15,15 +16,36 @@ from src.labeling.labels_utils import is_runway_image_valid
 from src.labeling.export_config import CORNERS_NAMES
 
 
+def extract_runway_info(runway_name):
+    """Extracts the numerical part and suffix from a runway identifier"""
+    match = re.match(r"(\d+)([LCR]?)", runway_name)
+    if match:
+        number = int(match.group(1))
+        suffix = match.group(2)
+        return number, suffix
+    return None, None
+
+def opposite(runway1, runway2):
+    """Determines if two runways are opposites based on number and suffix rules"""
+    number1, suffix1 = extract_runway_info(runway1)
+    number2, suffix2 = extract_runway_info(runway2)
+    if number1 is None or number2 is None:
+        return False
+    if (number1 + 18) % 36 != number2:
+        return False
+    
+    if (not suffix1 and not suffix2) \
+        or (suffix1 == suffix2 and suffix1 == 'C') \
+        or (suffix1, suffix2) in [('L', 'R'), ('R', 'L')]:
+        return True
+    return False
+
 def convert_label(yaml_scenario, image_path, image_shape, pose, frame, runway, runways_database):
     airport = pose['airport']
     image_time = datetime.datetime(**pose['time'])
-    
-    # Access the 'image' information from the top level of the YAML structure
     image_info = yaml_scenario['image']
-    print("image_info: ", image_info)
-    watermark = image_info.get("watermark_height", 300)  # Default to 300 if not found
-    print("watermark: ", watermark)
+    watermark = image_info.get("watermark_height", 300)
+    
     label = {
         'image': image_path,
         'airport': airport,
@@ -37,10 +59,7 @@ def convert_label(yaml_scenario, image_path, image_shape, pose, frame, runway, r
         'yaw': pose['pose'][3]
     }
     camera = GESCamera(image_shape, frame)
-    # Add a complete debug here to be sure which runway we consider, 
-    print(f"Computing camera for airport {airport}, runway {runway}")
-    # Add a debug for for which current roll, pitch, yaw, etc
-    print(f"Pose: {pose}")
+    # print(f"Computing camera for airport {airport}, runway {runway}")
         
     camera.compute(runways_database=runways_database, runway=runway, airport=airport)
     camera.compute_intrinsics_matrix()
@@ -141,14 +160,15 @@ def export_labels(yaml_scenario_path, google_export_dir=None, out_labels_file=No
     labels = Labels()
     os.makedirs(out_images_dir, exist_ok=True)
     j = 0
-    # TODO: clear this code once the .json dependency is removed
+    # TODO: clear this code if the .json dependency is removed at some point
     if len(ges_dataset.data['cameraFrames']) != len(glob.glob(str(google_export_dir /  "footage/*.jpeg"))):
         raise FileNotFoundError("Number of images in footage do not match poses in .json")
     
-    # enumerate over each frame and generate the associated list of labels
+    # enumerate over each frame and generate the associated list of labels, 1 label per runway
+    # but we skip the opposite runway of a runway already treated
     for i, frame in enumerate(ges_dataset.data['cameraFrames']):
         image_path = None
-        valid_runways = False # Flag to check if the runway is labeled at least once
+        # valid_runways = False # Removed current validity check to allow multiple partial runways per image
         while image_path is None or not os.path.exists(image_path):
             image_path: Path = google_export_dir / "footage" / f"{google_export_dir.stem}_{str(j).zfill(img_digits)}.jpeg"
             j += 1
@@ -157,24 +177,34 @@ def export_labels(yaml_scenario_path, google_export_dir=None, out_labels_file=No
             
         pose = yaml_scenario['poses'][i]
         airport = pose['airport']
-        print(f"\nExporting image {image_path} for airport {airport}, \n  - frame: {frame}")            
+        print(f"\nExporting image {image_path} for airport {airport}, \n  - frame: {frame}")
+        treated_runways = []
         for runway in yaml_scenario['airports_runways'][airport]:
+            # skip opposite runways
+            if any(opposite(runway, treated_runway) for treated_runway in treated_runways):
+                print(f"\nSkipping opposite runway {runway} already treated.")
+                continue
             output_image_path = out_images_dir / image_path.name
             label = convert_label(yaml_scenario, output_image_path, image_shape, pose, frame, runway, runways_database)
             print(f"  - runway{runway}_label: {label}")
             
-            if is_runway_image_valid(image_shape, label):
-                valid_runways = True
-                labels.add_label(label)
+            # Removed current validity check to allow multiple partial runways per image
+            # if is_runway_image_valid(image_shape, label):
+            #     valid_runways = True
+            labels.add_label(label)
+            treated_runways.append(runway)
         
         
         # output_image_path = out_images_dir / image_path.name
-        if valid_runways:
-            shutil.copy(image_path, output_image_path)
+        # Removed current validity check to allow multiple partial runways per image
+        # if valid_runways:
+            # shutil.copy(image_path, output_image_path)
+        shutil.copy(image_path, output_image_path)
 
     # Generate label file
     labels.export(out_labels_file)
     return labels
+
 
 # OBSOLETE - Previous version, single target runway labelling
 # def export_labels(yaml_config, google_export_dir=None, out_labels_file=None, out_images_dir=None):

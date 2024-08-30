@@ -34,7 +34,7 @@ def display_img_with_labels(dataset_labels, img_idx, figsize=None, save_dir=None
 
     # Add bbox
     try:
-        corners = np.array(dataset_labels.get_corners_list(img_filepath))
+        corners = np.array(dataset_labels.get_corners_list(img_idx))
         bbox = compute_bbox(corners)
     except IndexError:
         plt.title(f"No corners found for image {img_filepath}")
@@ -54,8 +54,7 @@ def display_img_with_labels(dataset_labels, img_idx, figsize=None, save_dir=None
     runway_img = cv2.rectangle(runway_img, tl, (tl[0] + w, tl[1] - h - text_h_offset), (255, 0, 0), -1)
 
     # Add Text
-    runway_img = cv2.putText(runway_img, label, (tl[0], tl[1] - text_h_offset), cv2.FONT_HERSHEY_SIMPLEX, 1,
-                             (255, 255, 255), 2)
+    runway_img = cv2.putText(runway_img, label, (tl[0], tl[1] - text_h_offset), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
     # Add Corners
     for c in corners:
