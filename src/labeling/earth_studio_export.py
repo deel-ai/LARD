@@ -177,16 +177,13 @@ def export_labels(yaml_scenario_path, google_export_dir=None, out_labels_file=No
             
         pose = yaml_scenario['poses'][i]
         airport = pose['airport']
-        print(f"\nExporting image {image_path} for airport {airport}, \n  - frame: {frame}")
         treated_runways = []
         for runway in yaml_scenario['airports_runways'][airport]:
             # skip opposite runways
             if any(opposite(runway, treated_runway) for treated_runway in treated_runways):
-                print(f"\nSkipping opposite runway {runway} already treated.")
                 continue
             output_image_path = out_images_dir / image_path.name
             label = convert_label(yaml_scenario, output_image_path, image_shape, pose, frame, runway, runways_database)
-            print(f"  - runway{runway}_label: {label}")
             
             # Removed current validity check to allow multiple partial runways per image
             # if is_runway_image_valid(image_shape, label):
