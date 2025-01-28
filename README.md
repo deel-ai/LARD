@@ -286,22 +286,22 @@ More from the DEEL project:
 
 <div align="center">
     <a href="#">
-        <img src="docs/assets/logo-ONERA.png" height="50px" alt="logo-ONERA">
+        <img src="docs/assets/logo-ONERA.png" height="40x" alt="logo-ONERA">
     </a>&nbsp;&nbsp;
     <a href="#">
-        <img src="docs/assets/logo-ANITI.jpg" height="50px" alt="logo-ANITI">
+        <img src="docs/assets/logo-ANITI.jpg" height="40px" alt="logo-ANITI">
     </a>&nbsp;&nbsp;
     <a href="#">
-        <img src="docs/assets/logo-IRT-StEx.png" height="50px" alt="logo-IRT-StEx">
+        <img src="docs/assets/logo-IRT-StEx.png" height="40px" alt="logo-IRT-StEx">
     </a>&nbsp;&nbsp;
     <a href="#">
-        <img src="docs/assets/logo-DEEL.png" height="50px" alt="logo-DEEL">
+        <img src="docs/assets/logo-DEEL.png" height="40px" alt="logo-DEEL">
     </a>
     <a href="#">
-        <img src="docs/assets/logo-AIRBUS_.png" height="50px" alt="logo-AIRBUS">
+        <img src="docs/assets/logo-AIRBUS_.png" height="40px" alt="logo-AIRBUS">
     </a>
     <a href="#">
-        <img src="docs/assets/logo-DGA_.png" height="50px" alt="logo-DGA">
+        <img src="docs/assets/logo-DGA_.png" height="40px" alt="logo-DGA">
     </a>
 </div>
 This project is a joint research work from ONERA, IRT Saint Exupéry, AIRBUS and DGA. It received funding from the French ”Investing for the Future – PIA3” program within the Artificial and Natural Intelligence Toulouse Institute (ANITI).
