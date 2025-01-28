@@ -227,6 +227,13 @@ The `.esp` file produced at *step #2* can be directly loaded into Google Earth S
 
 ❗️ **Important:** This generation will create a folder, in which the `.yaml` file produced at step #2 must be copied or moved, to obtain a directory organized like the example on the right.
 
+## 2-ter Flight Simulator generation recommendations
+***[New 01/2025]*** - You can now generate images using Flight simulator in addition to Google Earth. It requires to possess Flight Simulator 2020, and to follow everything explained directly in this associated github repository: [github.com/JeanBriceGinestet/GeoFlight-Replay](https://github.com/JeanBriceGinestet/GeoFlight-Replay).
+
+The rule marked by ❗️ **Important:** above still apply, the same structure of folder is expected once the generation is complete, therefore the images should be made available in a "footage" folder, with the associated yaml files.
+
+ ❗️❗️❗️ ***Limitation***: It is mandatory to first generate the images on Google Earth Studio (see *2-bis*), to obtain the `.json` file required for the labeling process. Indeed, for now, the generation using Flight Simulator is not self-sufficient, because a `.json` file representing all the positions is expected for the labeling process (step 3), and this file currently comes from the generation with GES. We are actively working to remove this constraint in a future version.
+
 ## 3. Automatic labeling
 - 🔥 [Notebook - **Labeling**](02_labeling.ipynb)
   - This notebook provides a comprehensive example to automatically label one or multiple Earth Studio generation results and export the corresponding dataset.
@@ -293,8 +300,11 @@ More from the DEEL project:
     <a href="#">
         <img src="docs/assets/logo-AIRBUS_.png" height="50px" alt="logo-AIRBUS">
     </a>
+    <a href="#">
+        <img src="docs/assets/logo-DGA_.png" height="50px" alt="logo-DGA">
+    </a>
 </div>
-This project is a joint research work from ONERA, IRT Saint Exupéry and AIRBUS. It received funding from the French ”Investing for the Future – PIA3” program within the Artificial and Natural Intelligence Toulouse Institute (ANITI).
+This project is a joint research work from ONERA, IRT Saint Exupéry, AIRBUS and DGA. It received funding from the French ”Investing for the Future – PIA3” program within the Artificial and Natural Intelligence Toulouse Institute (ANITI).
 
 ## 🗞️ Citation
 You can read our paper at https://hal.science/hal-04056760.
