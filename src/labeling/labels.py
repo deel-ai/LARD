@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from pathlib import PurePath, Path
-from src.labeling.export_config import CORNERS_NAMES
+from src.labeling.export_config import NEW_CORNERS_NAMES
 from typing import Union, List
 
 
@@ -27,7 +27,8 @@ class Labels:
     :type path: str or Path
     """
     sep = ";"
-    default_cols = ["image",
+    default_cols = ["uuid",
+                    "image",
                     "height",
                     "width",
                     "type",
@@ -39,16 +40,20 @@ class Labels:
                     "weather",
                     "night",
                     "time",
+                    "lat_cam",
+                    "lon_cam",
+                    "alt_cam",
+                    "yaw",  # -180 to +180, 0=south
+                    "pitch",  # (degree, clockwise, 90 is horizontal)
+                    "roll",  # (counterclockwise, degree. 0 is horizontal).
                     "slant_distance",
                     "along_track_distance",
                     "height_above_runway",
                     "lateral_path_angle",
                     "vertical_path_angle",
-                    "yaw",  # -180 to +180, 0=south
-                    "pitch",  # (degree, clockwise, 90 is horizontal)
-                    "roll",  # (counterclockwise, degree. 0 is horizontal).
-                    "watermark_height"
-                    ] + [f"{c}_{name}" for name in CORNERS_NAMES for c in ["x", "y"]]  # names of labels columns (
+                    "watermark_height",
+                    "runway_in_cone" # boolean that defines if the runway is in the cone used for generation
+                    ] + [f"{c}_{name}" for name in NEW_CORNERS_NAMES for c in ["x", "y"]]  # names of labels columns (
     # corners positions in the image)
 
     def __init__(self, path: Union[str, Path] = None) -> None:
@@ -70,8 +75,14 @@ class Labels:
         :type out_file: str
         :return: None
         """
-        self.df.to_csv(out_file, sep=self.sep, header=True, index=False)
-
+        self.df.to_csv(out_file, sep=self.sep, float_format="%.6f", header=True, index=False)
+    
+    def get_rows_for_image(self, image_path: str):
+        """
+        Return the DataFrame subset for all rows matching 'image_path'.
+        """
+        return self.df[self.df["image"] == image_path]
+    
     def add_label(self, label_infos: dict):
         """
         Add additional labels and metadata, provided as a python dictionary, to the ones stored.

@@ -1,8 +1,8 @@
 import math
 import numpy as np
 import cv2
-
-from src.ges.geo_utils import sin, cos, fit_3d_plane_from_points, projection_3d_point_on_plane, \
+import pyproj
+from src.geo.geo_utils import ecef2llh, sin, cos, fit_3d_plane_from_points, projection_3d_point_on_plane, \
     closest_point_on_line, find_angle_between_vectors, \
     get_distance_between_2_points, find_center, adjust_index, \
     adjust_point_projection
@@ -222,7 +222,7 @@ class GESCamera(object):
                           list(runway_points['C']['position'].values()),
                           list(runway_points['D']['position'].values())]
 
-        #noralized vectors
+        #normalized vectors
         vectorAB = (np.array(runway_corners_3d[0]) - np.array(runway_corners_3d[1])) / np.linalg.norm(np.array(runway_corners_3d[0]) - np.array(runway_corners_3d[1]))
         vectorDC = (np.array(runway_corners_3d[3]) - np.array(runway_corners_3d[2])) / np.linalg.norm(np.array(runway_corners_3d[3]) - np.array(runway_corners_3d[2]))
         vectorAD = (np.array(runway_corners_3d[0]) - np.array(runway_corners_3d[3])) / np.linalg.norm(np.array(runway_corners_3d[0]) - np.array(runway_corners_3d[3]))
@@ -232,8 +232,16 @@ class GESCamera(object):
         runway_corners_3d[1] = np.array(runway_corners_3d[1]) - vectorAB * delta_x + vectorBC * delta_y
         runway_corners_3d[2] = np.array(runway_corners_3d[2])  - vectorDC * delta_x - vectorBC * delta_y
         runway_corners_3d[3] = np.array(runway_corners_3d[3]) + vectorDC * delta_x - vectorAD * delta_y
+        corners_2D =  GESCamera.projection3d_2d(self.intrinsics, self.extrinsics, runway_corners_3d)        
+        
+        sorted_corners = sorted(corners_2D, key=lambda x: (x[1], x[0]))  # Sort primarily by y, then by x
 
-        return GESCamera.projection3d_2d(self.intrinsics, self.extrinsics, runway_corners_3d)
+        top_left = sorted_corners[0]
+        bottom_left = sorted_corners[1] if sorted_corners[1][0] < sorted_corners[2][0] else sorted_corners[2]
+        top_right = sorted_corners[3]
+        bottom_right = sorted_corners[1] if sorted_corners[1][0] > sorted_corners[2][0] else sorted_corners[2]
+
+        return [top_left, top_right, bottom_right, bottom_left]
 
     def compute_runway_axis_projection(self, runways_database, airport, runway, delta=0):
         runway_points = runways_database[airport][runway]
@@ -319,23 +327,35 @@ class GESCamera(object):
 
 
 
+    
     def compute(self, runways_database, airport, runway):
 
         runway_points = runways_database[airport][runway]
-        runway_pts = [list(runway_points['A']['position'].values()),
-                             list(runway_points['B']['position'].values()),
-                             list(runway_points['C']['position'].values()),
-                             list(runway_points['D']['position'].values())]
+        runway_pts = [
+            list(runway_points['A']['position'].values()),
+            list(runway_points['B']['position'].values()),
+            list(runway_points['C']['position'].values()),
+            list(runway_points['D']['position'].values())
+        ]
 
         _, ltp = find_center([list(runway_points['C']['position'].values()), list(runway_points['D']['position'].values())])
         _, fpap = find_center([list(runway_points['A']['position'].values()), list(runway_points['B']['position'].values())])
+        
+        ltp_lat, ltp_lon, ltp_alt = ecef2llh(ltp[0], ltp[1], ltp[2])
 
         # Warning: 4 points bestfit produces differents plan.normal depending on the order of the points.
         # It is a problem, especially for computing the right values for 'height_above_runway'
         self.runway_plane = fit_3d_plane_from_points(runway_pts)
         centerline_vector = (np.array(ltp) - np.array(fpap)) / np.linalg.norm(np.array(ltp) - np.array(fpap))
-        self.projected_position_on_runway_plane = projection_3d_point_on_plane(np.array(list(self.position.values())), self.runway_plane)
-        self.projected_position_along_track = closest_point_on_line(np.array(ltp), np.array(fpap), self.projected_position_on_runway_plane)
+        self.projected_position_on_runway_plane = projection_3d_point_on_plane(
+            np.array(list(self.position.values())), 
+            self.runway_plane
+        )
+        self.projected_position_along_track = closest_point_on_line(
+            np.array(ltp),
+            np.array(fpap), 
+            self.projected_position_on_runway_plane
+        )
 
 
         # The lateral path angle reference point is located 3050 meters along the extended runway centerline from the runway
@@ -343,7 +363,7 @@ class GESCamera(object):
         # which is the standard used in WAAS LPV approaches and is consistent with existing localizers
         # (scaled between 3 deg and 6 deg to achieve a 700 ft full width at the runway threshold).
         self.lateral_path_angle_reference_point = np.array(ltp) - centerline_vector * 3050
-
+        # UPDATE : This computation should be replaced by using the [ltp] directly for the lateral_boundary computation
 
         # The vertical path angle reference point is located horizontally 305 meters along the extended runway centerline
         # from the runway reference point, and vertically at runway elevation. This is approximately 1000 ft from the threshold
@@ -352,14 +372,24 @@ class GESCamera(object):
 
         # The along-track distance, or the distance along the X axis, points along the extended runway centerline but in the
         # opposite direction of the runway, such that a positive value indicates a position before the runway threshold.
-        sign_along_track_distance = np.sign(get_distance_between_2_points(self.projected_position_along_track, fpap) - get_distance_between_2_points(ltp, fpap))
-        self.along_track_distance = sign_along_track_distance * np.linalg.norm(self.projected_position_along_track - np.array(ltp))
+        sign_along_track_distance = np.sign(
+            get_distance_between_2_points(self.projected_position_along_track, fpap) 
+            - get_distance_between_2_points(ltp, fpap)
+        )
+        self.along_track_distance = sign_along_track_distance * np.linalg.norm(
+            self.projected_position_along_track - np.array(ltp)
+        )
 
 
         # The cross-track distance, or the distance along the Y axis, points perpendicular to the extended runway centerline,
         # such that a positive value indicates a position right of centerline from the perspective of the aircraft.
-        sign_cross_track_distance = np.sign(get_distance_between_2_points(self.projected_position_on_runway_plane, runway_pts[3]) - get_distance_between_2_points(self.projected_position_on_runway_plane, runway_pts[2]))
-        self.cross_track_distance = sign_cross_track_distance * np.linalg.norm(self.projected_position_on_runway_plane - self.projected_position_along_track)
+        sign_cross_track_distance = np.sign(
+            get_distance_between_2_points(self.projected_position_on_runway_plane, runway_pts[3]) 
+            - get_distance_between_2_points(self.projected_position_on_runway_plane, runway_pts[2])
+        )
+        self.cross_track_distance = sign_cross_track_distance * np.linalg.norm(
+            self.projected_position_on_runway_plane - self.projected_position_along_track
+        )
 
 
         # The height above runway, or the distance along the Z axis, is defined as the difference between the aircrafts true
@@ -381,8 +411,9 @@ class GESCamera(object):
         # negative when the aircraft is left of the extended centerline. The lateral path angle differs from a
         # localizer angle in that the reference point is fixed, whereas localizers may be located at various distances
         # from the threshold depending on runway length.
-        self.lateral_path_angle = sign_cross_track_distance * find_angle_between_vectors(self.lateral_path_angle_reference_point-self.projected_position_along_track,
-                                                             self.lateral_path_angle_reference_point-self.projected_position_on_runway_plane)*180/np.pi
+        self.lateral_path_angle = sign_cross_track_distance * find_angle_between_vectors(
+            self.lateral_path_angle_reference_point-self.projected_position_along_track,
+            self.lateral_path_angle_reference_point-self.projected_position_on_runway_plane)*180/np.pi
 
 
         # The vertical path angle is defined as the angle in the vertical plane formed between the local horizontal plane
@@ -391,8 +422,11 @@ class GESCamera(object):
         # being 3 deg. The sign is positive when the aircraft is above the runway elevation. The vertical path angle differs
         # from an ILS or RNAV glideslope in that the point of intersection with the runway is fixed at the vertical path
         # angle reference point instead of varying per runway.
-        self.vertical_path_angle = np.sign(self.height_above_runway)*find_angle_between_vectors(self.vertical_path_angle_reference_point-self.projected_position_along_track,
-                                                             self.vertical_path_angle_reference_point-self.projected_position_along_track + self.runway_plane.normal*self.height_above_runway)*180/np.pi
-
+        self.vertical_path_angle = np.sign(self.height_above_runway) * find_angle_between_vectors(
+            self.vertical_path_angle_reference_point - self.projected_position_along_track,
+            self.vertical_path_angle_reference_point 
+            - self.projected_position_along_track 
+            + self.runway_plane.normal * self.height_above_runway
+        ) * 180 / np.pi
 
 

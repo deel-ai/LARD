@@ -4,49 +4,49 @@ import glob
 import shutil
 from pathlib import Path
 from typing import Union
-from src.labeling.earth_studio_export import export_labels
-from src.labeling.json_export import from_json
+from src.labeling.label_export import export_labels
 from src.labeling.labels import Labels
-from src.labeling.export_config import ExportConfig, DatasetTypes
+from src.labeling.export_config import ExportConfig
 
 
 IMG_TYPES = ".png", ".jpg", ".jpeg"
 
 
-def export_real_directory(folder_path: Union[str, Path], test_images_dir: Union[str, Path]) -> dict:
+def export_directory(dataset_type, folder_path: Union[str, Path], test_images_dir: Union[str, Path]) -> dict:
     """
-    Parse and return the metadata for a real dataset and associated files.
-    """
-    labels = Labels()
-    img_list = []
-    for ext in IMG_TYPES:
-        img_list += glob.glob(f"{folder_path}/*{ext}")
-    for image in img_list:
-        image_path = Path(image)
-        json_path = image_path.with_suffix(".json")
-        label = from_json(json_path)
-        label['image'] = test_images_dir / image_path.name
-        labels.add_label(label)
-        shutil.copy(image_path, label['image'])
-    return labels
-
-
-def export_synthesized_directory(folder_path: Union[str, Path], test_images_dir: Union[str, Path]) -> dict:
-    """
-    Parse and return the metadata for a synthetized google earth dataset.
+    Parse and returns the metadata for a flight simulator dataset. 
     """
     labels = Labels()
     folder_path = Path(folder_path)
     for scenario in os.listdir(folder_path):
         acquisition_path = folder_path / scenario
+        yaml_file_path = acquisition_path / f"{scenario}.yaml"
+        
         if os.path.isdir(acquisition_path):
+            if not yaml_file_path.exists():
+                parent_yaml_file_path = folder_path / f"{scenario}.yaml"
+                if parent_yaml_file_path.exists():
+                    print(f"YAML file for scenario {scenario} found in the parent folder. Copying it to the correct location.")
+                    shutil.copy(parent_yaml_file_path, yaml_file_path)
+                else:
+                    parent_parent_yaml_file_path = folder_path / f"../{scenario}.yaml"
+                    if parent_parent_yaml_file_path.exists():
+                        print(f"YAML file for scenario {scenario} found in the parent-parent folder. Copying it to the correct location.")
+                        shutil.copy(parent_parent_yaml_file_path, yaml_file_path)
+                    else :
+                        print(f"YAML file for scenario {scenario} not found in the parent or parent-parent folder. Scenario skipped.")
+                        continue
             try:
-                folder_labels = export_labels(acquisition_path / f"{scenario}.yaml", out_images_dir=test_images_dir)
+                folder_labels = export_labels(dataset_type, acquisition_path / f"{scenario}.yaml", out_images_dir=test_images_dir)
             except KeyError as e:
                 print(f"Missing data for scenario {scenario} ({e} was not found): scenario skipped ")
                 continue
             except FileNotFoundError as e:
+                print(e)
                 print(f"File {e.filename} could not be found for scenario {scenario} : scenario skipped ")
+                continue
+            if (folder_labels is None):
+                print(f"[EXPORT FAILURE] Scenario {scenario} label export has failed; skipping scenario.")
                 continue
             folder_labels.add_metadata("scenario", scenario)
             labels += folder_labels
@@ -69,20 +69,21 @@ def export_datasets(export_config: ExportConfig) -> None:
 
     input_datasets = export_config.included_datasets
     labels = Labels()
+
+
     for dataset_name, dataset_infos in input_datasets.items():
         dataset_type = dataset_infos["type"]
         dataset_path = dataset_infos["path"]
-        if dataset_type == DatasetTypes.EARTH_STUDIO:
-            dataset_labels = export_synthesized_directory(dataset_path, test_images_dir)
-        elif dataset_type == DatasetTypes.REAL:
-            dataset_labels = export_real_directory(dataset_path, test_images_dir)
-        else:
-            raise NotImplementedError(f"Dataset type {dataset_type} is not supported yet")
+
+        dataset_labels = export_directory(dataset_type, dataset_path, test_images_dir)
+
         dataset_labels.add_metadata("type", dataset_type.value)
         dataset_labels.add_metadata("original_dataset", dataset_name)
         labels += dataset_labels
+
+
     labels.as_relative_paths(out_test_dir)
-    labels.reorder_corners() # ensures corners names matches their order in the image
+    # labels.reorder_corners() # ensures corners names matches their order in the image
     labels.export(out_test_dir / (export_config.dataset_name+".csv"))
     info_file = Path("data/infos.md")
     shutil.copy(info_file, out_test_dir/info_file.name)

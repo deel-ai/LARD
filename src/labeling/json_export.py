@@ -14,35 +14,48 @@ def from_json(path: Union[str, Path]) -> dict:
     :return: labels loaded in a python dict
     :rtype: dict
     """
+    print(path)
     label = {}
-    with open(path, 'r') as f:
-        json_label = json.load(f)
+    try:
+        with open(path, 'r') as f:
+            json_label = json.load(f)
 
-    label["image"] = json_label['imagePath']
-    label["height"] = json_label['imageHeight']
-    label["width"] = json_label["imageWidth"]
-    try:
-        label["airport"] = json_label["airport"]
-    except KeyError:
-        pass
-    try:
-        label["runway"] = json_label["runway"]
-    except KeyError:
-        pass
-    try:
-        label["time_to_landing"] = json_label["timeToLanding"]
-    except KeyError:
-        print(f"No time to landing in json {path}")
-    try:
-        label["weather"] = json_label["weather"]
-    except KeyError:
-        pass  # no weather field is expected to happen for a lot of images
-    try:
-        label["night"] = json_label["night"]
-    except KeyError:
-        pass  # no night field is expected to happen for a lot of images
-
-    for i, corner in enumerate(json_label["shapes"][0]["points"]):
-        label[f"x_{CORNERS_NAMES[i]}"] = int(corner[0])
-        label[f"y_{CORNERS_NAMES[i]}"] = int(corner[1])
+        label["image"] = json_label['imagePath']
+        label["height"] = json_label['imageHeight']
+        label["width"] = json_label["imageWidth"]
+        try:
+            label["airport"] = json_label["airport"]
+        except KeyError:
+            pass
+        try:
+            label["runway"] = json_label["runway"]
+        except KeyError:
+            pass
+        try:
+            label["time_to_landing"] = json_label["timeToLanding"]
+        except KeyError:
+            try:
+                label["time_to_landing"] = json_label["time_to_landing"]
+            except KeyError:
+                print(f"No time to landing in json {path}")
+                pass
+        try:
+            label["weather"] = json_label["weather"]
+        except KeyError:
+            pass  # no weather field is expected to happen for a lot of images
+        try:
+            label["night"] = json_label["night"]
+        except KeyError:
+            pass  # no night field is expected to happen for a lot of images
+        # for shape in json_label["shapes"]:
+        #     if shape["label"] == "runway":
+        #         for i, corner in enumerate(shape["points"]):
+        #             label[f"x_{CORNERS_NAMES[i]}"] = int(corner[0])
+        #             label[f"y_{CORNERS_NAMES[i]}"] = int(corner[1])
+        for i, corner in enumerate(json_label["shapes"][0]["points"]):
+            label[f"x_{CORNERS_NAMES[i]}"] = int(corner[0])
+            label[f"y_{CORNERS_NAMES[i]}"] = int(corner[1])
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        print(f"Error loading JSON file at {path}: {e}")
+        return None  # Return None to indicate an issue with the JSON file
     return label

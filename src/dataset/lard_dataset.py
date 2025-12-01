@@ -186,6 +186,7 @@ class LardDataset:
                sep: str = ";",
                header: bool = None,
                crop: bool = True,
+               heigh_width: bool = False,
                ext: str = "txt") -> None:
         """
         Export the Lard dataset to another format
@@ -212,6 +213,8 @@ class LardDataset:
         :type header: bool
         :param crop: If True, crop during export all images with watermarks and updates bboxes position for the cropped
             image. If False, the image will be copied without modifications.
+        :param height_width: If True, an header with column names is added to each label file.
+        :type header: bool
         :type crop: bool
         :param ext: Extension format for labels files. Default is "txt".
         :type ext: str
@@ -245,6 +248,8 @@ class LardDataset:
                 os.makedirs(out_label_dir, exist_ok=True)
             else:
                 out_label_file = dataset_dir / ("labels."+ext)
+            if heigh_width:
+                out_label_file
             bbox_id = 0
             out = {"id": [bbox_id]}
             last_image = None
