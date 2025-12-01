@@ -1,0 +1,41 @@
+ODD_Far:
+  max_distance_m: 6000
+  min_distance_m: 4500
+  alpha_h_min: -3
+  alpha_h_max: 3  
+  alpha_v_min: -5.2
+  alpha_v_max: -1.8
+  yaw_min: -24
+  yaw_max: 24 
+  pitch_min: -15
+  pitch_max: 5
+  roll_min: -30
+  roll_max: 30
+  
+ODD_Medium:
+  max_distance_m: 4500
+  min_distance_m: 2500
+  alpha_h_min: -3
+  alpha_h_max: 3  
+  alpha_v_min: -5.2
+  alpha_v_max: -1.8  
+  yaw_min: -24
+  yaw_max: 24 
+  pitch_min: -15
+  pitch_max: 5
+  roll_min: -15
+  roll_max: 15
+
+ODD_Close:
+  max_distance_m: 2500
+  min_distance_m: 280
+  alpha_h_min: -3
+  alpha_h_max: 3
+  alpha_v_min: -5.2
+  alpha_v_max: -1.8  
+  yaw_min: -18.5
+  yaw_max: 18.5
+  pitch_min: -15
+  pitch_max: 5
+  roll_min: -10
+  roll_max: 10
