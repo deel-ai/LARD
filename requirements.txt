@@ -7,3 +7,4 @@ timezonefinder==6.2.0
 pyyaml==6.0
 opencv-python==4.7.0.72
 shapely==2.0.1
+streamlit==1.41.1
