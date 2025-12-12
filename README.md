@@ -15,11 +15,11 @@
 </div>-->
 <br>
 
-> This page presents **LARD V2**, the **second** version of our dataset and generator. The first version *LARD V1* can be found [here](https://github.com/deel-ai/LARD/tree/LARD_V1).
+> This page presents **LARD V2**, the **second** version of our dataset and generator. **LARD V1** can be found [here](https://github.com/deel-ai/LARD/tree/LARD_V1).
 
 Landing Approach Runway Detection (**LARD**) is a [dataset](#%EF%B8%8F-lard-v2-dataset) of aerial front view images of runways designed for aircraft landing phase, which contains over **100 000** synthetic images of runways from the ~250 airports with the most traffic worldwide.
 
-LARD is also a [synthetic image generator](#%EF%B8%8F-synthetic-generator) which allows to generate images from 5 different data sources: Google Earth, Bing Maps, ArcGIS, XPlane and Flight Simulator.
+LARD is also a synthetic image generator which allows to generate images from 5 different data sources: Google Earth, Bing Maps, ArcGIS, XPlane and Flight Simulator. In this second version of LARD, we provide an interface for generating landing scenarios based on Streamlit.
 
 | ![dataset-mosaic](docs/assets/Mosaic_lard_V1.png "Google Earth") | ![synthetic-generator](docs/assets/Mosaic_LARD_V2.png "Synthetic Generator") |
 :---:|:---:
