@@ -39,7 +39,7 @@ LARD is also a synthetic image generator which allows to generate images from 5 
 - [Streamlit Interface](#streamlit-interface)
 - [LARD V2 dataset](#lard-v2-dataset)
 - [Image Generation Recommendations](#image-generation-recommendations)
-- [Models][#models]
+- [Models](#models)
 - [See Also](#see-also)
 - [Authors](#authors)
 - [Citation](#citation)
