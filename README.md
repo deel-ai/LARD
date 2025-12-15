@@ -17,36 +17,36 @@
 
 > This page presents **LARD V2**, the **second** version of our dataset and generator. **LARD V1** can be found [here](https://github.com/deel-ai/LARD/tree/LARD_V1).
 
-Landing Approach Runway Detection (**LARD**) is a [dataset](#%EF%B8%8F-lard-v2-dataset) of aerial front view images of runways designed for aircraft landing phase, which contains over **100 000** synthetic images of runways from the ~250 airports with the most traffic worldwide.
+Landing Approach Runway Detection (**LARD**) is a [dataset](#-lard-v2-dataset) of aerial front view images of runways designed for aircraft landing phase. This second version contains over **100 000** synthetic images of runways from the **~250** airports with the most traffic worldwide.
 
 LARD is also a synthetic image generator which allows to generate images from 5 different data sources: Google Earth, Bing Maps, ArcGIS, XPlane and Flight Simulator. In this second version of LARD, we provide an interface for generating landing scenarios based on Streamlit.
 
 | ![dataset-mosaic](docs/assets/Mosaic_lard_V1.png "Google Earth") | ![synthetic-generator](docs/assets/Mosaic_LARD_V2.png "Synthetic Generator") |
 :---:|:---:
-***LARD V1*** | *Additional sources in **LARD V2***
+***LARD V1*** | *Additional data sources in **LARD V2***
 ***Google Earth*** | *(Top) left: **XPlane**, right: **Flight Simulator***
 | | *(Bottom) left: **Bing Maps**, right: **ArcGIS***
 
 
 
 ## 🚀 Quickstart
-- 💾 [Download LARD **V2** dataset](https://huggingface.co/datasets/DEEL-AI/LARD_V2)
-- 🔥 [Launch Streamlit Application](#%EF%B8%8F-streamlit-interface)
-- 📜 [Read our paper] (To be published)
+- [Download LARD **V2** dataset](https://huggingface.co/datasets/DEEL-AI/LARD_V2)
+- [Launch Streamlit Application](#-streamlit-interface)
+- [Read our paper] (To be published)
 
-# 📚 Table of contents
+# Table of contents
 
-- [⚙️ Streamlit Interface](#%EF%B8%8F-streamlit-interface)
-- [✈️ LARD V2 dataset](#%EF%B8%8F-lard-v2-dataset)
-- [🛠️ Image Generation Recommendations](#%EF%B8%8F-image-generation-recommendations)
-- [👀 See Also](#-see-also)
-- [🎓 Authors](#-authors)
-- [🗞️ Citation](#%EF%B8%8F-citation)
-- [📝 License](#-license)
+- [Streamlit Interface](#-streamlit-interface)
+- [LARD V2 dataset](#-lard-v2-dataset)
+- [Image Generation Recommendations](#-image-generation-recommendations)
+- [See Also](#-see-also)
+- [Authors](#-authors)
+- [Citation](#-citation)
+- [License](#-license)
 
 
 
-# ⚙️ Streamlit Interface
+# Streamlit Interface
 
 LARD V2 now provides a user interface to simplify the generation of new data, based on [Streamlit](https://streamlit.io/). 
 
@@ -69,9 +69,9 @@ This will open a new window in your browser, which will guide you through the pr
 > If needed, these notebooks are still available if needed, please refer to the [section 2 of the LARD V1 Readme](https://github.com/deel-ai/LARD/tree/LARD_V1/?tab=readme-ov-file#%EF%B8%8F-synthetic-generator) for more details.
 
 
-# ✈️ LARD V2 Dataset
+# LARD V2 Dataset
 
-- 💾 [LARD **V2** - **Download**](https://share.deel.ai/s/H4iLKRmLkdBWqSt?path=%2Flard%2F1.0.0)
+- [LARD **V2** - **Download**](https://share.deel.ai/s/H4iLKRmLkdBWqSt?path=%2Flard%2F1.0.0)
 
 This dataset is dedicated to the detection of a runway from an aircraft during approach and landing phases. In our work, we only consider the approach segment which ranges from -6000 m to -280 m along-track distance from Landing Threshold Point (LTP). Throughout this segment, the acceptable aircraft positions remain similar but not equivalent to the ODD of LARD V1: the lateral path angle lies within [-3°,3°], originating from the LTP, while the vertical path angle takes its values in [-1.8°,-5.2°] w.r.t. the Vertical Reference Point (VRP), a point on the centerline located 305 m beyond the LTP.
 
@@ -87,7 +87,7 @@ For the aircraft attitude, the range for the pitch stays constant, between [-15�
 The first 3 parameters correspond to the position of the aircraft relative to the runway, while the last 3 parameters correspond to its orientation.
 Please not that these
 
-### 📁 Dataset structure
+### Dataset structure
 
 The dataset available on [HugginFace](https://huggingface.co/datasets/DEEL-AI/LARD_V2) is structured as follows:
 
@@ -110,11 +110,11 @@ A folder `images` contains all images from LARD V2. It is further divided into s
     | | | ...
 ```
 
-### ➗ Dataset Split
+### Dataset Split
 
 The dataset is already splitted between *train* and *test*. This was performed using the list of airports considered, with approximately 50% or airports in the training set, and 50% in the test set, selected at random.
 
-### 🏷️ Metadata
+### Metadata
 The labels of the dataset are provided in a series of `.csv` next to the `images/` folder. 
 Each `.csv` file corresponds to a single data source, and is dedicated to either training or testing as mentioned in the file name.
 
@@ -130,7 +130,7 @@ Each `.csv` file corresponds to a single data source, and is dedicated to either
 
 -   Finally, the last columns provide the pixel coordinates of each `corner` of the runways visible on the picture.
 
-# 🛠️ Image Generation Recommendations
+# Image Generation Recommendations
 
 This section describes the different interfaces used to generate the images expected to be labeled by the tool. The production of image based on Google Earth Studio is still support (as in LARD V1), but requires to generate the `.esp` file along the `.yaml` one during the scenario generation step (with Streamlit or with the dedicated notebooks). All other sources of data take the `.yaml` file as input and outputs the expected images.
 
@@ -158,7 +158,7 @@ The data sources ArcGIS, Bing Maps and Google Earth will be made available throu
 
 
 
-## 👀 See Also
+## See Also
 
 More from the DEEL project:
 - [Xplique](https://github.com/deel-ai/xplique) a Python library exclusively dedicated to explaining neural networks.
@@ -168,7 +168,7 @@ More from the DEEL project:
 - [DEEL White paper](https://arxiv.org/abs/2103.10529) a summary of the DEEL team on the challenges of certifiable AI and the role of data quality, representativity and explainability for this purpose.
 
 
-## 🎓 Authors
+## Authors
 
 <div align="center">
     <a href="#">
@@ -189,7 +189,7 @@ More from the DEEL project:
 </div>
 This project is a joint research work from ONERA, IRT Saint Exupéry and AIRBUS. It received funding from the French ”Investing for the Future – PIA3” program within the Artificial and Natural Intelligence Toulouse Institute (ANITI).
 
-## 🗞️ Citation
+## Citation
 You can read our first paper at https://hal.science/hal-04056760.
 
 If you use LARD as part of your workflow in a scientific publication, please consider citing the following paper:
@@ -208,5 +208,5 @@ If you use LARD as part of your workflow in a scientific publication, please con
 }
 ```
 
-## 📝 License
+## License
 The package is released under [MIT license](LICENSE).
