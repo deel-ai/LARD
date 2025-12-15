@@ -39,6 +39,7 @@ LARD is also a synthetic image generator which allows to generate images from 5 
 - [Streamlit Interface](#streamlit-interface)
 - [LARD V2 dataset](#lard-v2-dataset)
 - [Image Generation Recommendations](#image-generation-recommendations)
+- [Models][#models]
 - [See Also](#see-also)
 - [Authors](#authors)
 - [Citation](#citation)
@@ -158,9 +159,12 @@ The data sources ArcGIS, Bing Maps and Google Earth will be made available throu
 
 (In Construction)
 
+# Models
+Our latest paper on LARD V2 compares models trained on multiple configurations of LARD V2 data. For reproductibility, these models are available on a separate public repository with a AGPL license.
 
+LARD_V2 models: https://github.com/deel-ai-papers/Yolo_models_LARD_V2
 
-## See Also
+# See Also
 
 More from the DEEL project:
 - [Xplique](https://github.com/deel-ai/xplique) a Python library exclusively dedicated to explaining neural networks.
