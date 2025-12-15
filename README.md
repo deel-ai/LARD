@@ -91,7 +91,7 @@ Please not that these
 
 The dataset available on [HugginFace](https://huggingface.co/datasets/DEEL-AI/LARD_V2) is structured as follows:
 
-A folder `images` contains all images from LARD V2. It is further divided into source of data, which in turn contain one folder for each airport:
+A folder `images` contains all images from LARD V2. It is further partitioned by data sources, which in turn contain one folder for each airport:
 ```
     images/
     | arcgis/
@@ -109,6 +109,8 @@ A folder `images` contains all images from LARD V2. It is further divided into s
     | | CYVR/
     | | | ...
 ```
+
+The labels of the dataset are provided in a series of `.csv` files next to the `images/` folder. 
 
 ### Dataset Split
 
