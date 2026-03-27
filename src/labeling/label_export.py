@@ -49,7 +49,7 @@ def runway_is_facing_us(plane_heading_deg, runway_identifier):
 def export_labels(dataset_type, yaml_scenario_path, export_dir=None, out_labels_file=None, out_images_dir=None):
     # Parse configuration file
     # All the dependencies
-    debug=True
+    debug=False
     print(f"Label export of {yaml_scenario_path} started")
     if export_dir is None:
         export_dir = yaml_scenario_path.parent
@@ -102,7 +102,8 @@ def export_labels(dataset_type, yaml_scenario_path, export_dir=None, out_labels_
     # # enumerate over each pose and generate the associated list of labels, 1 label per runway
     # # but we skip the opposite runway of a runway already treated
     for i, pose in enumerate (yaml_scenario['poses']):      # i is the pose indice in yaml file
-        print (f" Labelling Pose {i} for airport {pose['airport']} and runway {pose['runway']}")
+        if debug:
+            print (f" Labelling Pose {i} for airport {pose['airport']} and runway {pose['runway']}")
         if with_images == True:
             image_path = None
             # Iterate through the possible image file extensions for the current index

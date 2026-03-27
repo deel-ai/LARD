@@ -37,7 +37,7 @@ def export_directory(dataset_type, folder_path: Union[str, Path], test_images_di
                         print(f"YAML file for scenario {scenario} not found in the parent or parent-parent folder. Scenario skipped.")
                         continue
             try:
-                folder_labels = export_labels(dataset_type, acquisition_path / f"{scenario}.yaml", out_images_dir=test_images_dir)
+                folder_labels, _, _ = export_labels(dataset_type, acquisition_path / f"{scenario}.yaml", out_images_dir=test_images_dir)
             except KeyError as e:
                 print(f"Missing data for scenario {scenario} ({e} was not found): scenario skipped ")
                 continue
