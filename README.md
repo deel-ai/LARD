@@ -196,21 +196,15 @@ More from the DEEL project:
 This project is a joint research work from ONERA, IRT Saint Exupéry and AIRBUS. It received funding from the French ”Investing for the Future – PIA3” program within the Artificial and Natural Intelligence Toulouse Institute (ANITI).
 
 ## Citation
-You can read our first paper at https://hal.science/hal-04056760.
+You can read the paper of LARD 2.0 at [https://hal.science/hal-05513852v1](https://hal.science/hal-05513852v1).
 
-If you use LARD as part of your workflow in a scientific publication, please consider citing the following paper:
+If you use our dataset or generator as part of your workflow in a scientific publication, please consider citing the following paper:
 ```
-@unpublished{ducoffe:hal-04056760,
-  TITLE = {{LARD - Landing Approach Runway Detection - Dataset for Vision Based Landing}},
-  AUTHOR = {Ducoffe, M{\'e}lanie and Carrere, Maxime and F{\'e}liers, L{\'e}o and Gauffriau, Adrien and Mussot, Vincent and Pagetti, Claire and Sammour, Thierry},
-  URL = {https://hal.science/hal-04056760},
-  NOTE = {working paper or preprint},
-  YEAR = {2023},
-  MONTH = Apr,
-  KEYWORDS = {open-source dataset ; vision based landing ; ML},
-  PDF = {https://hal.science/hal-04056760/file/main.pdf},
-  HAL_ID = {hal-04056760},
-  HAL_VERSION = {v1},
+@inproceedings{bougacha2026lard,
+  title={LARD 2.0: Enhanced Datasets and Benchmarking for Autonomous Landing Systems},
+  author={Bougacha, Yassine and Delhomme, Geoffrey and Ducoffe, M{\'e}lanie and Fuchs, Augustin and Ginestet, Jean-Brice and Girard, Jacques and Kraiem, Sofiane and Mamalet, Franck and Mussot, Vincent and Pagetti, Claire and Sammour, Thierry},
+  booktitle={13th European Congress of Embedded Real Time Systems (ERTS)},
+  year={2026}
 }
 ```
 
