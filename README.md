@@ -32,7 +32,7 @@ LARD is also a synthetic image generator which allows to generate images from 5 
 ## Quickstart
 - [Download LARD **V2** dataset](https://huggingface.co/datasets/DEEL-AI/LARD_V2)
 - [Launch Streamlit Application](#streamlit-interface)
-- [Read our paper] (To be published)
+- [Read our paper](https://arxiv.org/pdf/2603.26748)
 
 # Table of contents
 
