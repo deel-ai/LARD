@@ -76,7 +76,8 @@ This will open a new window in your browser, which will guide you through the pr
 
 This dataset is dedicated to the detection of a runway from an aircraft during approach and landing phases. In our work, we only consider the approach segment which ranges from -6000 m to -280 m along-track distance from Landing Threshold Point (LTP). Throughout this segment, the acceptable aircraft positions remain similar but not equivalent to the ODD of LARD V1: the lateral path angle lies within [-3°,3°], originating from the LTP, while the vertical path angle takes its values in [-1.8°,-5.2°] w.r.t. the Vertical Reference Point (VRP), a point on the centerline located 305 m beyond the LTP.
 
-For the aircraft attitude, the range for the pitch stays constant, between [-15°, +5°], which translates to an average nose-down orientation of about 5° relative to the horizon. However, to define appropriate ranges for the aircraft roll and yaw, the approach cone is split into 3 segments as follows:
+For the aircraft attitude, the range for the pitch stays constant, between [-15°, +5°], which translates to an average nose-down orientation of about 5° relative to the horizon. 
+This value is relative to the horizontal, meaning we can use [90 -pitch] to obtain the raw value. However, to define appropriate ranges for the aircraft roll and yaw, the approach cone is split into 3 segments as follows:
 
 |Along track distance (m) | Yaw range (°)| Roll range (°)|
 |-|-|-|
@@ -84,9 +85,7 @@ For the aircraft attitude, the range for the pitch stays constant, between [-15�
 | [-4500, -2500] | [-24, 24]     | [-15, 15]|
 | [-2500, -280]  | [-18.5, 18.5] | [-10, 10]|
 
-
-The first 3 parameters correspond to the position of the aircraft relative to the runway, while the last 3 parameters correspond to its orientation.
-Please not that these
+In term of image characteristics, we generated 1024x1024 images in jpeg format for LARD V2, with a fov of 60 (Please note that this is different from LARD V1 which was 2048x2448 with a fov of 30).
 
 ### Dataset structure
 
