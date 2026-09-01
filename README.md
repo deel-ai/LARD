@@ -141,22 +141,24 @@ This section describes the different interfaces used to generate the images expe
 The current streamlit interface allows to generate `.esp` files that can be used in Google Earth Studio as described in LARD V1. Please refer to the [section 2-bis of the LARD V1 Readme](https://github.com/deel-ai/LARD/tree/LARD_V1/?tab=readme-ov-file#2-bis-google-earth-generation-recommendations) for more details about this functionality.
 
 ## XPlane generation recommendations
-You can generate images using XPlane 12. It requires to possess a commercial version of XPlane 12, and to follow everything explained directly in this associated github repository:
+You can generate images using XPlane 12. It requires to possess a commercial version of XPlane 12, and to follow everything explained directly in this github repository:
 
 (In Construction)
 
+The resulting images should be made available in a "footage" folder, with the associated yaml files.
+
 ## Flight Simulator generation recommendations
 
-You can generate images using Flight simulator. It requires to possess Flight Simulator 2020, and to follow everything explained directly in this associated github repository: [github.com/JeanBriceGinestet/GeoFlight-Replay](https://github.com/JeanBriceGinestet/GeoFlight-Replay).
-
-(In Consolidation)
+You can generate images using Flight simulator. It requires to possess Flight Simulator 2020, and to follow everything explained directly in this github repository: [github.com/JeanBriceGinestet/GeoFlight-Replay](https://github.com/JeanBriceGinestet/GeoFlight-Replay).
 
 The resulting images should be made available in a "footage" folder, with the associated yaml files.
 
 ## Cesium-based generation recommandations
-The data sources ArcGIS, Bing Maps and Google Earth will be made available through a dedicated interface based on Cesium. 
+The data sources ArcGIS, Bing Maps and Google Earth will are available through a dedicated interface based on Cesium, accessible in this github repository:
 
-(In Construction)
+[LARD-Cesium](https://github.com/thierrysammour/LARD-CesiumSim)
+
+The resulting images should be made available in a "footage" folder, with the associated yaml files.
 
 # Models
 Our latest paper on LARD V2 compares models trained on multiple configurations of LARD V2 data. For reproductibility, these models are available on a separate public repository with a AGPL license.
