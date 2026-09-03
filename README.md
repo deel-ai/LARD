@@ -143,13 +143,15 @@ The current streamlit interface allows to generate `.esp` files that can be used
 ## XPlane generation recommendations
 You can generate images using XPlane 12. It requires to possess a commercial version of XPlane 12, and to follow everything explained directly in this github repository:
 
-(In Construction)
+[LARD_XPlane-replay](https://github.com/deel-ai-papers/LARD_xplane_replay)
 
 The resulting images should be made available in a "footage" folder, with the associated yaml files.
 
 ## Flight Simulator generation recommendations
 
-You can generate images using Flight simulator. It requires to possess Flight Simulator 2020, and to follow everything explained directly in this github repository: [github.com/JeanBriceGinestet/GeoFlight-Replay](https://github.com/JeanBriceGinestet/GeoFlight-Replay).
+You can generate images using Flight simulator. It requires to possess Flight Simulator 2020, and to follow everything explained directly in this github repository: 
+
+[GeoFlight-Replay](https://github.com/JeanBriceGinestet/GeoFlight-Replay)
 
 The resulting images should be made available in a "footage" folder, with the associated yaml files.
 
